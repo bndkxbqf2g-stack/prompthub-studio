@@ -116,6 +116,11 @@ Umgebung eingespeist. Wichtige Variablen: `GITHUB_TOKEN`, `GITHUB_REPOSITORY`,
 `PROMPTHUB_PROJECT_ROOT`, `CODEX_EXECUTABLE`, `PROMPTHUB_PUBLIC_ORIGIN` und
 `PROMPTHUB_MODE`.
 
+Das separate private GitHub-Control-Repository ist angelegt. Auf seinem
+`main`-Branch liegt `.prompthub/active-jobs.json` mit dem leeren Schema
+`{"version":1,"leases":[]}`. Es ist noch nicht mit der Anwendung verbunden:
+GitHub-OAuth-App, Runtime-Token/-Secrets und serverloser API-Host fehlen.
+
 ## Monitoring
 
 Überwacht werden letzter Heartbeat, Lease-Alter, GitHub-Sync, Prozess-Exit-Code,

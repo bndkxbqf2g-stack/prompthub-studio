@@ -17,8 +17,11 @@
 
 - GitHub MCP ist mit dem Nutzerkonto verbunden. Das Quell-Repository
   `bndkxbqf2g-stack/prompthub-studio` wurde am 2026-11-15 auf ausdrückliche
-  Nutzeranweisung öffentlich gestellt. Ein separates privates Control-Repository
-  und dessen Runtime-Token sind nicht eingerichtet.
+  Nutzeranweisung öffentlich gestellt. Ein separates privates Control-
+  Repository wurde am 2026-11-15 erstellt; auf `main` liegt die verifizierte
+  Initialdatei `.prompthub/active-jobs.json` mit Schema-Version 1 und leerer
+  Lease-Liste. Ein Runtime-Token und die Verbindung zur Laufzeit sind noch nicht
+  eingerichtet.
 - Die Codex-App meldet eine lauffähige Standard-Cloud-Umgebung, aber ohne
   hinterlegte Repositories. Daraus folgt keine nachgewiesene autonome Ausführung
   für dieses Projekt.
@@ -47,7 +50,8 @@
   keine PromptHub-GitHub-OAuth-App und keine Runtime-Secrets. Deshalb geben
   `/api/me` und `/healthz` HTTP 503; es gibt keine funktionsfähige Anmeldung,
   Auftragsverwaltung oder Cloud-Ausführung. Das Quell-Repository ist öffentlich;
-  das separate private Control-Repository existiert noch nicht.
+  das separate private Control-Repository ist vorhanden, aber nicht mit einer
+  Laufzeit verbunden.
 - Preview-Branches stehen auf `None`; automatische Production-Deployments sind
   ebenfalls deaktiviert. Preview-Adressen wären bei einer späteren Aktivierung
   öffentlich; Cloudflare Access ist nicht eingerichtet und Preview-Secrets

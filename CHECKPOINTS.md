@@ -708,3 +708,21 @@
   CLI-Login von einer noch fehlenden PromptHub-Runner-/Cloud-Konfiguration.
 - Pflichtprüfungen: `npm test` 105/105 bestanden; `npm run check` bestanden
   (96 Dateien, Prompt-Library synchron); `git diff --check` bestanden.
+
+## CP-027 – privates GitHub-Control-Repository vorbereitet
+
+- Datum: 2026-11-15, 20:46 UTC.
+- Ein separates privates GitHub-Control-Repository wurde erstellt. UI und
+  Repository-Metadaten bestätigen `Private`, Standardbranch `main` sowie
+  Schreibzugriff. Auf `main` wurde ausschließlich
+  `.prompthub/active-jobs.json` mit `{"version":1,"leases":[]}` initialisiert.
+  Der Commit ist `a9b74b446425992893967d80f5e3c9e704d1b4b0`; der Blob wurde über
+  die GitHub-Contents-API erneut gelesen und bestätigt.
+- Das Repository ist noch nicht mit einer PromptHub-Laufzeit verbunden. Es
+  wurden kein OAuth-Client, Runtime-Token, Job-Issue oder Secret angelegt; die
+  Control API bleibt deshalb unverfügbar. Keine Kostenressource wurde aktiviert.
+- `CLOUD_COST_RULES.md`, `ACCEPTANCE_CRITERIA.md` und `OPERATIONS.md` beschreiben
+  nun den vorhandenen privaten Speicher und die noch fehlende Laufzeitverbindung.
+- Pflichtprüfungen vor dem Checkpoint: `npm test` 105/105 bestanden;
+  `npm run check` bestanden (96 Dateien, Prompt-Library synchron);
+  `git diff --check` bestanden.
