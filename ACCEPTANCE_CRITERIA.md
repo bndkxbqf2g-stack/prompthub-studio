@@ -13,15 +13,15 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal bestanden; Mac offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | teilweise: Run 4 (`43720935247`, Commit `076af3c5d33dbba5fb7290a1b6d6a9df6734399b`) und Job `test` erfolgreich; Branch-API meldet `protected=false` und keine erforderlichen Checks; Merge-Gate fehlt |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | teilweise: Run 6 (`43724681369`, Commit `504477dc35dab908c8b3755550866bca071c72db`) und Job `test` erfolgreich; Nutzer hat `test` als Pflichtcheck freigegeben, aber GitHub blockiert Branch-Schutz für dieses private Repo auf Free; Merge-Gate fehlt |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
 | A13 | Kosten-/Ressourcenbegrenzung | keine Runtime-Dependencies, harte Cap-/Retry-/Polling-Limits | Pflicht | lokal bestanden |
 | A14 | Kontrollierte Eigenupdates | Evidenz-Gate für Strategien; kritische Adoption verlangt Approval | Pflicht | lokal bestanden; unabhängige Prüfung offen |
 | A15 | sichere Wiederherstellung | Backup-Manifest, SHA-256, Approval- und Tamper-Test | Pflicht | lokal bestanden |
-| A16 | Cloud-first Control Plane auf Cloudflare Pages ohne kostenpflichtigen Dauer-Server | `test/cloudflare-worker.test.mjs`, `test/cloudflare-pages.test.mjs`, `src/cloudflare/worker.mjs`, `functions/[[path]].js`, `src/pwa/_routes.json`, `wrangler.toml`; Free-Quota-Limits und Fail-Closed in `CLOUDFLARE_OPERATIONS.md` | Pflicht | lokal vorbereitet/getestet; Dashboard zeigt 0/100.000 Requests und keine Projekte; Billing-Seite lädt nicht; GitHub-App-Freigabe, KV-Binding, OAuth-Secrets, HTTPS-Deployment, Live-Ausfall- und Quotenprüfung offen |
-| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Cache und MIME | Pflicht | lokal bestanden; HTTPS-Installation auf iPhone offen |
+| A16 | Cloud-first Control Plane auf Cloudflare Pages ohne kostenpflichtigen Dauer-Server | `test/cloudflare-worker.test.mjs`, `test/cloudflare-pages.test.mjs`, `src/cloudflare/worker.mjs`, `functions/[[path]].js`, `src/pwa/_routes.json`, `wrangler.toml`; Free-Quota-Limits und Fail-Closed in `CLOUDFLARE_OPERATIONS.md` | Pflicht | teilweise: Pages live unter `https://prompthub-studio.pages.dev`, statische Assets HTTP 200, Fail closed verifiziert; `/api/me` und `/healthz` geben ohne Runtime-Konfiguration 503; OAuth/KV/Secrets, Quoten-/Ausfalltest und Kontobilling ungeprüft |
+| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Cache und MIME | Pflicht | Manifest, Icon und Service Worker live mit HTTP 200 geprüft; Installation und Bedienung auf echtem iPhone offen |
 | A18 | Multi-Projekt-Analyse | `test/projects.test.mjs`: Regeln, README, Skripte, Issues, CI, nur lesende API und Snapshot-Version | Pflicht | lokal bestanden |
 | A19 | Entfernen/Wiederverbinden/Datenlöschung | `test/projects.test.mjs`, `test/api-projects.test.mjs`: Bestätigung, Pause, laufende/stale Sperre, Wiederverbinden, getrennte Datenlöschung; kein Repo-Delete | Pflicht | lokal bestanden |
 | A20 | Prompt-Designer | `test/prompt-designer.test.mjs`, `test/api-projects.test.mjs`: Analyse, Einzelfrage, vier Optionen, Skip/Ende, Anforderungen/Annahmen, Version, QA und ausdrückliche Freigabe | Pflicht | lokal bestanden |
@@ -46,8 +46,11 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. Der GitHub-CI-Lauf 4 ist
-erfolgreich, aber `main` erzwingt den Check `test` derzeit nicht. Die Erstabnahme
-ist außerdem noch nicht vollständig bestanden, weil Cloudflare-Konto und
-Abrechnung, Pages-HTTPS-/OAuth-Deployment sowie ein echter Mac-/Cloud-Runner
-nicht nachgewiesen sind.
+A27/A28 sind durch reproduzierbare Tests belegt. GitHub Actions Run 6 und der
+Pages-Produktionsbuild für `504477dc35dab908c8b3755550866bca071c72db` sind
+erfolgreich; die PWA-Assets sind über HTTPS erreichbar. `main` erzwingt den
+freigegebenen Check `test` nicht, weil GitHub Branch-Schutz für das private
+Repository auf dem vorhandenen Free-Plan nicht anbietet. Die Control API ist
+noch nicht konfiguriert (503); OAuth/KV, ein echter Mac-/Cloud-Runner,
+iPhone-Installation und Kontobilling sind nicht nachgewiesen. Die vollständige
+technische Erstabnahme ist daher nicht bestanden.

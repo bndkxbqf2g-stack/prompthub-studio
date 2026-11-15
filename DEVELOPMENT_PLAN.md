@@ -75,9 +75,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
-- Cloudflare-Pages-Account, echtes KV-Binding, OAuth-App und privates
-  GitHub-Control-Repo sind nicht eingerichtet; keine Aktivierung oder
-  Veröffentlichung erfolgt.
+- Cloudflare Pages ist mit dem privaten Quell-Repository verbunden und die
+  PWA-Hülle unter `https://prompthub-studio.pages.dev` live. Der Pages-Build
+  und GitHub-Actions-Run 6 sind erfolgreich; das Control-API-KV-Binding, die
+  OAuth-App und Runtime-Secrets sind weiterhin nicht eingerichtet. Die API
+  liefert deshalb sicher HTTP 503; Cloudflare Fail closed ist verifiziert.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
 
@@ -85,22 +87,24 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Erledigt: GitHub-Actions-Run 4 (`43720935247`) war für Commit
-  `076af3c5d33dbba5fb7290a1b6d6a9df6734399b` erfolgreich; der Job `test`
+- Erledigt: GitHub-Actions-Run 6 (`43724681369`) war für Commit
+  `504477dc35dab908c8b3755550866bca071c72db` erfolgreich; der Job `test`
   einschließlich Tests, statischer Analyse und Whitespace-Prüfung bestand.
-- Offen und freigabepflichtig: GitHub-API meldet `main` mit
-  `protected=false`, `required_status_checks.enforcement_level=off` und ohne
-  erforderliche Checks. Der verpflichtende Merge-Gate muss nach ausdrücklicher
-  Zustimmung als Repository-Sicherheitsregel auf den Check `test` gesetzt
-  werden. Remote-Control- und Runner-Integrationschecks sind ebenfalls offen.
+- Merge-Gate: der Nutzer hat `test` ausdrücklich als Pflichtcheck freigegeben.
+  GitHub Branch-Protection meldete jedoch, dass Regeln für dieses private
+  Repository einen bezahlten Team- oder Enterprise-Organisationsplan benötigen.
+  Wegen privatem Repo und geschütztem 0-€-Budget wurde kein Upgrade und keine öffentliche
+  Umstellung vorgenommen. CI läuft, aber `main` erzwingt den Check nicht.
+  Remote-Control- und Runner-Integrationschecks bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.
 
 ### Phase 3 – produktionsnahe Sicherheit
 
-- Externes HTTPS-Hosting der Control API nur nach Nutzerfreigabe.
-- OAuth-App, Scopes, Session-/Backup-Verfahren und Rate-Limits prüfen.
+- Die statische PWA ist auf Cloudflare Pages HTTPS veröffentlicht.
+- OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
+  Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.
 
 ### Phase 4 – technische Abnahme
