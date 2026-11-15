@@ -21,7 +21,7 @@ const state = {
 
 const el = (selector) => document.querySelector(selector);
 const elements = {
-  notice: el("#notice"), authPanel: el("#auth-panel"), appPanel: el("#app-panel"), userLabel: el("#user-label"),
+  notice: el("#notice"), authPanel: el("#auth-panel"), appPanel: el("#app-panel"), unavailablePanel: el("#unavailable-panel"), userLabel: el("#user-label"),
   updateButton: el("#update-app"),
   projects: el("#projects"), projectForm: el("#project-form"), projectDetail: el("#project-detail"),
   incidentPanel: el("#incident-panel"), incidentReportForm: el("#incident-report-form"), incidentSummary: el("#incident-summary"), incidentComponents: el("#incident-components"), incidents: el("#incidents"),
@@ -912,8 +912,8 @@ el("#voice-input").addEventListener("click", () => {
 el("#library-search").addEventListener("input", renderLibrary);
 el("#library-category").addEventListener("change", renderLibrary);
 el("#refresh").addEventListener("click", async () => {
-  await Promise.all([loadProjects(), loadMetrics(), loadStrategies()]);
-  notice("Projekt- und Nutzungsübersicht aktualisiert.", "success");
+  const refreshed = await boot();
+  if (refreshed) notice("Projekt- und Nutzungsübersicht aktualisiert.", "success");
 });
 el("#logout").addEventListener("click", async () => {
   await request("/api/logout", { method: "POST" }).catch(() => {});
@@ -927,14 +927,23 @@ async function boot() {
     state.provider = provider;
     elements.userLabel.textContent = `${local ? "Lokale Sitzung" : "GitHub"} · ${user.login}`;
     elements.authPanel.hidden = true;
+    elements.unavailablePanel.hidden = true;
     elements.appPanel.hidden = false;
     await Promise.all([loadLibrary(), loadProjects(), loadMetrics()]);
+    return true;
   } catch (error) {
     if (error.status === 401) {
+      elements.unavailablePanel.hidden = true;
       elements.authPanel.hidden = false;
       elements.appPanel.hidden = true;
       notice("Nicht angemeldet.");
-    } else notice("Die Control API ist derzeit nicht erreichbar.", "error");
+    } else {
+      elements.authPanel.hidden = true;
+      elements.appPanel.hidden = true;
+      elements.unavailablePanel.hidden = false;
+      notice("Die Control API ist derzeit nicht erreichbar.", "error");
+    }
+    return false;
   }
 }
 
