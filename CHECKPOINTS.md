@@ -686,7 +686,7 @@
 
 ## CP-026 – Windows-Codex-CLI und pausierte Cloudflare-Deployments verifiziert
 
-- Datum: 2026-11-15, 20:25 UTC.
+- Datum: 2026-11-15, 20:33 UTC.
 - `codex login status` scheiterte zunächst mit `Could not find home directory`.
   Mit einem nur für den Prozess gesetzten `CODEX_HOME`, das auf das vorhandene
   `%USERPROFILE%\.codex` zeigte, lieferte es Exit-Code 0 und den Status
@@ -697,6 +697,11 @@
   Produktions-Deployments sind pausiert, Previews stehen auf `None`; die alte
   `pages.dev`-Veröffentlichung bleibt erreichbar. Es wurde nichts gelöscht,
   reaktiviert oder kostenpflichtig geschaltet.
+- PR #9 wurde nach erfolgreichem Pflichtjob `test` automatisch gemergt.
+  GitHub-Actions-PR-Run 44 (`43758160942`) bestand; Main-Run 45
+  (`43758223685`) bestand mit `test` und Push-Patch-Whitespace-Prüfung. Der
+  GitHub-Pages-Run 9 (`43758223028`) bestand mit Build und Deployment. Die
+  Abnahmematrix wurde auf diesen CI- und Deployment-Nachweis aktualisiert.
 - `OPERATIONS.md` dokumentiert nun den reversiblen Windows-CLI-Workaround sowie
   GitHub Pages als aktiven statischen PWA-Host und Cloudflare als pausierte
   Altressource. `DEVELOPMENT_PLAN.md` unterscheidet den erfolgreichen lokalen

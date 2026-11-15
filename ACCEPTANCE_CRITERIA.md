@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal verifiziert: gestarteter lokaler Server meldete `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen; echter Mac-Runner weiterhin offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; PR-/Push-Patchvergleich, erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | PR #7 wurde per Auto-Merge erst nach bestandenem Job `test` integriert. Run 38 (`43755761899`) bestand für Head `01245abfdb79abec4b042bd8a5c8e79a00499949`, einschließlich PR-Patch-Whitespace-Prüfung; Main-Run 39 (`43755804179`) bestand für Merge-Commit `f76eaa507bb7cd8736dab093dbd7d6ea102536bd`, einschließlich Push-Patch-Prüfung. Der Pages-Deploy-Run 7 (`43755803561`) bestand ebenfalls. Letzter erfolgreicher Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; erneutes Lesen ist für die aktuelle GitHub-Integration mit 403 nicht verfügbar. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht. Details zu früheren Läufen in CP-021 bis CP-024 |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; PR-/Push-Patchvergleich, erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | PR #7 wurde nach bestandenem Job `test` integriert. PR-Run 38 (`43755761899`) bestand einschließlich PR-Patch-Whitespace-Prüfung; Main-Run 39 (`43755804179`) bestand einschließlich Push-Patch-Prüfung. Zuletzt wurde PR #9 (Head `459b0ee9445fb601747d6fe43a90d8d4f022c055`) per Auto-Merge nach bestandenem Pflichtjob `test` in Main-Commit `f43ba070bbd4af38f1ea072fc523a702dd9ad371` integriert. PR-Run 44 (`43758160942`) bestand; Main-Run 45 (`43758223685`) bestand mit `test` und Push-Patch-Whitespace-Prüfung. Pages-Run 9 (`43758223028`) bestand mit Build, Upload und Deployment. Letzter erfolgreicher Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; erneutes Lesen ist für die aktuelle GitHub-Integration mit 403 nicht verfügbar. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht. Details zu früheren Läufen in CP-021 bis CP-024 |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,10 +46,11 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. Der aktuelle Main-Commit
-`f76eaa507bb7cd8736dab093dbd7d6ea102536bd` hat den GitHub-`test`-Job in Run 39
-bestanden; PR #7 wurde nach bestandenem PR-Check automatisch gemergt. GitHub
-Pages-Run 7 war erfolgreich. Das Quell-Repository ist auf ausdrückliche
+A27/A28 sind durch reproduzierbare Tests belegt. Der zuletzt funktionsseitig
+verifizierte Main-Stand `f43ba070bbd4af38f1ea072fc523a702dd9ad371` bestand den
+GitHub-`test`-Job in Main-Run 45; PR #9 wurde nach bestandenem PR-Run 44
+automatisch gemergt. GitHub Pages-Run 9 bestand mit Build und Deployment. Das
+Quell-Repository ist auf ausdrückliche
 Nutzeranweisung öffentlich; kein kostenpflichtiger Plan wurde aktiviert. Der
 Nutzer hat Cloudflare als Hosting-Ziel abgewählt; dessen bestehende Ressource
 bleibt pausiert. GitHub Pages stellt keine Control API bereit, und es ist noch
