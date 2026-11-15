@@ -383,3 +383,24 @@
   wurden nicht verändert.
 - Nachweis für den aktuellen Workspace: `npm test` 82/82 bestanden;
   `npm run check` erfolgreich für 90 Dateien; `git diff --check` erfolgreich.
+
+## CP-015 – A14-Freigabe-Gate geprüft und Status korrigiert
+
+- Datum: 2026-11-15, 16:42 UTC.
+- Eine unabhängige, ausschließlich lesende Prüfung bestätigte, dass
+  `KnowledgeStore.adoptStrategy()` bei kritischen Strategien jeden nichtleeren
+  `approvedBy`-Text akzeptiert und `evidenceRefs` nur als freie Strings speichert.
+  Die Anzahl von zwei Referenzen belegt keine tatsächlichen Test- oder CI-
+  Ergebnisse.
+- `KnowledgeStore` wird derzeit nur von `test/knowledge-recovery.test.mjs`
+  importiert und ist nicht mit der Produktions-App verbunden. Der Fehler ist
+  deshalb eine unsichere vorbereitete Kontrollkomponente, kein nachgewiesener
+  Produktionspfad.
+- A14 wurde in `ACCEPTANCE_CRITERIA.md` auf `teilweise` gesetzt. Es wurden keine
+  Freigabe-Gates oder Sicherheitsregeln verändert; deren Korrektur benötigt die
+  vorgeschriebene menschliche Freigabe und unabhängige Prüfung.
+- Nachweis: `npm test` 82/82 bestanden; `npm run check` erfolgreich für 90
+  Dateien; `git diff --check` erfolgreich.
+- GitHub bestätigt weiterhin `private`. Ein Browser-Schreibzugang ist in dieser
+  Sitzung nicht verfügbar; Credential Manager und GitHub-Connector stellten
+  keinen nutzbaren Einstellungs-Schreibweg bereit. Es gab keine Remoteänderung.
