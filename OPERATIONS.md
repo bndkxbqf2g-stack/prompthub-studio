@@ -64,6 +64,14 @@ dem Aktivieren wird ein Commit-/Manifest-Checkpoint angelegt. Rollback erfolgt
 auf einen bekannten Commit in einem neuen Restore-Schritt. Kritische Runner-,
 Auth- und Freigabecodeänderungen benötigen eine unabhängige Prüfung.
 
+Die PWA zeigt „Neue Version laden“, sobald ein aktualisierter Service Worker
+bereitsteht. Erst nach Antippen wird er aktiviert und die Seite einmal neu
+geladen; der erste Service-Worker-Einsatz löst keinen automatischen Reload aus.
+Offline-Fallback gilt nur für statische GET-Assets. API-, OAuth- und Health-
+Anfragen bleiben netzwerkgebunden. Beim Aktivieren werden ausschließlich ältere
+`prompthub-static-*`-Caches gelöscht. Bei Änderungen an der statischen Assetliste
+wird die Cache-Version in `src/pwa/sw.js` erhöht.
+
 ## Ressourcen und Kosten
 
 Keine Produktions-Dependencies und keine automatisch aktivierten kostenpflichtigen

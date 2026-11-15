@@ -1,3 +1,5 @@
+import { registerServiceWorker } from "./service-worker-client.mjs";
+
 const state = {
   user: null,
   projects: [],
@@ -14,6 +16,7 @@ const state = {
 const el = (selector) => document.querySelector(selector);
 const elements = {
   notice: el("#notice"), authPanel: el("#auth-panel"), appPanel: el("#app-panel"), userLabel: el("#user-label"),
+  updateButton: el("#update-app"),
   projects: el("#projects"), projectForm: el("#project-form"), projectDetail: el("#project-detail"),
   incidentPanel: el("#incident-panel"), incidentReportForm: el("#incident-report-form"), incidentSummary: el("#incident-summary"), incidentComponents: el("#incident-components"), incidents: el("#incidents"),
   designerForm: el("#designer-form"), draftView: el("#draft-view"), intent: el("#intent"),
@@ -762,5 +765,5 @@ elements.incidentReportForm.addEventListener("submit", async (event) => {
     notice("Fehlerbericht projektbezogen gespeichert; Ursache bleibt unbestätigt.", "success");
   } catch (error) { notice(error.message || "Fehlerbericht konnte nicht gespeichert werden.", "error"); }
 });
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+void registerServiceWorker({ navigatorObject: navigator, updateButton: elements.updateButton });
 boot();

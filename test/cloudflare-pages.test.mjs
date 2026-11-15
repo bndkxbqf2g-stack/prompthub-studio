@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
+import { runInNewContext } from "node:vm";
 import { onRequest } from "../functions/[[path]].js";
 
 const routes = JSON.parse(await readFile(new URL("../src/pwa/_routes.json", import.meta.url), "utf8"));
@@ -46,5 +47,52 @@ test("Pages health endpoint reports missing setup instead of fake availability",
 test("PWA service worker caches the second application script for offline launch", async () => {
   const worker = await readFile(new URL("../src/pwa/sw.js", import.meta.url), "utf8");
   assert.match(worker, /"\/regression-test-request\.js"/);
+  assert.match(worker, /"\/service-worker-client\.mjs"/);
+});
+
+test("service worker preserves unrelated caches and waits for a user-requested update", async () => {
+  const source = await readFile(new URL("../src/pwa/sw.js", import.meta.url), "utf8");
+  const listeners = new Map();
+  const calls = { added: [], deleted: [], claimed: 0, skipped: 0 };
+  const caches = {
+    async open(name) {
+      calls.opened = name;
+      return { async addAll(paths) { calls.added = paths; } };
+    },
+    async keys() { return ["prompthub-static-v3", "other-app-cache", "prompthub-static-v4"]; },
+    async delete(name) { calls.deleted.push(name); },
+    async match() { return new Response("cached offline asset"); },
+  };
+  const self = {
+    location: { origin: "https://prompthub.example" },
+    clients: { async claim() { calls.claimed += 1; } },
+    async skipWaiting() { calls.skipped += 1; },
+    addEventListener(type, listener) { listeners.set(type, listener); },
+  };
+  runInNewContext(source, { self, caches, URL, fetch: async () => { throw new Error("offline"); } });
+
+  const waits = [];
+  listeners.get("install")({ waitUntil(promise) { waits.push(promise); } });
+  await Promise.all(waits);
+  assert.equal(calls.opened, "prompthub-static-v4");
+  assert.ok(calls.added.includes("/service-worker-client.mjs"));
+
+  listeners.get("activate")({ waitUntil(promise) { waits.push(promise); } });
+  await Promise.all(waits);
+  assert.deepEqual(calls.deleted, ["prompthub-static-v3"]);
+  assert.equal(calls.claimed, 1);
+
+  listeners.get("message")({ data: { type: "UNRELATED_MESSAGE" }, waitUntil() { assert.fail("unrelated messages must not activate the worker"); } });
+  assert.equal(calls.skipped, 0);
+  listeners.get("message")({ data: { type: "PROMPTHUB_ACTIVATE_UPDATE" }, waitUntil(promise) { waits.push(promise); } });
+  await Promise.all(waits);
+  assert.equal(calls.skipped, 1);
+
+  let responsePromise;
+  listeners.get("fetch")({ request: new Request("https://prompthub.example/styles.css"), respondWith(promise) { responsePromise = promise; } });
+  assert.equal(await (await responsePromise).text(), "cached offline asset");
+  let interceptedApi = false;
+  listeners.get("fetch")({ request: new Request("https://prompthub.example/api/me"), respondWith() { interceptedApi = true; } });
+  assert.equal(interceptedApi, false);
 });
 

@@ -341,3 +341,26 @@
   noch nicht auf GitHub veröffentlicht. Für diesen Fix wurde kein GitHub-CI-
   Lauf und kein Produktionsdeployment ausgeführt. OAuth-Secrets,
   Cloudflare-Runtime und Repository-Einstellungen blieben unverändert.
+
+## CP-013 – PWA-Update nach Nutzerentscheidung
+
+- Datum: 2026-11-15, 16:10 UTC; Arbeitsbasis `6123cf79120f97f73dd11fb56ecf64def385b2ab`.
+- Der Service Worker verwendet `prompthub-static-v4`, löscht nur ältere
+  PromptHub-Caches, beansprucht Clients nach Aktivierung und umgeht API-,
+  OAuth-, Health- sowie Nicht-GET-Anfragen. Statische GET-Assets bleiben bei
+  Netzwerkausfall aus dem Cache verfügbar.
+- Ein sichtbarer Update-Button erscheint erst, wenn eine neue Worker-Version
+  installiert ist. Sie aktiviert sich nach Antippen und löst genau einen Reload
+  aus; die erste Installation lädt nicht automatisch neu. Das neue
+  `service-worker-client.mjs` wird für Offline-Start mitgecacht und erhält
+  `text/javascript` im lokalen Server.
+- Regressionstests prüfen Update-Race, einmaligen Reload, Erstinstallation,
+  Offline-Fallback, Cache-Isolation und Ausschluss der API-Anfragen.
+- Nachweis: `npm test` 82/82 bestanden; `npm run check` erfolgreich für 90
+  Dateien; `git diff --check` erfolgreich; `npm run demo` endete mit
+  `succeeded` und sieben Ereignissen.
+- A17 bleibt teilweise offen, bis Installation und Aktualisierung auf einem
+  echten iPhone geprüft wurden. Diese Änderung wurde noch nicht committed,
+  gepusht oder nach Cloudflare Pages deployed; sie ist lokal auf dem Branch
+  `codex/oauth-returnto-hardening` dokumentiert. GitHub-PR #2 und
+  Repository-Einstellungen wurden nicht verändert.

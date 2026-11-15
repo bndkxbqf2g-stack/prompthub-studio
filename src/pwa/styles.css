@@ -32,6 +32,8 @@ p { color: var(--muted); line-height: 1.55; }
 .notice { min-height: 0; margin-bottom: 12px; color: var(--warning); }
 .notice.error { color: var(--danger); }
 .notice.success { color: var(--success); }
+.update-button { margin: 0 0 14px; }
+.update-button[hidden] { display: none; }
 .icon-button, .text-button { border: 0; color: var(--muted); background: transparent; cursor: pointer; }
 .icon-button { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; font-size: 1.5rem; }
 .text-button { padding: 8px 0; font-size: .85rem; }
