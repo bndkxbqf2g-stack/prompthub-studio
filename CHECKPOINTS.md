@@ -162,3 +162,23 @@
   Nutzerprojekt bleibt mangels Remote und Runner offen.
 - Implementierungscommit: `30a94ed` (`Add evidence-based regression task preparation`).
 - Kosten: keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
+## CP-006 – Privates GitHub-Repository verbunden
+
+- Datum: 2026-11-15
+- Der Nutzer hat `bndkxbqf2g-stack/prompthub-studio` erstellt. Die GitHub-API
+  bestätigt `visibility=private`, Standardbranch `main` und Schreibberechtigung.
+- Der saubere lokale Stand `ec8dc42` wurde als Snapshot in den Remote-Branch
+  importiert. Der Import-Commit lautet `ca6210a7681f82aa7a9535806e804f938349c444`;
+  der Branch wurde mit erwartetem Vorgänger aktualisiert, ohne Force-Push.
+  Enthalten sind 90 versionierte Dateien mit zusammen 1.895.896 Bytes, darunter
+  das PWA-Icon. Eine `.env`-Datei war nicht versioniert und wurde nicht übertragen.
+- Mangels Git-Transportanmeldung erfolgte der Import über die verbundene GitHub-
+  API. Die ursprüngliche lokale Commit-Abstammung wurde nicht reproduziert; der
+  Remote-Commit enthält den Quellbaum aus `ec8dc42`.
+- `.github/workflows/ci.yml` liegt im Remote. Die kombinierte Commit-Statusabfrage
+  lieferte `statuses: []`; damit ist kein erfolgreicher GitHub-Actions-Lauf
+  nachgewiesen. Lokale Prüfungen aus CP-005 bleiben `npm test` 70/70 und
+  `npm run check` 83 Dateien.
+- Abnahmestatus bleibt `conditional_local_pass`; A09 und externe Betriebsnachweise
+  sind offen. Angebotsküche (`Einkaufen`) bleibt bis zum Abnahmegatter gesperrt.
+- Es wurden keine kostenpflichtigen Dienste oder Tarife aktiviert.

@@ -7,12 +7,18 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 ## Status
 
 Die Implementierung befindet sich in der technischen Erstabnahme. Der lokale
-Memory-Modus ist für reproduzierbare Tests und die vertikale Demo gedacht. Der
-GitHub-Modus benötigt ein vom Nutzer konfiguriertes, möglichst privates Control-
-Repository, Token und OAuth-Credentials. Kein Remote-Repository und kein
-Deployment werden automatisch erstellt. Die Anlage eines privaten
-`prompthub-studio`-Remotes ist vom Nutzer freigegeben, aber noch nicht erfolgt;
-Remote-Push und GitHub-CI bleiben bis zum verfügbaren Erstellungszugang offen.
+Memory-Modus ist für reproduzierbare Tests und die vertikale Demo gedacht. Das
+private GitHub-Repository [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
+enthält den lokalen Quellstand `ec8dc42` auf `main` (Remote-Snapshot-Commit
+`ca6210a`). Der Snapshot wurde über die verbundene GitHub-API importiert, weil
+für Git-Transport hier keine Anmeldung eingerichtet ist; die ursprüngliche
+lokale Commit-Abstammung wurde dabei nicht übernommen.
+
+Die GitHub-CI-Konfiguration ist enthalten. Für den Snapshot lieferte die
+Commit-Statusabfrage keine Status-Einträge; ein erfolgreicher GitHub-Actions-Lauf
+ist daher noch nicht belegt. Der GitHub-Betrieb der Anwendung benötigt weiterhin
+ein separat konfiguriertes privates Control-Repository, Token und OAuth-
+Zugangsdaten. Ein Deployment wurde nicht erstellt.
 
 ## Schnellstart
 

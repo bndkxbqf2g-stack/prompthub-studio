@@ -4,20 +4,23 @@
 
 Die Pakete sind klein, testbar und einzeln rücksetzbar. Parallelisierung wird nur
 eingesetzt, wenn getrennte Worktrees und eine zuverlässige Schnittstelle
-vorhanden sind. Ohne vorhandenes Remote-Repository und ohne zwei verifizierte
-Worker wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
+vorhanden sind. Das private Quell-Repository existiert; zwei verifizierte Worker
+und getrennte, verlässliche Arbeitsbereiche sind nicht nachgewiesen. Bis dahin
+wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 ## Phasen
 
 ### Phase 0 – Inventar und Schutzrahmen (erledigt)
 
 - Arbeitsmappe, Regeln, lokale Tools und GitHub-Berechtigung geprüft.
-- Kein passendes lokales/eigenes PromptHub-Repository gefunden.
-- Kein Remote-Repository erstellt.
-- Der Nutzer hat die Anlage eines GitHub-Repositorys `prompthub-studio`
-  ausdrücklich autorisiert. Die Anlage bleibt ausstehend, bis der angekündigte
-  Repository-Erstellungszugang verfügbar ist; ohne Remote werden weder Push
-  noch GitHub-CI als erfolgt dargestellt.
+- Kein passendes vorhandenes PromptHub-Repository gefunden; der Nutzer hat
+  anschließend das private Repository `bndkxbqf2g-stack/prompthub-studio`
+  erstellt. Es wurde geprüft: `private`, Standardbranch `main`, Schreibzugriff.
+- Der lokale Stand `ec8dc42` wurde am 2026-11-15 als Snapshot über die GitHub-API
+  nach `main` übertragen (Commit `ca6210a`). Da kein Git-Transportzugang vorlag,
+  wurde die lokale Commit-Abstammung nicht übernommen.
+- `.github/workflows/ci.yml` ist enthalten. Die Commit-Statusabfrage lieferte
+  `statuses: []`; ein erfolgreicher GitHub-Actions-Lauf bleibt unbelegt.
 - Angebotsküche ist laut Nutzer das bestehende GitHub-Repository `Einkaufen`.
   Der Inhalt bleibt bis zur bestandenen PromptHub-Abnahme und der einmaligen
   MVP-Umfangsbestätigung unangetastet.
@@ -69,7 +72,8 @@ Worker wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- GitHub Actions CI aktivieren und Pflichtchecks dokumentieren.
+- Einen tatsächlichen GitHub-Actions-Lauf des `push`-Commits erfassen und
+  Pflichtchecks mit erfolgreichem Ergebnis dokumentieren.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.
