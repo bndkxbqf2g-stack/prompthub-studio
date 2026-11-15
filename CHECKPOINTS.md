@@ -438,7 +438,8 @@
   keine Dateien.
 - Nachweis: gezielte A14/Auth-Tests 17/17 bestanden; `npm test` 94/94
   bestanden; `npm run check` erfolgreich für 92 Dateien und synchronisierte
-  Prompt-Bibliothek; `git diff --check` bestanden.
+  Prompt-Bibliothek; `git diff --check` bestanden. Implementierungs-Commit:
+  `4e71d0e` (lokal, nicht gepusht).
 - Abnahme A14 bleibt teilweise: echte GitHub-PR-/Review-/Actions-Nachweise und
   eine PWA-Verwaltung der Strategiebewertungen sind noch nicht live abgenommen.
 - Der A14-Fix wurde lokal ausgeführt und geprüft. Es erfolgten kein Push,
