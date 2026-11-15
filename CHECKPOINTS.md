@@ -904,3 +904,21 @@
 - Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 106/106;
   `npm run check` bestand für 96 Dateien und bestätigte die Prompt-Library;
   `git diff --check` ohne Befund.
+
+## CP-036 – PWA erklärt fehlende Control API ohne falschen Erfolg
+
+- Datum: 2026-11-15.
+- Die PWA zeigt bei fehlender Control API eine verständliche Erklärung und hält
+  Authentifizierungs- und Projektbereiche verborgen. Aktualisieren wiederholt
+  den Bootstrap und meldet nur bei erfolgreicher Antwort Erfolg. Regressionstests
+  decken Erklärung, Sichtbarkeit und das Erfolgs-Gate ab.
+- PR #21 (Head `a873695153a6bb24e61b149d5ee0fc64108e33a4`) bestand Actions-Run 80
+  (`43770627889`) mit Apple-Silicon-, Intel-macOS- und Pflichtjob `test`; GitHub
+  Auto-Merge integrierte ihn als `bf5a15c1b8a4fc0f832e55aefcdc84bfa440c5a5`.
+  Main-CI-Run 81 (`43770701922`) und Pages-Run 21 (`43770701589`) bestanden.
+- Live-Smoke nach Pages-Run 21 im Viewport 390×844 zeigte die Erklärung und den
+  fortbestehenden Fehler nach Aktualisieren; keine Erfolgsmeldung oder
+  Projektdaten wurden vorgetäuscht. Eine echte iPhone-Installation und Offline-
+  Prüfung bleiben offen.
+- Lokale Pflichtprüfungen: `npm test` 108/108; `npm run check` bestand für 97
+  Dateien und bestätigte die Prompt-Library; `git diff --check` ohne Befund.
