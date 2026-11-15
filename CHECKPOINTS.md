@@ -771,3 +771,24 @@
   und hält die weiterhin fehlende Branch-Protection-Neulesung mit HTTP 403 fest.
 - Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 105/105;
   `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
+
+## CP-030 – öffentliche Statusseite und Live-PWA verifiziert
+
+- Datum: 2026-11-15, 21:13 UTC.
+- Browserprüfung öffnete die GitHub-Pages-PWA unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Das UI wurde
+  geladen und meldete ehrlich, dass die serverseitige Control API nicht
+  erreichbar ist.
+- `manifest.webmanifest` und `app-icon-source.png` (1254×1254) wurden unter dem
+  GitHub-Pages-Unterpfad über HTTPS geladen. Das Manifest verwendet relative
+  `start_url`/`scope`, Standalone-Modus und das PNG-Icon. Eine echte
+  iPhone-Installation und Live-Offline-/Updateprüfung bleiben offen.
+- Die öffentliche README-Startseite zeigte veraltete PR-/Control-Repository-
+  Angaben. `README.md` wurde auf den vorbereiteten privaten Control-Speicher,
+  fehlende Runtime-Verbindung, aktuellen No-Go-Quotenstatus und die echte
+  Erreichbarkeit der PWA aktualisiert.
+- `ACCEPTANCE_CRITERIA.md` verweist jetzt auf Main-Run 57, Pages-Run 13 und die
+  direkte Live-Browserprüfung; nicht ausgeführte iPhone-/Offline-Tests bleiben
+  ausdrücklich offen.
+- Pflichtprüfungen nach den Dokumentationsänderungen: `npm test` 105/105;
+  `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
