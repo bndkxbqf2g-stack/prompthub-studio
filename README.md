@@ -11,18 +11,21 @@ am 2026-11-15 veröffentlichte GitHub-Quell-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
 ist die dauerhafte Quelle für den Quellcode. `main` verlangt für Merges den
 erfolgreichen Check `test`; die Branch-API bestätigte `strict=true` und
-Admin-Enforcement. GitHub Actions Run 14 für Commit
-`d45d1514656ce120da54e97de5e02f7ee68db288` bestand. Der zugehörige PR #2 ist
-offen und nicht gemergt.
+Admin-Enforcement. PR #2 wurde nach bestandenen Pflichtchecks mit 14 Commits in
+`main` gemergt. GitHub Actions Run 19 (`43749169752`) bestand für den PR-Head
+`36ba10a4166bb365e6fcc8d06b443a2d77118d35`. GitHub bestätigt
+`allow_auto_merge=true`; PR #2 wurde nach den grünen Checks manuell gemergt.
 
 GitHub Pages ist unter
 [bndkxbqf2g-stack.github.io/prompthub-studio](https://bndkxbqf2g-stack.github.io/prompthub-studio/)
 aktiv; die PWA-Dateien liegen unter
 [`/src/pwa/`](https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/).
 GitHub Pages liefert statische Dateien, aber keine serverseitige Control API.
-Die aktuelle Live-Version lädt die PWA-Assets wegen Root-relativer Pfade nicht
-korrekt. Ein getesteter Fix ist lokal vorbereitet und noch nicht in PR #2
-übertragen oder veröffentlicht.
+Nach dem Merge lädt die Live-PWA ihre relative Stylesheet- und Icon-/Manifest-
+Verweise unter diesem Unterpfad. Die Browserprüfung zeigte das gerenderte UI
+ohne Konsolenfehler. Die PWA meldet dort weiterhin, dass die Control API nicht
+erreichbar ist. iPhone-Installation und Offline-/Updateverhalten sind live noch
+nicht abgenommen.
 
 Das Cloudflare-Pages-Projekt und seine letzte Veröffentlichung unter
 [prompthub-studio.pages.dev](https://prompthub-studio.pages.dev) bleiben

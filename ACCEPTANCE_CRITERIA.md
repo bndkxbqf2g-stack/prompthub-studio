@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal verifiziert: gestarteter lokaler Server meldete `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen; echter Mac-Runner weiterhin offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | bestanden für PR-Merges: Branch-API bestätigt `main`, erforderlichen Check `test`, `strict=true` und Admin-Enforcement; Actions Run 14 (`43746180556`) für Commit `d45d1514656ce120da54e97de5e02f7ee68db288` bestand. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | PR #2 wurde nach erfolgreichem Pflichtcheck `test` gemergt. GitHub Actions Run 19 (`43749169752`) bestand für PR-Head `36ba10a4166bb365e6fcc8d06b443a2d77118d35`; Branch-API bestätigt für `main` den erforderlichen Check `test`, `strict=true` und Admin-Enforcement. GitHub bestätigt `allow_auto_merge=true`. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht; Merge-Commit `c3d479a7676a143ebf4c6ad8448651e162bb9ea3` hat keinen separaten Actions-Run |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -21,7 +21,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A14 | Kontrollierte Eigenupdates | `test/strategy-learning.test.mjs`, `test/pwa-strategy.test.mjs`, `test/api-projects.test.mjs`, `test/auth.test.mjs`; GitHub-PR-/Actions-Evidenz, unabhängiger Review und authentifizierte Freigabe | Pflicht | teilweise: lokale API-/PWA-Gates, projektbezogene Erfassung/Anzeige und Projektwechsel-Regressionen bestanden; echte GitHub-Review-/Actions-Nachweise und produktive Control-API-Verbindung sind wegen fehlender Laufzeitkonfiguration noch nicht live abgenommen |
 | A15 | sichere Wiederherstellung | Backup-Manifest, SHA-256, Approval- und Tamper-Test | Pflicht | lokal bestanden |
 | A16 | Cloud-first Control Plane auf Cloudflare Pages ohne kostenpflichtigen Dauer-Server | `test/cloudflare-worker.test.mjs`, `test/cloudflare-pages.test.mjs`, `src/cloudflare/worker.mjs`, `functions/[[path]].js`, `src/pwa/_routes.json`, `wrangler.toml`; Free-Quota-Limits und Fail-Closed in `CLOUDFLARE_OPERATIONS.md` | Pflicht | teilweise: letzte Cloudflare-Veröffentlichung unter `https://prompthub-studio.pages.dev` bleibt erreichbar, automatische Production- und Preview-Deployments sind pausiert; `/api/me` und `/healthz` geben ohne Runtime-Konfiguration 503; GitHub Pages ist statisch und ersetzt keine Control API; OAuth/KV/Secrets, Quoten-/Ausfalltest und Kontobilling ungeprüft |
-| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`, `test/pwa-updates.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Offline-Fallback, Cache-Isolation, freigegebener Update-Flow und MIME | Pflicht | teilweise: GitHub Pages liefert die PWA-HTML unter `/src/pwa/`; dort waren relative Assets/Installationsscope fehlerhaft. Der lokal getestete Unterpfad-Fix wurde noch nicht in den offenen PR übertragen; Offline-/Update-Flow lokal regressionstested; echte iPhone-Installation und Aktualisierung offen |
+| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`, `test/pwa-updates.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Offline-Fallback, Cache-Isolation, freigegebener Update-Flow und MIME | Pflicht | teilweise: nach PR #2 (14 Commits, Merge-Commit `c3d479a7676a143ebf4c6ad8448651e162bb9ea3`) lädt GitHub Pages die PWA unter `/src/pwa/` mit Unterpfad-relativem Stylesheet sowie Icon-/Manifest-URLs; Browserprüfung zeigte gerendertes UI ohne Konsolenfehler. Die Control API ist auf GitHub Pages nicht verfügbar, UI meldet sie nicht erreichbar. Offline-/Update-Flow ist lokal regressionstested; echte iPhone-Installation und Live-Offline-/Updateprüfung bleiben offen |
 | A18 | Multi-Projekt-Analyse | `test/projects.test.mjs`: Regeln, README, Skripte, Issues, CI, nur lesende API und Snapshot-Version | Pflicht | lokal bestanden |
 | A19 | Entfernen/Wiederverbinden/Datenlöschung | `test/projects.test.mjs`, `test/api-projects.test.mjs`: Bestätigung, Pause, laufende/stale Sperre, Wiederverbinden, getrennte Datenlöschung; kein Repo-Delete | Pflicht | lokal bestanden |
 | A20 | Prompt-Designer | `test/prompt-designer.test.mjs`, `test/api-projects.test.mjs`: Analyse, Einzelfrage, vier Optionen, Skip/Ende, Anforderungen/Annahmen, Version, QA und ausdrückliche Freigabe | Pflicht | lokal bestanden |
@@ -46,13 +46,16 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. GitHub Actions Run 14 und der
-Branch-API-Readback belegen den erfolgreichen Check und die Schutzregel auf
-`main`. Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich;
-kein kostenpflichtiger Plan wurde aktiviert. Der letzte dokumentierte
+A27/A28 sind durch reproduzierbare Tests belegt. PR #2 wurde gemergt; GitHub
+Actions Run 19 bestätigt den erfolgreichen Pflichtcheck auf dem PR-Head und die
+Branch-API bestätigt die Schutzregel auf `main`. GitHub erlaubt Auto-Merge für
+zukünftige geeignete PRs. Das Quell-Repository ist auf ausdrückliche
+Nutzeranweisung öffentlich; kein kostenpflichtiger Plan wurde aktiviert. Der letzte dokumentierte
 Production-Build für `504477dc35dab908c8b3755550866bca071c72db` ist erfolgreich;
 automatische Cloudflare-Deployments sind pausiert. Die Regel blockiert
 PR-Merges bei fehlendem oder fehlgeschlagenem `test`; direkte Pushes sind nicht
-beschränkt. Die Control API ist noch nicht konfiguriert (503); OAuth/KV, ein
-echter Mac-/Cloud-Runner, iPhone-Installation und Kontobilling sind nicht
-nachgewiesen. Die vollständige technische Erstabnahme ist daher nicht bestanden.
+beschränkt. Die PWA-Shell wird unter dem GitHub-Pages-Unterpfad korrekt
+ausgeliefert, aber GitHub Pages stellt keine Control API bereit. Die Cloudflare-
+Control API ist noch nicht konfiguriert (503); OAuth/KV, ein echter Mac-/Cloud-
+Runner, iPhone-Installation und Kontobilling sind nicht nachgewiesen. Die
+vollständige technische Erstabnahme ist daher nicht bestanden.
