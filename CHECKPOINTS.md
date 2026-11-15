@@ -533,3 +533,30 @@
   `npm run check` bestanden (94 Dateien, Prompt-Library synchron);
   `git diff --check` bestanden.
 
+## CP-020 – GitHub Pages geprüft, Cloudflare-Builds pausiert
+
+- Datum: 2026-11-15 18:50 UTC.
+- Auf Nutzerwunsch wurde im Cloudflare-Dashboard die automatische Production-
+  Bereitstellung deaktiviert. Preview-Deployments stehen auf `None`; beides
+  wurde in den gespeicherten Projekteinstellungen erneut angezeigt. Das letzte
+  Deployment und das Cloudflare-Pages-Projekt wurden nicht gelöscht; die alte
+  Adresse bleibt erreichbar. Kein kostenpflichtiger Tarif wurde aktiviert.
+- GitHub Pages ist für `bndkxbqf2g-stack/prompthub-studio` auf `main`/`/(root)`
+  aktiv. Der Repository-Root liefert eine README-Seite; die PWA-HTML ist unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/` erreichbar.
+  Die Browseransicht zeigte dort nur die ungestaltete HTML-Hülle. Codeprüfung
+  bestätigte Root-absolute Pfade, die am Repository-Unterpfad scheitern.
+  GitHub Pages stellt statische Dateien, aber keine serverseitige Control API
+  bereit.
+- Commit `9938c58499eaf0b28362c611e7016b226847d378` auf PR #2 stellt PWA-Assets,
+  Manifest-Start-/Scope und Service-Worker-Registrierung auf relative Pfade um,
+  erhöht die Cache-Version und ergänzt einen Regressionstest für den
+  GitHub-Pages-Unterpfad. PR #2 ist offen und nicht gemergt; der Fix ist noch
+  nicht live.
+- `npm test`: 104/104 bestanden. Der erste Lauf deckte eine veraltete
+  Cacheversions-Assertion im bestehenden PWA-Test auf; der Test wurde auf v6
+  aktualisiert und der vollständige zweite Lauf bestand. `npm run check`
+  bestand (94 Dateien, Prompt-Library synchron); `git diff --check` bestand.
+  GitHub Actions Run 17 (`43748927468`) bestand für den Commit oben: Pflichtjob
+  `test` und alle Schritte erfolgreich.
+- Die Control API bleibt mangels Backend-Konfiguration nicht betriebsbereit.
