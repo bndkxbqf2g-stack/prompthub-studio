@@ -139,7 +139,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet
   Netlify Free als noch nicht aktivierte Option. Auth-/Session-Adapter,
   Runtime-Abhängigkeit und Netlify-Kontoverknüpfung warten auf ausdrückliche
-  Freigaben sowie unabhängige Sicherheitsprüfung.
+  Freigaben. Die unabhängige, rein lesende Sicherheitsprüfung vom 2026-11-15
+  empfiehlt bis zu Tests, Live-Nachweisen und einer verlässlichen teamweiten
+  Quotenmessung No-Go für die produktive Aktivierung.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.
 
 ### Phase 4 – technische Abnahme
