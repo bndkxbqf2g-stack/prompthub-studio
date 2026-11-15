@@ -69,29 +69,35 @@ mit dem Unterpfad-Fix gemergt. Eine Live-Browserprüfung bestätigte das gerende
 PWA-UI und geladene Styles sowie relative Icon-/Manifest-Pfade; die Oberfläche
 meldet weiterhin, dass die Control API nicht erreichbar ist.
 
-Cloudflare Pages `prompthub-studio` bleibt mit dem GitHub-Quell-Repository
-verbunden, wird aber nicht mehr als Veröffentlichungsziel verwendet. Das
-Cloudflare-Dashboard zeigte am 2026-11-15 den Projektstatus `Deployments
-paused`; Production-Deployments sind pausiert und Preview-Deployments stehen auf
-`None`. Die letzte Veröffentlichung unter https://prompthub-studio.pages.dev
-bleibt öffentlich erreichbar. Das Projekt wurde nicht gelöscht. `wrangler.toml`
-enthält weiterhin die Pages-Konfiguration; das frühere Workers-Static-Assets-
-Profil bleibt in `wrangler.worker.toml` erhalten.
+Main-Commit `b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f` bestand Main-CI-Run 66
+(`43764164796`) und GitHub-Pages-Run 16 (`43764164154`). PR #16 wurde nach
+bestandenem `test`-Check automatisch gemergt.
+
+Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
+mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
+veröffentlichte Version unter https://prompthub-studio.pages.dev bleibt
+erreichbar. Das Projekt ist nicht gelöscht. Der Nutzer hat seine Entfernung
+angefragt; die gesonderte Bestätigung für die irreversible Projektlöschung
+steht noch aus. `wrangler.toml` enthält weiterhin historische Pages-
+Konfiguration; das Workers-Static-Assets-Profil liegt in
+`wrangler.worker.toml`.
 
 Die statische PWA-Hülle ist erreichbar. Die Control API antwortet mit HTTP 503,
 bis ein Production-KV-Binding `SESSIONS`, die GitHub-OAuth-App, eine Login-
 Allowlist und die dokumentierten serverseitigen Variablen/Secrets eingerichtet
 sind. Der Pages-Runtime-Schalter `Fail closed` ist gespeichert und verifiziert.
-Die Preview-Bereitstellung steht laut erneutem Dashboard-Readback auf `None`.
-Preview-Adressen wären bei Aktivierung öffentlich; daher keine Preview-Secrets
-setzen und vor einer Aktivierung Cloudflare Access konfigurieren.
+Preview-Bereitstellungen wurden im Dashboard auf `None` gesetzt; nach dem
+Browserausfall konnte diese Einstellung nicht erneut ausgelesen werden. Bei
+einer späteren Aktivierung wären Preview-Adressen öffentlich; dafür keine
+Preview-Secrets setzen und zuvor Cloudflare Access konfigurieren.
 
-Die Cloudflare-GitHub-Integration ist nicht die GitHub-OAuth-Anmeldung innerhalb
-der PWA. `main` verlangt für PR-Merges den Statuscheck `test`; die Regel verlangt
-keinen PR und beschränkt direkte Pushes nicht. Details zu Build, Bindings,
-Schreibzugriff, HTTPS-Prüfungen, kostenfreien Kontingenten und offenen
-Abnahmepunkten stehen in `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner
-bleibt mangels verifizierter Laufzeitschnittstelle `not_configured`.
+Die letzte erfolgreiche Branch-Regel-Abfrage bestätigte für `main` den Check
+`test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die
+verbundene GitHub-Schnittstelle nicht verfügbar. Laut dem letzten Readback
+verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Historische
+Cloudflare-Konfiguration und aktuelle Einschränkungen stehen in
+`CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner bleibt mangels verifizierter
+Laufzeitschnittstelle `not_configured`.
 
 ## Pull Requests und Auto-Merge
 
@@ -134,19 +140,14 @@ dem Aktivieren wird ein Commit-/Manifest-Checkpoint angelegt. Rollback erfolgt
 auf einen bekannten Commit in einem neuen Restore-Schritt. Kritische Runner-,
 Auth- und Freigabecodeänderungen benötigen eine unabhängige Prüfung.
 
-Der lokale Stand auf `codex/oauth-returnto-hardening` enthält den neuen PWA-
-Updateablauf: „Neue Version laden“ erscheint, sobald ein aktualisierter Service
-Worker bereitsteht. Erst nach Antippen wird er aktiviert und die Seite einmal
-neu geladen; der erste Service-Worker-Einsatz löst keinen automatischen Reload
-aus. Offline-Fallback gilt nur für statische GET-Assets. API-, OAuth- und Health-
-Anfragen bleiben netzwerkgebunden. Beim Aktivieren werden ausschließlich ältere
-`prompthub-static-*`-Caches gelöscht. Bei Änderungen an der statischen Assetliste
-wird die Cache-Version in `src/pwa/sw.js` erhöht.
-
-Dieser lokale Stand ist noch nicht gepusht. Die zuletzt dokumentierte Production-
-Version stammt von Commit `504477dc35dab908c8b3755550866bca071c72db` und verwendet
-weiterhin `prompthub-static-v3`; der neue Updateablauf ist deshalb noch nicht
-auf `prompthub-studio.pages.dev` verfügbar.
+Der Service Worker fragt bei einer bereitstehenden neuen Version zuerst nach
+Nutzeraktion („Neue Version laden“) und lädt sie erst danach; der erste
+Service-Worker-Einsatz löst keinen automatischen Reload aus. Offline-Fallback
+gilt nur für statische GET-Assets. API-, OAuth- und Health-Anfragen bleiben
+netzwerkgebunden. Beim Aktivieren werden ausschließlich ältere
+`prompthub-static-*`-Caches gelöscht. Der Ablauf ist in `test/pwa-updates.test.mjs`
+lokal regressionstested. Eine Live-Abnahme auf einem iPhone, einschließlich
+Offline- und Updateverhalten, steht noch aus.
 
 ## Ressourcen und Kosten
 

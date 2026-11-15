@@ -832,3 +832,26 @@
 - `ACCEPTANCE_CRITERIA.md` verweist nun auf diese Nachweise. PR #15 änderte
   ausschließlich Abnahmematrix und Checkpoint-Dokumentation; Produktcode und
   Sicherheitsregeln blieben unverändert.
+
+## CP-033 – Hosting- und Abnahmestatus aktualisiert
+
+- Datum: 2026-11-15.
+- `README.md`, `OPERATIONS.md`, `CLOUD_COST_RULES.md`,
+  `CLOUDFLARE_OPERATIONS.md`, `DEVELOPMENT_PLAN.md` und
+  `ACCEPTANCE_CRITERIA.md` stimmen den dokumentierten Main-Stand auf
+  `b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f`, Main-CI-Run 66 und Pages-Run 16
+  ab. PR #16 bestand PR-CI-Run 65 und wurde automatisch gemergt.
+- GitHub Pages ist der aktive statische PWA-Host. Cloudflare Pages bleibt
+  pausiert; das letzte im Dashboard beobachtete Deployment
+  `7f73f6ff-0294-4c4e-800c-d9509b48709c` für Commit
+  `8f0fdc25e90f0ba32d0ed79c724ff136aed14881` ist nicht gelöscht und weiterhin
+  erreichbar. Eine endgültige Projektlöschung wurde nicht ausgeführt, weil die
+  gesonderte Bestätigung noch aussteht.
+- Cloudflare zeigte `Workers Free`; die geprüfte Nutzungsansicht war kein
+  vollständiger accountweiter Abrechnungsnachweis. Die Dokumentation behauptet
+  deshalb keine unabhängig verifizierte Gesamtabrechnung von 0 €.
+- Der Nutzer hat zukünftige automatische Merges nach bestandenen Pflichtchecks
+  autorisiert. Der letzte erfolgreiche Branch-Regel-Readback bleibt als letzter
+  bekannter Nachweis gekennzeichnet; eine aktuelle Neulesung liegt nicht vor.
+- Lokale Pflichtprüfungen: `npm test` 105/105 bestanden; `npm run check`
+  bestand für 96 Dateien; `git diff --check` ohne Befund.

@@ -38,36 +38,37 @@
   „Usage blocked“. Included-Usage-Alerts sind eingeschaltet. Bei erreichtem
   kostenfreien Kontingent blockiert GitHub Actions statt Mehrverbrauch zu
   berechnen; ein CI-Lauf bleibt deshalb von der verbleibenden Free-Usage abhängig.
-- Cloudflare Pages `prompthub-studio` bleibt mit dem öffentlichen Quell-
-  Repository verbunden; die letzte Veröffentlichung
-  `10eb0d77-7b19-4edc-9adc-548518e098f7` für Commit
-  `504477dc35dab908c8b3755550866bca071c72db` ist weiterhin unter
-  `https://prompthub-studio.pages.dev` erreichbar. Automatische Production-
-  Deployments sind deaktiviert, Preview-Deployments stehen nach Dashboard-
-  Readback auf `None`. Es wurde kein Projekt oder Deployment gelöscht.
-  `Fail closed` bleibt im Dashboard gespeichert und verifiziert.
+- GitHub Pages ist der aktive statische PWA-Host unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`; es gibt dort
+  keine Control API. Cloudflare ist abgewählt. Das Pages-Projekt
+  `prompthub-studio` ist pausiert und noch mit dem öffentlichen Quell-Repository
+  verbunden. Das zuletzt im Dashboard beobachtete erfolgreiche Deployment war
+  `7f73f6ff-0294-4c4e-800c-d9509b48709c` für Commit
+  `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`; die alte Veröffentlichung unter
+  `https://prompthub-studio.pages.dev` bleibt erreichbar. Deployments sind
+  pausiert; Preview-Builds wurden auf `None` gesetzt, konnten nach dem
+  Browserausfall aber nicht erneut ausgelesen werden. Das Projekt wurde nicht
+  gelöscht; die endgültige Löschung wartet auf eine gesonderte Bestätigung.
 - Die Control-Plane-Runtime ist nicht eingerichtet: kein `SESSIONS`-KV-Binding,
   keine PromptHub-GitHub-OAuth-App und keine Runtime-Secrets. Deshalb geben
   `/api/me` und `/healthz` HTTP 503; es gibt keine funktionsfähige Anmeldung,
   Auftragsverwaltung oder Cloud-Ausführung. Das Quell-Repository ist öffentlich;
   das separate private Control-Repository ist vorhanden, aber nicht mit einer
   Laufzeit verbunden.
-- Preview-Branches stehen auf `None`; automatische Production-Deployments sind
-  ebenfalls deaktiviert. Preview-Adressen wären bei einer späteren Aktivierung
-  öffentlich; Cloudflare Access ist nicht eingerichtet und Preview-Secrets
-  wurden nicht gesetzt.
-- Die Cloudflare-Billing-Seite lud nicht; der Kontotarif und Zahlungsmittel
-  sind daher nicht unabhängig verifiziert. In diesem Arbeitsgang wurde kein
-  kostenpflichtiger Tarif, keine kostenpflichtige Ressource und keine
-  Abrechnungsfunktion aktiviert. Das 0-€-Budget bleibt verbindlich.
-- Wrangler Direct Upload wäre eine Alternative ohne GitHub-App, erfordert aber
-  `Pages Write` auf Kontoebene. Dieses Recht kann Pages-Projekte des Kontos
-  erstellen, ändern und löschen. Das bereits verknüpfte Git-Integrationsprojekt
-  wird nicht auf Direct Upload umgestellt. Für diese Sitzung fehlen Wrangler,
-  Cloudflare-Token und Cloud-Browser; es fand keine Cloudflare-Schreiboperation
-  statt. Ein GitHub-Actions-Deployment-Workflow ist nicht eingerichtet; der
-  verifizierte $0-Actions-Budgetstopp blockiert Mehrverbrauch nach erschöpfter
-  inkludierter Free-Usage.
+- Der Cloudflare-Account zeigte bei einer späteren schreibgeschützten Prüfung
+  den Tarif `Workers Free`. Die Seite für abrechnungsrelevante Nutzung zeigte
+  nur für Spectrum „No data“ und weist auf tägliche Aktualisierung hin; das ist
+  kein vollständiger accountweiter Kosten- oder Verbrauchsnachweis. Es wird
+  daher keine accountweite Aussage „0 € abgerechnet“ getroffen.
+- In der letzten Prüfung wurde kein kostenpflichtiger Tarif aktiviert. Die
+  beobachtete Workers-Free-Einstellung und die unvollständige Nutzungsansicht
+  belegen jedoch weder vollständige Abrechnungsdaten noch Kontostand oder
+  Zahlungsmittel. Cloudflare wird nicht weiter als Host eingerichtet.
+- Das Projekt ist weiterhin mit GitHub verbunden, aber pausiert. Es wurden in
+  der letzten Prüfung keine Cloudflare-Einstellungen geändert. Ein zusätzlicher
+  GitHub-Actions-Deployment-Workflow ist nicht eingerichtet; der GitHub-
+  Actions-Budgetstopp blockiert Mehrverbrauch nach erschöpfter inkludierter
+  Free-Usage.
 - Der Cloudflare-Tarifstand wurde am 2026-11-15 ausschließlich anhand der
   offiziellen Dokumentation recherchiert: Free Workers bis 100.000 Worker-
   Requests/Tag und 10 ms CPU je Aufruf; statische Assets sind kostenfrei und
@@ -81,14 +82,13 @@
   `/healthz` `runner_status: not_configured`. Die Cloud-PWA-Ausführung ist daher
   vorbereitet, aber erst nach Einrichtung und externem Funktionstest abnehmbar.
 - Der Nutzer hat `test` als erforderlichen GitHub-Check ausdrücklich
-  freigegeben und anschließend ausdrücklich die Veröffentlichung des
-  Quell-Repositories angeordnet. GitHub Free erlaubt Branch Protection für
-  öffentliche Repositories. Die Branch-Protection-API bestätigt für `main`
-  den erforderlichen Check `test`, `strict=true` und Admin-Enforcement.
-  GitHub Actions Run 14 (`43746180556`) bestand für Commit
-  `d45d1514656ce120da54e97de5e02f7ee68db288`; `main` verlangt damit `test` für
-  PR-Merges. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht.
-  Es wurde kein kostenpflichtiger Plan aktiviert. Quellen:
+  freigegeben, das Quell-Repository öffentlich gestellt und automatische Merges
+  nach bestandenen Pflichtchecks ausdrücklich autorisiert. Der letzte
+  erfolgreiche Branch-Protection-Readback bestätigte für `main` den Check
+  `test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über
+  die verbundene Schnittstelle nicht verfügbar. Der Readback zeigte außerdem,
+  dass die Regel keinen PR verlangt und direkte Pushes nicht beschränkt.
+  GitHub meldete `allow_auto_merge=true`. Quellen:
   [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).
 
 ## Laufzeitregeln

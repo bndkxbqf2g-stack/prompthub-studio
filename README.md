@@ -9,14 +9,16 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
 am 2026-11-15 veröffentlichte GitHub-Quell-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. Der letzte dokumentierte Main-Stand
-vor dieser Statusaktualisierung war `65f0b8fbee80ede6cd25b3163b962cda3ffee953`;
-Main-CI-Run 57 (`43762108744`) und GitHub-Pages-Run 13 (`43762107596`)
-bestanden. PR #13 wurde nach erfolgreichem Pflichtcheck automatisch gemergt.
-Der letzte erfolgreiche Branch-API-Readback bestätigte den erforderlichen Check `test`,
-`strict=true` und Admin-Enforcement; die aktuelle GitHub-Integration kann diese
-Regel derzeit nicht erneut auslesen. Direkte Pushes sind nicht eingeschränkt.
-GitHub bestätigt `allow_auto_merge=true`.
+ist die dauerhafte Quelle für den Quellcode. `main` steht auf
+`b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f`; Main-CI-Run 66
+(`43764164796`) und GitHub-Pages-Run 16 (`43764164154`) waren erfolgreich.
+PR #16 wurde nach bestandenem `test`-Check automatisch gemergt. GitHub meldet
+`allow_auto_merge=true`; der Nutzer hat automatische Merges nach bestandenen
+Pflichtchecks ausdrücklich autorisiert. Der letzte erfolgreiche
+Branch-API-Readback bestätigte den erforderlichen Check `test`, `strict=true`
+und Admin-Enforcement. Ein aktueller Readback der Branch-Regel ist über die
+verbundene GitHub-Schnittstelle nicht verfügbar; laut letztem Readback verlangt
+die Regel keinen PR und beschränkt direkte Pushes nicht.
 
 GitHub Pages ist unter
 [bndkxbqf2g-stack.github.io/prompthub-studio](https://bndkxbqf2g-stack.github.io/prompthub-studio/)
@@ -27,23 +29,21 @@ Der Live-Browser lud UI, Manifest und das PNG-App-Icon über HTTPS. Die PWA zeig
 „Die Control API ist derzeit nicht erreichbar.“ Die Installation auf einem
 echten iPhone sowie Offline- und Updateverhalten sind live noch nicht abgenommen.
 
-Das Cloudflare-Pages-Projekt und seine letzte Veröffentlichung unter
-[prompthub-studio.pages.dev](https://prompthub-studio.pages.dev) bleiben
-vorhanden. Automatische Production-Deployments sind pausiert, Preview-Deployments
-stehen auf `None`; die vorhandene Veröffentlichung wurde nicht gelöscht. Ihre
-Control API ist nicht eingerichtet: `/api/me` und `/healthz` antworten deshalb
-mit HTTP 503 (`cloud_control_plane_not_configured`). OAuth, KV-Binding und
-Runtime-Secrets fehlen; keine der beiden Live-Adressen ist derzeit eine
-betriebsbereite Auftragssteuerung.
+Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt bleibt
+pausiert; die alte Veröffentlichung und `*.pages.dev`-Adresse sind noch
+vorhanden, und die GitHub-Verknüpfung besteht weiter. Die Control API ist dort
+nicht eingerichtet: `/api/me` und `/healthz` antworten mit HTTP 503
+(`cloud_control_plane_not_configured`). OAuth, KV-Binding und Runtime-Secrets
+fehlen. GitHub Pages liefert nur die statische PWA und keine Control API.
 
 Ein separates privates GitHub-Control-Repository wurde angelegt und mit einer
 leeren Lease-Datei initialisiert. Es ist noch nicht mit einer PromptHub-Laufzeit
 verbunden; OAuth-App, Runtime-Secrets und ein freigegebener serverloser API-Host
 fehlen. Die Control API ist daher nicht verfügbar. Es wurde kein kostenpflichtiger
-Plan aktiviert. Der
-Cloudflare-Billing-Status konnte wegen der nicht ladenden Abrechnungsseite
-nicht unabhängig verifiziert werden. Die
-Abnahmematrix, Kostenregeln und aktuellen Betriebseinschränkungen stehen in
+Plan aktiviert. Eine spätere schreibgeschützte Dashboard-Prüfung zeigte den
+Workers-Free-Tarif; die Abrechnungsansicht lieferte keinen vollständigen
+accountweiten Kostenbeleg. Die Abnahmematrix, Kostenregeln und aktuellen
+Betriebseinschränkungen stehen in
 `ACCEPTANCE_CRITERIA.md`, `CLOUD_COST_RULES.md`,
 `CLOUDFLARE_OPERATIONS.md` und `HOSTING_OPTIONS.md`.
 
@@ -67,8 +67,8 @@ werden:
 npm run demo
 ```
 
-Die serverlose Cloudflare-Variante und ihre verbindlichen Setup-/Kostenlimits
-stehen in `CLOUDFLARE_OPERATIONS.md`; automatische Deployments bleiben pausiert.
+Die frühere Cloudflare-Variante und ihr pausierter Status sind in
+`CLOUDFLARE_OPERATIONS.md` dokumentiert. Cloudflare-Deployments bleiben pausiert.
 Netlify Free ist als Alternative geprüft, aber noch nicht verbunden oder
 freigegeben. Die unabhängige Prüfung empfiehlt vor produktiver Aktivierung
 No-Go: OAuth-/Session-Integration, isolierte Previews und ein verlässlicher
