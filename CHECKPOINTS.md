@@ -626,3 +626,21 @@
 - Prüfungen: `npm test` 104/104 bestanden; `npm run check` erfolgreich
   (95 Dateien, Prompt-Library synchron); `git diff --check` erfolgreich.
   Keine Laufzeitabhängigkeit und kein Test wurden geändert.
+
+## CP-023 – Auto-Merge-Autorisierung umgesetzt und nachgewiesen
+
+- Datum: 2026-11-15, 19:50 UTC.
+- Die ausdrückliche Nutzerautorisierung für Auto-Merge zukünftiger PRs ist in
+  `OPERATIONS.md` dokumentiert. Die Regel hält `test`, unabhängige Reviews und
+  erforderliche menschliche Freigaben aufrecht und weist darauf hin, dass
+  direkte Pushes durch die aktuelle `main`-Regel nicht gesperrt sind.
+- PR #5 wurde für Auto-Merge vorgemerkt und nach bestandenem Pflichtjob
+  `test` automatisch per Squash integriert. GitHub Actions Run 28
+  (`43754476641`) bestand für PR-Head
+  `047ab9a5eb2f323706a087ef7b233edad61a68fe`; Merge-Commit:
+  `ab508221f681d9700a09b275b627dd309e583de2`. GitHub-Readback bestätigte
+  `merged=true` und `auto_merge.merge_method=squash`.
+- Pflichtprüfungen lokal: `npm test` 104/104 bestanden; `npm run check`
+  erfolgreich (95 Dateien, Prompt-Library synchron); `git diff --check`
+  erfolgreich. Die Änderung ist dokumentarisch; Runtime, Tests und Kosten-
+  beziehungsweise Deployment-Einstellungen wurden nicht verändert.
