@@ -39,14 +39,16 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Der Inhalt bleibt bis zur bestandenen PromptHub-Abnahme und der einmaligen
   MVP-Umfangsbestätigung unangetastet.
 - Aktueller Codex-Zugriff (2026-11-15): `codex-cli 0.167.0-alpha.4.1` ist in
-  der verwalteten Windows-Shell installiert, aber `codex login status` scheitert
-  mit `Could not find home directory`; `USERPROFILE` ist gesetzt, `HOME` und
-  `CODEX_HOME` nicht. Die Umgebungsvariablen wurden nicht verändert. Die
-  Codex-Cloud-Umgebungsabfrage meldet `asenvcfg_base` als bereit/lauffähig, aber
-  ohne verknüpfte Repositories. Es wurde kein Cloud-Task gestartet. Somit ist
-  weder ein authentifizierter lokaler Executor noch autonome Cloud-Ausführung
-  für PromptHub nachgewiesen. `gh` und `wrangler` sind nicht verfügbar; ein
-  echter Mac-Runner wurde nicht getestet. GitHub-Schreibzugriff wurde später
+  der verwalteten Windows-Shell installiert. `codex login status` scheiterte
+  zunächst mit `Could not find home directory`; mit einem nur für den Aufruf
+  gesetzten `CODEX_HOME` auf das vorhandene `%USERPROFILE%\.codex` meldete die
+  CLI erfolgreich eine ChatGPT-Sitzung. Der Override wurde entfernt; es wurde
+  keine dauerhafte Umgebungs- oder Auth-Konfiguration geändert. Das bestätigt
+  den Login dieser CLI-Umgebung, aber weder die Konfiguration des PromptHub-
+  Runners noch autonome Cloud-Ausführung. Die Codex-Cloud-Umgebungsabfrage
+  meldet `asenvcfg_base` als bereit/lauffähig, aber ohne verknüpfte Repositories;
+  es wurde kein Cloud-Task gestartet. `gh` und `wrangler` sind nicht verfügbar;
+  ein echter Mac-Runner wurde nicht getestet. GitHub-Schreibzugriff wurde später
   über den vorhandenen Git Credential Manager nachgewiesen (`admin=true`,
   `push=true`); Sandbox-Datei-/Netzwerkgrenzen wurden für die erforderlichen
   Git-Metadaten- und Push-Befehle gezielt überwunden.

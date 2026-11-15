@@ -683,3 +683,23 @@
 - Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test`
   105/105 bestanden; `npm run check` bestanden (96 Dateien); `git diff --check`
   bestanden.
+
+## CP-026 – Windows-Codex-CLI und pausierte Cloudflare-Deployments verifiziert
+
+- Datum: 2026-11-15, 20:25 UTC.
+- `codex login status` scheiterte zunächst mit `Could not find home directory`.
+  Mit einem nur für den Prozess gesetzten `CODEX_HOME`, das auf das vorhandene
+  `%USERPROFILE%\.codex` zeigte, lieferte es Exit-Code 0 und den Status
+  `ChatGPT session`. Der Override wurde wieder entfernt; persistente Umgebungs-
+  und Authentifizierungseinstellungen wurden nicht geändert. Das belegt keinen
+  gestarteten oder für PromptHub konfigurierten Runner.
+- Das Cloudflare-Dashboard zeigte für `prompthub-studio` `Deployments paused`.
+  Produktions-Deployments sind pausiert, Previews stehen auf `None`; die alte
+  `pages.dev`-Veröffentlichung bleibt erreichbar. Es wurde nichts gelöscht,
+  reaktiviert oder kostenpflichtig geschaltet.
+- `OPERATIONS.md` dokumentiert nun den reversiblen Windows-CLI-Workaround sowie
+  GitHub Pages als aktiven statischen PWA-Host und Cloudflare als pausierte
+  Altressource. `DEVELOPMENT_PLAN.md` unterscheidet den erfolgreichen lokalen
+  CLI-Login von einer noch fehlenden PromptHub-Runner-/Cloud-Konfiguration.
+- Pflichtprüfungen: `npm test` 105/105 bestanden; `npm run check` bestanden
+  (96 Dateien, Prompt-Library synchron); `git diff --check` bestanden.
