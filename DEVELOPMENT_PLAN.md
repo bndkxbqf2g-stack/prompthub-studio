@@ -93,10 +93,14 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Production- und Preview-Deployments sind pausiert. GitHub Pages ist unter
   `https://bndkxbqf2g-stack.github.io/prompthub-studio/` aktiv; die PWA-Dateien
   sind unter `/src/pwa/`. GitHub Pages stellt keine Control API bereit. GitHub
-  Actions Run 14
-  (`43746180556`) für den offenen PR-Head `d45d1514656ce120da54e97de5e02f7ee68db288`
-  ist erfolgreich. Das Control-API-KV-Binding, die OAuth-App und Runtime-Secrets
-  sind weiterhin nicht eingerichtet; die API liefert deshalb HTTP 503.
+  Pages-Unterpfad-Fix wurde mit PR #2 gemergt. GitHub Actions Run 19
+  (`43749169752`) bestand auf PR-Head
+  `36ba10a4166bb365e6fcc8d06b443a2d77118d35`; Merge-Commit ist
+  `c3d479a7676a143ebf4c6ad8448651e162bb9ea3`. Die Browserprüfung bestätigte
+  geladene Styles und relative Icon-/Manifest-Pfade, aber die Control API ist
+  auf diesem statischen Host nicht erreichbar. Das Control-API-KV-Binding, die
+  OAuth-App und Runtime-Secrets sind weiterhin nicht eingerichtet; die
+  Cloudflare-API liefert deshalb HTTP 503.
   Cloudflare Fail closed ist verifiziert.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
@@ -105,24 +109,29 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Erledigt: GitHub Actions Run 14 (`43746180556`) war für den offenen PR-Head
-  `d45d1514656ce120da54e97de5e02f7ee68db288` erfolgreich; Pflichtjob `test`
-  und die Schritte `npm test`, `npm run check`, `git diff --check` bestanden.
+- Erledigt: GitHub Actions Run 19 (`43749169752`) war für PR #2 mit Head
+  `36ba10a4166bb365e6fcc8d06b443a2d77118d35` erfolgreich; Pflichtjob `test`
+  bestand und PR #2 wurde mit Merge-Commit
+  `c3d479a7676a143ebf4c6ad8448651e162bb9ea3` in `main` integriert.
 - Merge-Gate: Nach der ausdrücklichen Freigabe von `test` und der autorisierten
   Veröffentlichung des Quell-Repositories wurde `main` mit erforderlichem
   Check `test`, `strict=true` und Admin-Enforcement geschützt. API-Readback
   bestätigt die Werte. Die Regel verlangt keinen PR und beschränkt direkte
-  Pushes nicht. Es wurde kein kostenpflichtiger Plan aktiviert. PR #2 ist offen
-  und nicht gemergt; Remote-Control- und Runner-Integrationschecks bleiben offen.
+  Pushes nicht. Es wurde kein kostenpflichtiger Plan aktiviert. PR #2 wurde
+  nach erfolgreichen Pflichtchecks gemergt; GitHub bestätigt `allow_auto_merge=true`
+  für zukünftige geeignete PRs. Remote-Control- und Runner-Integrationschecks
+  bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.
 
 ### Phase 3 – produktionsnahe Sicherheit
 
-- Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; der
-  Unterpfad-Fix ist lokal vorbereitet. Der vorhandene Cloudflare-Deploy bleibt
-  erreichbar, wird aber nicht mehr automatisch aktualisiert.
+- Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; PR #2 enthält
+  den Unterpfad-Fix und die Live-Seite lädt Styles sowie relative
+  Icon-/Manifest-Pfade. Die Control API bleibt auf dem statischen Host
+  unerreichbar. Der vorhandene Cloudflare-Deploy bleibt erreichbar, wird aber
+  nicht mehr automatisch aktualisiert.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.

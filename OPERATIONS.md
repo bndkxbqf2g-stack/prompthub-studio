@@ -32,8 +32,10 @@ Workers-Static-Assets-Profil bleibt in `wrangler.worker.toml` erhalten.
 
 GitHub Pages ist unter https://bndkxbqf2g-stack.github.io/prompthub-studio/
 aktiv. Die PWA-Dateien liegen unter `/src/pwa/`; GitHub Pages bietet dort nur
-statische Assets, keine Control API oder serverseitige Anmeldung. Der PWA-Fix
-für diesen Unterpfad ist lokal vorbereitet, aber noch nicht in PR #2 übertragen.
+statische Assets, keine Control API oder serverseitige Anmeldung. PR #2 wurde
+mit dem Unterpfad-Fix gemergt. Eine Live-Browserprüfung bestätigte das gerenderte
+PWA-UI und geladene Styles sowie relative Icon-/Manifest-Pfade; die Oberfläche
+meldet weiterhin, dass die Control API nicht erreichbar ist.
 
 Die statische PWA-Hülle ist erreichbar. Die Control API antwortet mit HTTP 503,
 bis ein Production-KV-Binding `SESSIONS`, die GitHub-OAuth-App, eine Login-

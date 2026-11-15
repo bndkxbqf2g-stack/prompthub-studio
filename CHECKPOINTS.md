@@ -560,3 +560,37 @@
   GitHub Actions Run 17 (`43748927468`) bestand für den Commit oben: Pflichtjob
   `test` und alle Schritte erfolgreich.
 - Die Control API bleibt mangels Backend-Konfiguration nicht betriebsbereit.
+
+## CP-021 – PR #2 gemergt und GitHub-Pages-PWA verifiziert
+
+- Datum: 2026-11-15, 19:08 UTC.
+- PR #2 wurde mit 14 Commits in `main` gemergt. GitHub zeigt den PR als
+  erfolgreich geschlossen; Merge-Commit: `c3d479a7676a143ebf4c6ad8448651e162bb9ea3`.
+  Die zwei PR-Checks waren erfolgreich. GitHub Actions Run 19
+  (`43749169752`) bestand für den PR-Head
+  `36ba10a4166bb365e6fcc8d06b443a2d77118d35`; der Merge-Commit hat keinen
+  separaten Actions-Run.
+- GitHub bestätigt das öffentliche Repository und `allow_auto_merge=true`.
+  Der Merge von PR #2 erfolgte manuell, nachdem die Pflichtchecks erfolgreich
+  waren. Auto-Merge kann für zukünftige geeignete PRs verwendet werden. Die
+  bereits verifizierte `main`-Regel verlangt `test`, `strict=true` und erzwingt
+  sie auch für Administratoren; sie erzwingt keinen PR und sperrt direkte
+  Pushes nicht.
+- Nach dem Merge wurde
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/` im Browser
+  geladen. Das gerenderte UI verwendet den korrekten Repository-Unterpfad;
+  Stylesheet und relative Icon-/Manifest-URLs sind aufgelöst. Es gab keine
+  Browser-Konsolenfehler. Die Oberfläche meldet weiterhin, dass die Control
+  API nicht erreichbar ist. GitHub Pages hostet nur statische Dateien; dies
+  ist kein Nachweis für OAuth, die API, Offline-Start oder iPhone-Installation.
+- Cloudflare Pages wurde nicht gelöscht oder neu veröffentlicht; automatische
+  Production- und Preview-Deployments bleiben pausiert. Es wurden keine
+  kostenpflichtigen Dienste aktiviert. Kontobilling bleibt ungeprüft.
+- Dokumentation auf den gemergten und live geprüften Stand gebracht:
+  `README.md`, `ACCEPTANCE_CRITERIA.md`, `DEVELOPMENT_PLAN.md` und
+  `OPERATIONS.md`. A17 bleibt teilweise offen; die technische Erstabnahme ist
+  nicht bestanden, solange Control API/OAuth, Runner, iPhone-Prüfung und weitere
+  externe Nachweise fehlen.
+- Pflichtprüfungen nach den Statusänderungen: `npm test` 104/104 bestanden;
+  `npm run check` erfolgreich (94 Dateien, Prompt-Library synchron);
+  `git diff --check` erfolgreich. Es wurden keine Tests oder Regeln geändert.
