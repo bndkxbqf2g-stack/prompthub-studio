@@ -73,7 +73,10 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Belegstatus und Stichproben-/Aufbewahrungsgrenzen aus. CI speichert keine
   vollständigen Logs.
 - A14-Strategiebewertungen sind über API und GitHub-Evidenz-Gate angebunden.
-  Eine eigene PWA-Verwaltung, echte Review-/Actions-Nachweise und kontrollierte
+  Die PWA unterstützt projektbezogenes Erfassen, Anzeigen und freigabegesteuerte
+  Übernahme. Job- und Fehlerhistorie-Ansichten fragen projektgefiltert ab und
+  verwerfen verspätete Antworten nach Projektwechseln.
+  Echte Review-/Actions-Nachweise, produktive API-Konfiguration und kontrollierte
   Wirksamkeitsvergleiche bleiben offene Arbeit.
 - Offene Wissensarbeit: kontrollierte, explizit geprüfte projektübergreifende
   Übertragung und gepaarte Strategieexperimente mit Commit-/CI-Vergleich.

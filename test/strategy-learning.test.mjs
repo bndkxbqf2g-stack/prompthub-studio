@@ -251,6 +251,29 @@ test("critical API route derives the approver from GitHub session and rejects lo
   assert.equal(calls.length, 0);
 });
 
+test("strategy API is project-scoped and derives the proposer from the authenticated session", async () => {
+  const calls = [];
+  const handler = createRequestHandler({
+    config: readConfig({ NODE_ENV: "test", PROMPTHUB_MODE: "memory", AUTH_MODE: "local" }),
+    controlPlane: { async listJobs() { return []; } },
+    auth: { async getSession() { return { user: { login: "signed-in-author" }, provider: "local", local: true }; } },
+    strategyLearning: {
+      async list(projectId) { return [{ id: "strategy_saved", project_id: projectId }]; },
+      async evaluate(...args) { calls.push(args); return { id: "strategy_new", status: "awaiting_approval" }; },
+    },
+  });
+  const base = "http://127.0.0.1/api/projects/owner%2Fapp/strategies";
+  const listed = await handler(new Request(base));
+  assert.deepEqual(await listed.json(), { strategies: [{ id: "strategy_saved", project_id: PROJECT }] });
+  const created = await handler(new Request(base, {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ name: "Store verified evidence", hypothesis: "Observe the actual merged outcome.", pullRequestNumber: 12, workflowRunId: 34, proposedBy: "forged-user" }),
+  }));
+  assert.equal(created.status, 201);
+  assert.deepEqual(calls[0], [PROJECT, { name: "Store verified evidence", hypothesis: "Observe the actual merged outcome.", pullRequestNumber: 12, workflowRunId: 34 }, "signed-in-author"]);
+});
+
 test("critical API route takes the approver identity only from the authenticated GitHub session", async () => {
   const calls = [];
   const handler = createRequestHandler({

@@ -93,9 +93,16 @@ Quellen werden über Commit-SHAs, Testnamen, Issue-Nummern oder URLs erhalten.
 - Ein grüner Pflichtcheck belegt nur, dass dieser Check auf einer
   zusammengeführten Änderung bestanden wurde. Er ist allein kein kausaler
   Wirksamkeitsnachweis und keine gemessene Qualitäts- oder Leistungsaussage.
-- Derzeit sind die Endpunkte implementiert; eine eigene PWA-Oberfläche zur
-  Verwaltung der Strategiebewertungen und Live-Nachweise aus GitHub sind noch
-  nicht abgenommen.
+- Die PWA kann Bewertungen projektbezogen erfassen und anzeigen. Sie bietet die
+  Übernahme nur bei vollständiger aktueller Evidenz und einer GitHub-Session an;
+  der Server prüft alle Nachweise bei der Freigabe erneut. Nutzereingaben werden
+  als Textknoten ausgegeben und nicht als HTML interpretiert. Auftrags- und
+  Fehlerhistorie-Anfragen werden auf das ausgewählte Projekt gefiltert;
+  verspätete Antworten nach einem Projektwechsel werden verworfen. Ladefehler
+  bleiben von einem erfolgreich geladenen leeren Zustand unterscheidbar.
+- Die UI kennzeichnet einen grünen Pflichtcheck ausdrücklich als CI-Nachweis,
+  nicht als bewiesene kausale Wirksamkeit. Echte GitHub-Review-/Actions-Belege
+  und die produktive Control-API sind noch nicht live abgenommen.
 
 ## Fehlerprävention und Lernen
 

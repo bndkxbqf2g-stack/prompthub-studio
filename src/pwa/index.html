@@ -71,6 +71,26 @@
             </form>
             <div id="incidents" class="incident-list" aria-live="polite"></div>
           </section>
+          <section id="strategy-panel" class="strategy-panel" hidden aria-labelledby="strategy-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">KONTROLLIERTE VERBESSERUNGEN</p><h3 id="strategy-title">Strategie- und CI-Nachweise</h3></div>
+            </div>
+            <p class="muted">Erfasse eine bereits gemergte Änderung mit erfolgreichem GitHub-Check <code>test</code>. Ein grüner Check allein belegt keine kausale Wirksamkeit. PromptHub ändert das Repository bei diesem Schritt nicht.</p>
+            <form id="strategy-form" class="strategy-form">
+              <label for="strategy-name">Strategie</label>
+              <input id="strategy-name" name="name" maxlength="300" required placeholder="Zum Beispiel: Regressionstest vor Änderung ergänzen">
+              <label for="strategy-hypothesis">Beobachtung oder Hypothese</label>
+              <textarea id="strategy-hypothesis" name="hypothesis" rows="3" maxlength="4000" required placeholder="Was sollte verbessert werden und was ist tatsächlich beobachtet?"></textarea>
+              <div class="strategy-evidence-fields">
+                <label for="strategy-pr">Gemergte PR-Nummer</label>
+                <input id="strategy-pr" name="pullRequestNumber" type="number" min="1" step="1" required inputmode="numeric">
+                <label for="strategy-run">Erfolgreiche Actions-Run-ID</label>
+                <input id="strategy-run" name="workflowRunId" type="number" min="1" step="1" required inputmode="numeric">
+              </div>
+              <button class="button secondary" type="submit">GitHub-Nachweise prüfen</button>
+            </form>
+            <div id="strategies" class="strategy-list" aria-live="polite"></div>
+          </section>
         </section>
 
         <section id="designer-section" class="card designer-card">

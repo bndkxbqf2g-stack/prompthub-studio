@@ -64,7 +64,7 @@ test("service worker preserves unrelated caches and waits for a user-requested u
       calls.opened = name;
       return { async addAll(paths) { calls.added = paths; } };
     },
-    async keys() { return ["prompthub-static-v3", "other-app-cache", "prompthub-static-v4"]; },
+    async keys() { return ["prompthub-static-v3", "prompthub-static-v4", "other-app-cache", "prompthub-static-v5"]; },
     async delete(name) { calls.deleted.push(name); },
     async match() { calls.matched += 1; return new Response("cached offline asset"); },
   };
@@ -79,12 +79,13 @@ test("service worker preserves unrelated caches and waits for a user-requested u
   const waits = [];
   listeners.get("install")({ waitUntil(promise) { waits.push(promise); } });
   await Promise.all(waits);
-  assert.equal(calls.opened, "prompthub-static-v4");
+  assert.equal(calls.opened, "prompthub-static-v5");
+  assert.ok(calls.added.includes("/strategy-presentation.mjs"));
   assert.ok(calls.added.includes("/service-worker-client.mjs"));
 
   listeners.get("activate")({ waitUntil(promise) { waits.push(promise); } });
   await Promise.all(waits);
-  assert.deepEqual(calls.deleted, ["prompthub-static-v3"]);
+  assert.deepEqual(calls.deleted, ["prompthub-static-v3", "prompthub-static-v4"]);
   assert.equal(calls.claimed, 1);
 
   listeners.get("message")({ data: { type: "UNRELATED_MESSAGE" }, waitUntil() { assert.fail("unrelated messages must not activate the worker"); } });

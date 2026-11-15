@@ -1,6 +1,6 @@
 const CACHE_PREFIX = "prompthub-static-";
-const CACHE = "prompthub-static-v4";
-const STATIC_ASSETS = ["/", "/styles.css", "/app.js", "/service-worker-client.mjs", "/regression-test-request.js", "/manifest.webmanifest", "/app-icon-source.png"];
+const CACHE = "prompthub-static-v5";
+const STATIC_ASSETS = ["/", "/styles.css", "/app.js", "/strategy-presentation.mjs", "/service-worker-client.mjs", "/regression-test-request.js", "/manifest.webmanifest", "/app-icon-source.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(STATIC_ASSETS)));

@@ -180,7 +180,7 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
       const session = await auth.getSession(request);
       if (!session) return json(401, { error: "authentication_required" });
       await beforeProtectedApi?.(request, session);
-      if (request.method === "GET" && pathname === "/api/me") return json(200, { user: session.user, local: session.local === true });
+      if (request.method === "GET" && pathname === "/api/me") return json(200, { user: session.user, local: session.local === true, provider: session.provider ?? (session.local === true ? "local" : "unknown") });
       if (request.method === "POST" && pathname === "/api/logout") {
         const cookie = typeof auth.logout === "function" ? await auth.logout(request) : undefined;
         return json(200, { ok: true }, cookie ? { "Set-Cookie": cookie } : {});
@@ -209,7 +209,16 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
         const strategyId = strategyMatch[2] ?? null;
         const action = strategyMatch[3] ?? null;
         if (!strategyId && request.method === "GET") return json(200, { strategies: await strategyLearning.list(projectId) });
-        if (!strategyId && request.method === "POST") return json(201, { strategy: await strategyLearning.evaluate(projectId, await bodyJson(request, 10_000), session.user.login) });
+        if (!strategyId && request.method === "POST") {
+          const payload = await bodyJson(request, 10_000);
+          const input = {
+            name: payload.name,
+            hypothesis: payload.hypothesis,
+            pullRequestNumber: payload.pullRequestNumber,
+            workflowRunId: payload.workflowRunId,
+          };
+          return json(201, { strategy: await strategyLearning.evaluate(projectId, input, session.user.login) });
+        }
         if (strategyId && action === "adopt" && request.method === "POST") {
           if (session.provider !== "github" || session.local === true) return json(403, { error: "critical_strategy_adoption_requires_github_authentication" });
           const payload = await bodyJson(request, 10_000);
