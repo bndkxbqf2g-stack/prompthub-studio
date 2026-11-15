@@ -9,13 +9,13 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
 am 2026-11-15 veröffentlichte GitHub-Quell-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. Der zuletzt verifizierte Main-Stand
-vor dem aktuellen CI-Änderungszweig ist
-`cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`; Main-CI-Run 69
-(`43765995946`) und GitHub-Pages-Run 17 (`43765995208`) waren erfolgreich.
-PR #17 bestand PR-CI-Run 68 (`43765871861`, Pflichtjob `test`) und wurde danach
-gemergt. GitHub meldet `allow_auto_merge=true`; der Nutzer hat automatische
-Merges nach bestandenen Pflichtchecks ausdrücklich autorisiert. Der letzte erfolgreiche
+ist die dauerhafte Quelle für den Quellcode. Der verifizierte Main-Commit ist
+`50eda91e4211b89c9da178cc235e0bc2c67f68b5`; Main-CI-Run 72
+(`43767244221`) und GitHub-Pages-Run 18 (`43767243571`) waren erfolgreich.
+PR #18 bestand PR-CI-Run 71 (`43767158231`) auf Apple-Silicon- und Intel-macOS
+sowie den Pflichtjob `test` und wurde automatisch gemergt. GitHub meldet
+`allow_auto_merge=true`; der Nutzer hat automatische Merges nach bestandenen
+Pflichtchecks ausdrücklich autorisiert. Der letzte erfolgreiche
 Branch-API-Readback bestätigte den erforderlichen Check `test`, `strict=true`
 und Admin-Enforcement. Ein aktueller Readback der Branch-Regel ist über die
 verbundene GitHub-Schnittstelle nicht verfügbar; laut letztem Readback verlangt
@@ -26,9 +26,13 @@ GitHub Pages ist unter
 aktiv; der Live-Browser lädt die PWA unter
 [`/src/pwa/`](https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/).
 GitHub Pages liefert statische Dateien, aber keine serverseitige Control API.
-Der Live-Browser lud UI, Manifest und das PNG-App-Icon über HTTPS. Die PWA zeigt
+Nach Pages-Run 18 antworteten PWA-Startseite, Manifest, PNG-App-Icon, Service
+Worker, App-JavaScript und Stylesheet live per HTTPS mit HTTP 200 und passenden
+Inhaltstypen. Die PWA zeigt
 „Die Control API ist derzeit nicht erreichbar.“ Die Installation auf einem
 echten iPhone sowie Offline- und Updateverhalten sind live noch nicht abgenommen.
+Die macOS-CI deckt beide CPU-Architekturen ab, weist aber keinen lokalen
+MacBook-Runner mit Codex-Ausführung nach.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt bleibt
 pausiert; die alte Veröffentlichung und `*.pages.dev`-Adresse sind noch

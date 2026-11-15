@@ -18,8 +18,8 @@
   noch nicht bestätigt. Das Projekt bleibt daher pausiert und erhalten.
 - Die aktive statische PWA liegt auf GitHub Pages unter
   https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/. Main-Commit
-  `cd3264da58cbffd3d040e3cfe0a0b71e3ab48949` bestand Main-CI-Run 69 und Pages-
-  Run 17. GitHub Pages hostet keine Control API; der Browser zeigt dafür einen
+  `50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72 und Pages-
+  Run 18. GitHub Pages hostet keine Control API; der Browser zeigt dafür einen
   klaren Verfügbarkeitsfehler.
 - Die frühere Cloudflare-API war nicht konfiguriert: OAuth-App, Runtime-Secrets
   und KV-Binding fehlten. Ihr letzter dokumentierter Status für `/api/me` und

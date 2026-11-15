@@ -855,3 +855,29 @@
   bekannter Nachweis gekennzeichnet; eine aktuelle Neulesung liegt nicht vor.
 - Lokale Pflichtprüfungen: `npm test` 105/105 bestanden; `npm run check`
   bestand für 96 Dateien; `git diff --check` ohne Befund.
+
+## CP-034 – macOS-CI-Gates bestanden und automatisch gemergt
+
+- Datum: 2026-11-15.
+- `.github/workflows/ci.yml` führt vollständige Tests und statische Prüfungen
+  auf `macos-latest` (Apple Silicon) und `macos-15-intel` aus. Der bestehende
+  Pflichtjob `test` läuft immer und schlägt fehl, wenn der macOS-Job fehlschlägt
+  oder wegen privater Repository-Sichtbarkeit übersprungen wird. Es wurden keine
+  Branch-Regeln geändert.
+- GitHub Actions Run 71 (`43767158231`) für PR #18 und Head
+  `e653164e1d6094dcc84b4ff29b7b07ba847a5ff8` bestand beide macOS-Lanes und den
+  Pflichtjob `test`. GitHub Auto-Merge war aktiviert und integrierte den PR als
+  Commit `50eda91e4211b89c9da178cc235e0bc2c67f68b5`.
+- Main-CI-Run 72 (`43767244221`) bestand auf dem Merge-Commit einschließlich
+  beider macOS-Lanes und `test`. GitHub-Pages-Run 18 (`43767243571`) bestand
+  mit `build`, `deploy` und `report-build-status`.
+- Der anschließende HTTPS-Smoke auf der veröffentlichten GitHub-Pages-PWA
+  bestätigte HTTP 200 und passende Inhaltstypen für Startseite, Manifest,
+  App-Icon, Service Worker, App-Skript und Stylesheet.
+- GitHub dokumentiert Standard-Runner in öffentlichen Repositories als
+  kostenlos und unbegrenzt; die gewählten Runner sind Standard- und keine
+  größeren Runner. Das belegt keinen accountweiten Abrechnungsstand.
+- Lokale Pflichtprüfungen: `npm test` 106/106 bestanden; `npm run check`
+  bestand für 96 Dateien; `git diff --check` ohne Befund.
+- A06 ist teilweise belegt: macOS-Kompatibilität ist CI-getestet. Ein echter
+  lokaler MacBook-Runner mit Codex-Ausführung bleibt offen.

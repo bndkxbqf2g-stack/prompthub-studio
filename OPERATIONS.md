@@ -65,14 +65,15 @@ https://bndkxbqf2g-stack.github.io/prompthub-studio/
 
 Die PWA-Dateien liegen unter `/src/pwa/`; GitHub Pages bietet dort nur
 statische Assets, keine Control API oder serverseitige Anmeldung. PR #2 wurde
-mit dem Unterpfad-Fix gemergt. Eine Live-Browserprüfung bestätigte das gerenderte
-PWA-UI und geladene Styles sowie relative Icon-/Manifest-Pfade; die Oberfläche
-meldet weiterhin, dass die Control API nicht erreichbar ist.
+mit dem Unterpfad-Fix gemergt. Nach Pages-Run 18 antworteten Startseite,
+Manifest, App-Icon, Service Worker, App-Skript und Stylesheet live mit HTTP 200
+und passenden Inhaltstypen; die PWA meldet weiterhin, dass die Control API nicht
+erreichbar ist.
 
-Der zuletzt vollständig verifizierte Main-Stand vor dem aktuellen
-CI-Änderungszweig ist `cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`; Main-CI-Run 69
-(`43765995946`) und GitHub-Pages-Run 17 (`43765995208`) waren erfolgreich. PR
-#17 bestand PR-CI-Run 68 (`43765871861`, `test`) und wurde danach gemergt.
+Main-Commit `50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72
+(`43767244221`) und GitHub-Pages-Run 18 (`43767243571`). PR #18 bestand PR-CI-
+Run 71 (`43767158231`) auf beiden macOS-Architekturen und für `test`; GitHub
+führte den Merge automatisch aus.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
