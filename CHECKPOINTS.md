@@ -964,3 +964,19 @@
 - Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 108/108;
   `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
   `git diff --check` ohne Befund.
+
+## CP-039 – PR-/Main-Evidenz nach Auto-Merge aktualisiert
+
+- Datum: 2026-11-16.
+- PR #24 (`761b7510a4206d83e318252a168be92f14c17234`) bestand Actions-Run 89
+  (`43774470371`) vollständig: `macos-latest`, `macos-15-intel` und `test`.
+  GitHub auto-mergte den PR als `86202135780f25f63c288886c85d7694d4204410`.
+- Der lokale `main` wurde auf diesen Merge-Commit fast-forward aktualisiert und
+  war danach sauber. Der verbundene Commit-Status-Readback lieferte keine
+  separaten Statuskontexte. Ein Main-CI- oder Pages-Run nach diesem Merge wurde
+  nicht unabhängig ausgelesen; die Dokumentation behauptet ihn daher nicht.
+- PR #24 änderte nur Dokumentation; Hosting-Anbieter und PWA-Code blieben
+  unverändert.
+- Lokale Pflichtprüfungen dieser Evidenzaktualisierung: `npm test` 108/108;
+  `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
+  `git diff --check` ohne Befund.
