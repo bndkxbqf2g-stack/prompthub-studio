@@ -134,6 +134,10 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   nicht mehr automatisch aktualisiert.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
+- Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet
+  Netlify Free als noch nicht aktivierte Option. Auth-/Session-Adapter,
+  Runtime-Abhängigkeit und Netlify-Kontoverknüpfung warten auf ausdrückliche
+  Freigaben sowie unabhängige Sicherheitsprüfung.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.
 
 ### Phase 4 – technische Abnahme

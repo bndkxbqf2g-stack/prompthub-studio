@@ -594,3 +594,35 @@
 - Pflichtprüfungen nach den Statusänderungen: `npm test` 104/104 bestanden;
   `npm run check` erfolgreich (94 Dateien, Prompt-Library synchron);
   `git diff --check` erfolgreich. Es wurden keine Tests oder Regeln geändert.
+
+## CP-022 – kostenfreie Hosting-Alternativen für die Control API geprüft
+
+- Datum: 2026-11-15, 19:29 UTC.
+- GitHub Pages ist live als statische PWA-Hülle geprüft; die Control API ist
+  nicht erreichbar. Die offizielle GitHub-Dokumentation bestätigt, dass Pages
+  keine serverseitigen Sprachen ausführt.
+- Netlify Free ist als mögliche Alternative recherchiert, nicht eingerichtet:
+  300 Credits/Monat mit hartem Limit, ohne Auto-Recharge; bei Erreichen des
+  Teamlimits pausieren die Sites, bis das Kontingent zurückgesetzt wird. Der
+  Tarif enthält Functions und Blobs. Functions rechnen Compute mit 10
+  Credits/GB-Stunde, Bandbreite mit 20 Credits/GB und Webrequests mit 2
+  Credits/10.000 Requests ab. Das sind Anbieterangaben, keine Verbrauchsmessung.
+- Netlify Blobs kann starke Konsistenz verwenden, benötigt aber das SDK
+  `@netlify/blobs`. Site-weite Stores teilen Daten zwischen Deploy-Kontexten;
+  daher müssen Previewzugriffe isoliert/deaktiviert und Sitzungslaufzeiten
+  serverseitig begrenzt werden. Diese Auth-/Session-Änderung ist kritisch und
+  wurde nicht implementiert.
+- Vercel Hobby wurde als zweite Möglichkeit verglichen: kostenlose Limits und
+  Pause bei Überschreitung, aber nur für persönliche, nicht-kommerzielle
+  Nutzung. Netlify bleibt bloß Kandidat; keine Anbieterentscheidung wurde
+  umgesetzt.
+- Erforderliche Vorbedingungen: ausdrückliche Nutzerfreigabe für die
+  Netlify-Verknüpfung und die kritische Session-Store-Änderung, Ausnahme für die
+  neue Runtime-Abhängigkeit sowie unabhängige Sicherheitsprüfung. Keine
+  Anbieter-App, Secrets, Kostenressource oder Deployment wurden erstellt.
+- Dokumentation ergänzt: `HOSTING_OPTIONS.md`, mit Verweisen in `README.md` und
+  `DEVELOPMENT_PLAN.md`. Cloudflare-Builds bleiben pausiert; GitHub Pages bleibt
+  statisch; die technische Gesamt-Abnahme ist nicht bestanden.
+- Prüfungen: `npm test` 104/104 bestanden; `npm run check` erfolgreich
+  (95 Dateien, Prompt-Library synchron); `git diff --check` erfolgreich.
+  Keine Laufzeitabhängigkeit und kein Test wurden geändert.
