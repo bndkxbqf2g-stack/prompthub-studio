@@ -1,8 +1,16 @@
+import { registerServiceWorker } from "./service-worker-client.mjs";
+import { strategyApprovalGate, strategyStatusLabel } from "./strategy-presentation.mjs";
+
 const state = {
   user: null,
   projects: [],
   selectedProject: null,
   incidents: [],
+  incidentLoadStatus: "idle",
+  jobsLoadStatus: "idle",
+  strategies: [],
+  strategyLoadStatus: "idle",
+  provider: null,
   jobs: [],
   draft: null,
   attachments: [],
@@ -14,8 +22,10 @@ const state = {
 const el = (selector) => document.querySelector(selector);
 const elements = {
   notice: el("#notice"), authPanel: el("#auth-panel"), appPanel: el("#app-panel"), userLabel: el("#user-label"),
+  updateButton: el("#update-app"),
   projects: el("#projects"), projectForm: el("#project-form"), projectDetail: el("#project-detail"),
   incidentPanel: el("#incident-panel"), incidentReportForm: el("#incident-report-form"), incidentSummary: el("#incident-summary"), incidentComponents: el("#incident-components"), incidents: el("#incidents"),
+  strategyPanel: el("#strategy-panel"), strategyForm: el("#strategy-form"), strategies: el("#strategies"),
   designerForm: el("#designer-form"), draftView: el("#draft-view"), intent: el("#intent"),
   jobs: el("#jobs"), jobCount: el("#job-count"), metrics: el("#metrics"), jobCap: el("#job-cap"),
   librarySearch: el("#library-search"), libraryCategory: el("#library-category"), libraryResults: el("#library-results"),
@@ -98,7 +108,9 @@ function renderProjectDetail() {
   elements.projectDetail.replaceChildren();
   elements.projectDetail.hidden = !project;
   elements.incidentPanel.hidden = !project;
+  elements.strategyPanel.hidden = !project;
   elements.designerForm.querySelector("button[type=submit]").disabled = !project;
+  elements.strategyForm.querySelector("button[type=submit]").disabled = !project;
   if (!project) return;
   const analysis = project.analysis ?? {};
   addText(elements.projectDetail, "h3", `${project.full_name} · ${project.default_branch}`);
@@ -134,6 +146,8 @@ function renderProjectDetail() {
 function renderIncidents() {
   elements.incidents.replaceChildren();
   if (!state.selectedProject) return;
+  if (state.incidentLoadStatus === "loading") return addText(elements.incidents, "p", "Fehlerhistorie wird geladen …", "muted");
+  if (state.incidentLoadStatus === "error") return addText(elements.incidents, "p", "Fehlerhistorie ist derzeit nicht verfügbar.", "error-text");
   if (!state.incidents.length) return addText(elements.incidents, "p", "Für dieses Projekt sind noch keine Fehler oder Fehlerberichte erfasst.", "empty");
   for (const incident of state.incidents) {
     const card = document.createElement("article");
@@ -168,6 +182,62 @@ function renderIncidents() {
     }
     if (incident.cause_status !== "human_confirmed") card.append(buildHypothesisForm(incident));
     elements.incidents.append(card);
+  }
+}
+
+function renderStrategies() {
+  elements.strategies.replaceChildren();
+  if (!state.selectedProject) return;
+  if (state.strategyLoadStatus === "loading") return addText(elements.strategies, "p", "Strategienachweise werden geladen …", "muted");
+  if (state.strategyLoadStatus === "error") return addText(elements.strategies, "p", "Strategienachweise sind derzeit nicht verfügbar.", "error-text");
+  if (!state.strategies.length) return addText(elements.strategies, "p", "Für dieses Projekt sind noch keine Strategienachweise gespeichert.", "empty");
+  for (const strategy of state.strategies) {
+    const card = document.createElement("article");
+    card.className = "strategy-card";
+    const heading = document.createElement("header");
+    addText(heading, "h4", strategy.name || "Unbenannte Strategie");
+    const label = addText(heading, "span", strategyStatusLabel(strategy), `chip ${strategy.critical ? "paused" : "succeeded"}`);
+    if (strategy.critical) label.classList.add("critical-chip");
+    card.append(heading);
+    addText(card, "p", strategy.hypothesis, "strategy-hypothesis");
+    const evidence = strategy.evidence ?? {};
+    addText(card, "p", `PR #${evidence.pull_request_number ?? "?"} · Actions-Run ${evidence.workflow_run_id ?? "?"} · Pflichtcheck ${evidence.check_name ?? "unbekannt"} bestanden`, "muted");
+    addText(card, "p", `${evidence.changed_file_count ?? 0} geänderte Pfade · Head ${typeof evidence.head_sha === "string" ? evidence.head_sha.slice(0, 12) : "unbekannt"} · ${evidence.verified === true ? "GitHub-API-Evidenz geprüft" : "Evidenz ungeprüft"}`, "muted");
+    if (strategy.critical && strategy.status === "awaiting_approval") {
+      const gate = strategyApprovalGate(strategy, state.provider, state.selectedProject);
+      addText(card, "p", gate.reason, gate.allowed ? "success-text" : "muted");
+      if (Array.isArray(evidence.independent_reviewers) && evidence.independent_reviewers.length) {
+        addText(card, "p", `Aktuelle unabhängige Reviewer: ${evidence.independent_reviewers.map((review) => review.login).join(", ")}`, "muted");
+      }
+      if (gate.allowed) card.append(button("Kritische Strategie übernehmen …", "secondary", () => adoptStrategy(strategy)));
+    } else if (strategy.critical && strategy.status === "adopted") {
+      addText(card, "p", `Menschlich freigegeben von ${strategy.approved_by ?? "unbekannt"} · ${strategy.approved_at ? new Date(strategy.approved_at).toLocaleString("de-DE") : "Zeit unbekannt"}`, "success-text");
+    } else {
+      addText(card, "p", "Der erfolgreiche Pflichtcheck bestätigt nur, dass die Änderung diesen Check bestanden hat. Er belegt keine kausale Wirksamkeit oder Leistungsverbesserung.", "muted");
+    }
+    elements.strategies.append(card);
+  }
+}
+
+async function adoptStrategy(strategy) {
+  const gate = strategyApprovalGate(strategy, state.provider, state.selectedProject);
+  if (!gate.allowed) return notice(gate.reason, "error");
+  const expected = `ADOPT STRATEGY ${strategy.id}`;
+  const description = document.createElement("div");
+  addText(description, "p", "PromptHub prüft PR, CI, Dateiliste und Review erneut. Diese Freigabe speichert nur den kritischen Strategienachweis; sie merged oder verändert kein GitHub-Repository.");
+  addText(description, "p", `PR #${strategy.evidence.pull_request_number} · Run ${strategy.evidence.workflow_run_id} · ${strategy.evidence.head_sha.slice(0, 12)}`, "muted");
+  if (!await confirmation({ title: "Kritische Strategie freigeben?", description, expected, label: `Nach Prüfung exakt „${expected}“ eingeben` })) return;
+  try {
+    await request(`/api/projects/${encodeURIComponent(state.selectedProject)}/strategies/${encodeURIComponent(strategy.id)}/adopt`, {
+      method: "POST",
+      body: JSON.stringify({ confirmation: expected }),
+    });
+    await loadStrategies();
+    notice("Kritischer Strategienachweis wurde nach erneuter GitHub-Prüfung freigegeben.", "success");
+  } catch (error) {
+    if (error.status === 403) notice("Kritische Freigaben benötigen eine angemeldete GitHub-Sitzung, die vom Proposer und PR-Autor getrennt ist.", "error");
+    else if (error.status === 409) notice("GitHub-Nachweise haben sich geändert oder sind unvollständig. Aktualisiere die Projektansicht und prüfe sie erneut.", "error");
+    else notice(error.message || "Kritische Strategie konnte nicht freigegeben werden.", "error");
   }
 }
 
@@ -217,9 +287,17 @@ async function confirmIncidentCause(incident, hypothesis) {
   const fields = document.createElement("div");
   addText(fields, "p", "Die Bestätigung benötigt einen verifizierten fehlgeschlagenen Pflichtcheck und einen später bestandenen Lauf desselben Checks.");
   const failed = document.createElement("input");
+  failed.id = `failed-job-${incident.id}`;
   failed.placeholder = "Fehlgeschlagener Job: job_…";
   const corrected = document.createElement("input");
+  corrected.id = `corrected-job-${incident.id}`;
   corrected.placeholder = "Später erfolgreicher Job: job_…";
+  const failedLabel = document.createElement("label");
+  failedLabel.htmlFor = failed.id;
+  failedLabel.textContent = "Fehlgeschlagener Pflichtcheck-Job";
+  const correctedLabel = document.createElement("label");
+  correctedLabel.htmlFor = corrected.id;
+  correctedLabel.textContent = "Später bestandener Pflichtcheck-Job";
   const sameChange = document.createElement("input");
   sameChange.type = "checkbox";
   sameChange.required = true;
@@ -231,7 +309,7 @@ async function confirmIncidentCause(incident, hypothesis) {
   const ineffectiveLabel = document.createElement("label");
   ineffectiveLabel.className = "checkbox-row";
   ineffectiveLabel.append(ineffective, document.createTextNode("Diesen Ansatz als nachweislich ungeeignet kennzeichnen"));
-  fields.append(failed, corrected, sameChangeLabel, ineffectiveLabel);
+  fields.append(failedLabel, failed, correctedLabel, corrected, sameChangeLabel, ineffectiveLabel);
   const expected = `CONFIRM CAUSE ${incident.id}`;
   const approved = await confirmation({ title: "Fehlerursache bestätigen?", description: fields, expected, label: `Nach Prüfung der Belege exakt „${expected}“ eingeben` });
   if (!approved) return;
@@ -246,24 +324,59 @@ async function confirmIncidentCause(incident, hypothesis) {
 }
 
 async function loadIncidents() {
-  if (!state.selectedProject) { state.incidents = []; renderIncidents(); return; }
+  const projectId = state.selectedProject;
+  if (!projectId) { state.incidents = []; state.incidentLoadStatus = "idle"; renderIncidents(); return; }
+  state.incidentLoadStatus = "loading";
+  renderIncidents();
   try {
-    const payload = await request(`/api/projects/${encodeURIComponent(state.selectedProject)}/incidents`);
+    const payload = await request(`/api/projects/${encodeURIComponent(projectId)}/incidents`);
+    if (state.selectedProject !== projectId) return;
     state.incidents = payload.incidents;
+    state.incidentLoadStatus = "ready";
   } catch (error) {
+    if (state.selectedProject !== projectId) return;
     state.incidents = [];
+    state.incidentLoadStatus = "error";
     notice(error.message || "Fehlerhistorie konnte nicht geladen werden.", "error");
   }
   renderIncidents();
 }
 
+async function loadStrategies() {
+  const projectId = state.selectedProject;
+  if (!projectId) { state.strategies = []; state.strategyLoadStatus = "idle"; renderStrategies(); return; }
+  state.strategyLoadStatus = "loading";
+  renderStrategies();
+  try {
+    const payload = await request(`/api/projects/${encodeURIComponent(projectId)}/strategies`);
+    if (state.selectedProject !== projectId) return;
+    state.strategies = payload.strategies;
+    state.strategyLoadStatus = "ready";
+  } catch (error) {
+    if (state.selectedProject !== projectId) return;
+    state.strategies = [];
+    state.strategyLoadStatus = "error";
+    notice(error.status === 501 ? "Strategienachweise sind für diese Laufzeit nicht eingerichtet." : "Strategienachweise konnten nicht geladen werden.", "error");
+  }
+  renderStrategies();
+}
+
 function selectProject(projectId) {
   state.selectedProject = projectId;
+  state.jobs = [];
+  state.incidents = [];
+  state.strategies = [];
+  state.jobsLoadStatus = projectId ? "loading" : "idle";
+  state.incidentLoadStatus = projectId ? "loading" : "idle";
+  state.strategyLoadStatus = projectId ? "loading" : "idle";
   state.draft = null;
   elements.draftView.hidden = true;
   renderProjects();
   renderProjectDetail();
-  Promise.all([loadJobs(), loadIncidents()]).catch(() => notice("Projektansicht konnte nicht vollständig geladen werden.", "error"));
+  renderJobs();
+  renderIncidents();
+  renderStrategies();
+  Promise.all([loadJobs(), loadIncidents(), loadStrategies()]).catch(() => notice("Projektansicht konnte nicht vollständig geladen werden.", "error"));
 }
 
 function confirmation({ title, description, expected, label }) {
@@ -353,29 +466,61 @@ async function deleteProjectData(project) {
 async function loadProjects() {
   try {
     const payload = await request("/api/projects");
+    const previousProject = state.selectedProject;
     state.projects = payload.projects;
     if (!state.projects.some((item) => item.id === state.selectedProject && item.status === "connected")) {
       state.selectedProject = state.projects.find((item) => item.status === "connected")?.id ?? null;
     }
+    if (state.selectedProject !== previousProject) {
+      state.jobs = [];
+      state.incidents = [];
+      state.strategies = [];
+      state.jobsLoadStatus = state.selectedProject ? "loading" : "idle";
+      state.incidentLoadStatus = state.selectedProject ? "loading" : "idle";
+      state.strategyLoadStatus = state.selectedProject ? "loading" : "idle";
+    }
     renderProjects();
     renderProjectDetail();
-    if (state.selectedProject) await Promise.all([loadJobs(), loadIncidents()]);
+    if (state.selectedProject) await Promise.all([loadJobs(), loadIncidents(), loadStrategies()]);
+    else {
+      state.jobs = [];
+      state.incidents = [];
+      state.strategies = [];
+      state.jobsLoadStatus = "idle";
+      state.incidentLoadStatus = "idle";
+      state.strategyLoadStatus = "idle";
+      renderJobs();
+      renderIncidents();
+      renderStrategies();
+    }
   } catch (error) {
     state.projects = [];
+    state.selectedProject = null;
+    state.jobs = [];
+    state.incidents = [];
+    state.strategies = [];
+    state.jobsLoadStatus = "error";
+    state.incidentLoadStatus = "error";
+    state.strategyLoadStatus = "error";
     renderProjects();
     renderProjectDetail();
+    renderJobs();
     renderIncidents();
+    renderStrategies();
     if (error.status === 501) notice("Multi-Projektverwaltung ist erst nach Einrichtung der GitHub-Control-Plane verfügbar.");
     else notice("Projektübersicht konnte nicht geladen werden.", "error");
   }
 }
 
 function renderJobs() {
-  const visible = state.selectedProject ? state.jobs.filter((job) => job.project.toLowerCase() === state.selectedProject) : state.jobs;
+  const visible = state.selectedProject ? state.jobs.filter((job) => job.project.toLowerCase() === state.selectedProject) : [];
   elements.jobCount.textContent = `${visible.length} ${visible.length === 1 ? "Auftrag" : "Aufträge"}`;
   elements.jobs.replaceChildren();
+  if (!state.selectedProject) return addText(elements.jobs, "p", "Verbinde ein Projekt, um projektbezogene Aufträge zu sehen.", "empty");
+  if (state.jobsLoadStatus === "loading") return addText(elements.jobs, "p", "Projektaufträge werden geladen …", "muted");
+  if (state.jobsLoadStatus === "error") return addText(elements.jobs, "p", "Projektaufträge sind derzeit nicht verfügbar.", "error-text");
   if (!visible.length) {
-    addText(elements.jobs, "p", state.selectedProject ? "Für dieses Projekt liegen noch keine Aufträge vor." : "Verbinde ein Projekt, um projektbezogene Aufträge zu sehen.", "empty");
+    addText(elements.jobs, "p", "Für dieses Projekt liegen noch keine Aufträge vor.", "empty");
     return;
   }
   for (const job of visible) {
@@ -411,8 +556,21 @@ function renderJobs() {
 }
 
 async function loadJobs() {
-  const payload = await request("/api/jobs");
-  state.jobs = payload.jobs;
+  const projectId = state.selectedProject;
+  if (!projectId) { state.jobs = []; state.jobsLoadStatus = "idle"; renderJobs(); return; }
+  state.jobsLoadStatus = "loading";
+  renderJobs();
+  try {
+    const payload = await request(`/api/jobs?project=${encodeURIComponent(projectId)}`);
+    if (state.selectedProject !== projectId) return;
+    state.jobs = payload.jobs;
+    state.jobsLoadStatus = "ready";
+  } catch (error) {
+    if (state.selectedProject !== projectId) return;
+    state.jobs = [];
+    state.jobsLoadStatus = "error";
+    notice(error.message || "Projektaufträge konnten nicht geladen werden.", "error");
+  }
   renderJobs();
 }
 
@@ -680,6 +838,35 @@ elements.projectForm.addEventListener("submit", async (event) => {
   }
 });
 
+elements.strategyForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  if (!state.selectedProject) return notice("Wähle zuerst ein verbundenes Projekt.", "error");
+  const values = new FormData(elements.strategyForm);
+  const pullRequestNumber = Number(values.get("pullRequestNumber"));
+  const workflowRunId = Number(values.get("workflowRunId"));
+  if (!Number.isSafeInteger(pullRequestNumber) || pullRequestNumber < 1 || !Number.isSafeInteger(workflowRunId) || workflowRunId < 1) {
+    return notice("PR-Nummer und Actions-Run-ID müssen positive ganze Zahlen sein.", "error");
+  }
+  try {
+    const result = await request(`/api/projects/${encodeURIComponent(state.selectedProject)}/strategies`, {
+      method: "POST",
+      body: JSON.stringify({
+        name: values.get("name").trim(),
+        hypothesis: values.get("hypothesis").trim(),
+        pullRequestNumber,
+        workflowRunId,
+      }),
+    });
+    elements.strategyForm.reset();
+    await loadStrategies();
+    notice(result.strategy.critical
+      ? "GitHub-Nachweise gespeichert. Die kritische Übernahme wartet auf unabhängigen Review und menschliche Freigabe."
+      : "GitHub-Nachweise gespeichert. CI-Erfolg ist kein Wirksamkeitsnachweis.", "success");
+  } catch (error) {
+    notice(error.status === 409 ? "Die PR oder der CI-Lauf passt nicht zu den Anforderungen oder die Nachweise sind unvollständig." : error.message || "GitHub-Nachweise konnten nicht geprüft werden.", "error");
+  }
+});
+
 elements.designerForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!state.selectedProject) return notice("Wähle zuerst ein verbundenes Projekt.", "error");
@@ -725,7 +912,7 @@ el("#voice-input").addEventListener("click", () => {
 el("#library-search").addEventListener("input", renderLibrary);
 el("#library-category").addEventListener("change", renderLibrary);
 el("#refresh").addEventListener("click", async () => {
-  await Promise.all([loadProjects(), loadMetrics()]);
+  await Promise.all([loadProjects(), loadMetrics(), loadStrategies()]);
   notice("Projekt- und Nutzungsübersicht aktualisiert.", "success");
 });
 el("#logout").addEventListener("click", async () => {
@@ -735,8 +922,9 @@ el("#logout").addEventListener("click", async () => {
 
 async function boot() {
   try {
-    const { user, local } = await request("/api/me");
+    const { user, local, provider } = await request("/api/me");
     state.user = user;
+    state.provider = provider;
     elements.userLabel.textContent = `${local ? "Lokale Sitzung" : "GitHub"} · ${user.login}`;
     elements.authPanel.hidden = true;
     elements.appPanel.hidden = false;
@@ -762,5 +950,5 @@ elements.incidentReportForm.addEventListener("submit", async (event) => {
     notice("Fehlerbericht projektbezogen gespeichert; Ursache bleibt unbestätigt.", "success");
   } catch (error) { notice(error.message || "Fehlerbericht konnte nicht gespeichert werden.", "error"); }
 });
-if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+void registerServiceWorker({ navigatorObject: navigator, updateButton: elements.updateButton });
 boot();

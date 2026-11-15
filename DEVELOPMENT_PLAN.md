@@ -4,7 +4,7 @@
 
 Die Pakete sind klein, testbar und einzeln rücksetzbar. Parallelisierung wird nur
 eingesetzt, wenn getrennte Worktrees und eine zuverlässige Schnittstelle
-vorhanden sind. Das private Quell-Repository existiert; zwei verifizierte Worker
+vorhanden sind. Das Quell-Repository existiert; zwei verifizierte Worker
 und getrennte, verlässliche Arbeitsbereiche sind nicht nachgewiesen. Bis dahin
 wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
@@ -15,7 +15,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Arbeitsmappe, Regeln, lokale Tools und GitHub-Berechtigung geprüft.
 - Kein passendes vorhandenes PromptHub-Repository gefunden; der Nutzer hat
   anschließend das private Repository `bndkxbqf2g-stack/prompthub-studio`
-  erstellt. Es wurde geprüft: `private`, Standardbranch `main`, Schreibzugriff.
+  erstellt. Es wurde zunächst als `private`, Standardbranch `main` mit
+  Schreibzugriff geprüft. Am 2026-11-15 wurde es auf ausdrückliche
+  Nutzeranweisung öffentlich gestellt.
 - Der lokale Stand `ec8dc42` wurde am 2026-11-15 als Snapshot über die GitHub-API
   nach `main` übertragen (Commit `ca6210a`). Da kein Git-Transportzugang vorlag,
   wurde die lokale Commit-Abstammung nicht übernommen.
@@ -36,13 +38,18 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Angebotsküche ist laut Nutzer das bestehende GitHub-Repository `Einkaufen`.
   Der Inhalt bleibt bis zur bestandenen PromptHub-Abnahme und der einmaligen
   MVP-Umfangsbestätigung unangetastet.
-- Aktuelle Codex-Prüfung: `codex-cli 0.167.0-alpha.4.1` ist installiert und
-  `codex login status` meldet mit dem vorhandenen `CODEX_HOME` eine ChatGPT-
-  Sitzung. Ein begrenzter `codex exec --ephemeral --sandbox read-only`-Test
-  scheiterte mit `Zugriff verweigert` beim Schreiben interner temporärer und
-  Diagnosezustandsdateien. Das belegt keine ausführbare Runner-Verbindung.
-  Umgebung: Windows; `gh` und `wrangler` sind nicht verfügbar. Ein echter
-  Mac-Runner und eine kostenlose Cloud-Executor-Freigabe sind nicht verifiziert.
+- Aktueller Codex-Zugriff (2026-11-15): `codex-cli 0.167.0-alpha.4.1` ist in
+  der verwalteten Windows-Shell installiert, aber `codex login status` scheitert
+  mit `Could not find home directory`; `USERPROFILE` ist gesetzt, `HOME` und
+  `CODEX_HOME` nicht. Die Umgebungsvariablen wurden nicht verändert. Die
+  Codex-Cloud-Umgebungsabfrage meldet `asenvcfg_base` als bereit/lauffähig, aber
+  ohne verknüpfte Repositories. Es wurde kein Cloud-Task gestartet. Somit ist
+  weder ein authentifizierter lokaler Executor noch autonome Cloud-Ausführung
+  für PromptHub nachgewiesen. `gh` und `wrangler` sind nicht verfügbar; ein
+  echter Mac-Runner wurde nicht getestet. GitHub-Schreibzugriff wurde später
+  über den vorhandenen Git Credential Manager nachgewiesen (`admin=true`,
+  `push=true`); Sandbox-Datei-/Netzwerkgrenzen wurden für die erforderlichen
+  Git-Metadaten- und Push-Befehle gezielt überwunden.
 - Verbindliche Dokumentation und Abnahmematrix angelegt.
 
 ### Phase 1 – vertikaler und projektbezogener Schnitt (aktuell)
@@ -70,16 +77,27 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   derselben Korrektur. Promptkontext und Fehlerdashboard weisen Datenquelle,
   Belegstatus und Stichproben-/Aufbewahrungsgrenzen aus. CI speichert keine
   vollständigen Logs.
+- A14-Strategiebewertungen sind über API und GitHub-Evidenz-Gate angebunden.
+  Die PWA unterstützt projektbezogenes Erfassen, Anzeigen und freigabegesteuerte
+  Übernahme. Job- und Fehlerhistorie-Ansichten fragen projektgefiltert ab und
+  verwerfen verspätete Antworten nach Projektwechseln.
+  Echte Review-/Actions-Nachweise, produktive API-Konfiguration und kontrollierte
+  Wirksamkeitsvergleiche bleiben offene Arbeit.
 - Offene Wissensarbeit: kontrollierte, explizit geprüfte projektübergreifende
   Übertragung und gepaarte Strategieexperimente mit Commit-/CI-Vergleich.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
-- Cloudflare Pages ist mit dem privaten Quell-Repository verbunden und die
-  PWA-Hülle unter `https://prompthub-studio.pages.dev` live. Der Pages-Build
-  und GitHub-Actions-Run 6 sind erfolgreich; das Control-API-KV-Binding, die
-  OAuth-App und Runtime-Secrets sind weiterhin nicht eingerichtet. Die API
-  liefert deshalb sicher HTTP 503; Cloudflare Fail closed ist verifiziert.
+- Die letzte Cloudflare-Pages-Veröffentlichung unter
+  `https://prompthub-studio.pages.dev` bleibt erreichbar; automatische
+  Production- und Preview-Deployments sind pausiert. GitHub Pages ist unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/` aktiv; die PWA-Dateien
+  sind unter `/src/pwa/`. GitHub Pages stellt keine Control API bereit. GitHub
+  Actions Run 14
+  (`43746180556`) für den offenen PR-Head `d45d1514656ce120da54e97de5e02f7ee68db288`
+  ist erfolgreich. Das Control-API-KV-Binding, die OAuth-App und Runtime-Secrets
+  sind weiterhin nicht eingerichtet; die API liefert deshalb HTTP 503.
+  Cloudflare Fail closed ist verifiziert.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
 
@@ -87,22 +105,24 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Erledigt: GitHub-Actions-Run 6 (`43724681369`) war für Commit
-  `504477dc35dab908c8b3755550866bca071c72db` erfolgreich; der Job `test`
-  einschließlich Tests, statischer Analyse und Whitespace-Prüfung bestand.
-- Merge-Gate: der Nutzer hat `test` ausdrücklich als Pflichtcheck freigegeben.
-  GitHub Branch-Protection meldete jedoch, dass Regeln für dieses private
-  Repository einen bezahlten Team- oder Enterprise-Organisationsplan benötigen.
-  Wegen privatem Repo und geschütztem 0-€-Budget wurde kein Upgrade und keine öffentliche
-  Umstellung vorgenommen. CI läuft, aber `main` erzwingt den Check nicht.
-  Remote-Control- und Runner-Integrationschecks bleiben offen.
+- Erledigt: GitHub Actions Run 14 (`43746180556`) war für den offenen PR-Head
+  `d45d1514656ce120da54e97de5e02f7ee68db288` erfolgreich; Pflichtjob `test`
+  und die Schritte `npm test`, `npm run check`, `git diff --check` bestanden.
+- Merge-Gate: Nach der ausdrücklichen Freigabe von `test` und der autorisierten
+  Veröffentlichung des Quell-Repositories wurde `main` mit erforderlichem
+  Check `test`, `strict=true` und Admin-Enforcement geschützt. API-Readback
+  bestätigt die Werte. Die Regel verlangt keinen PR und beschränkt direkte
+  Pushes nicht. Es wurde kein kostenpflichtiger Plan aktiviert. PR #2 ist offen
+  und nicht gemergt; Remote-Control- und Runner-Integrationschecks bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.
 
 ### Phase 3 – produktionsnahe Sicherheit
 
-- Die statische PWA ist auf Cloudflare Pages HTTPS veröffentlicht.
+- Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; der
+  Unterpfad-Fix ist lokal vorbereitet. Der vorhandene Cloudflare-Deploy bleibt
+  erreichbar, wird aber nicht mehr automatisch aktualisiert.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.

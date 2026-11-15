@@ -54,6 +54,23 @@ export class GitHubClient {
     return this.request(`/repos/${repository}`);
   }
 
+  getPullRequest(repository, pullRequestNumber) {
+    if (!Number.isSafeInteger(pullRequestNumber) || pullRequestNumber < 1) throw new Error("pull request number is invalid");
+    return this.request(`/repos/${repository}/pulls/${pullRequestNumber}`);
+  }
+
+  listPullRequestFiles(repository, pullRequestNumber, { perPage = 100, page = 1 } = {}) {
+    if (!Number.isSafeInteger(pullRequestNumber) || pullRequestNumber < 1) throw new Error("pull request number is invalid");
+    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 100 || !Number.isInteger(page) || page < 1 || page > 100) throw new Error("pull request file pagination is invalid");
+    return this.request(`/repos/${repository}/pulls/${pullRequestNumber}/files?per_page=${perPage}&page=${page}`);
+  }
+
+  listPullRequestReviews(repository, pullRequestNumber, { perPage = 100, page = 1 } = {}) {
+    if (!Number.isSafeInteger(pullRequestNumber) || pullRequestNumber < 1) throw new Error("pull request number is invalid");
+    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 100 || !Number.isInteger(page) || page < 1 || page > 100) throw new Error("pull request review pagination is invalid");
+    return this.request(`/repos/${repository}/pulls/${pullRequestNumber}/reviews?per_page=${perPage}&page=${page}`);
+  }
+
   getUser() {
     return this.request("/user");
   }
@@ -87,10 +104,15 @@ export class GitHubClient {
     return this.request(`/repos/${repository}/actions/runs?per_page=${perPage}`);
   }
 
-  listWorkflowRunJobs(repository, runId, perPage = 100) {
+  getWorkflowRun(repository, runId) {
     if (!Number.isSafeInteger(runId) || runId < 1) throw new Error("workflow run ID is invalid");
-    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 100) throw new Error("workflow job page size must be between 1 and 100");
-    return this.request(`/repos/${repository}/actions/runs/${runId}/jobs?per_page=${perPage}`);
+    return this.request(`/repos/${repository}/actions/runs/${runId}`);
+  }
+
+  listWorkflowRunJobs(repository, runId, perPage = 100, page = 1) {
+    if (!Number.isSafeInteger(runId) || runId < 1) throw new Error("workflow run ID is invalid");
+    if (!Number.isInteger(perPage) || perPage < 1 || perPage > 100 || !Number.isInteger(page) || page < 1 || page > 100) throw new Error("workflow job pagination is invalid");
+    return this.request(`/repos/${repository}/actions/runs/${runId}/jobs?per_page=${perPage}&page=${page}`);
   }
 
   createIssue(repository, payload) {

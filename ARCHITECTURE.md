@@ -36,8 +36,8 @@ nur an `127.0.0.1`.
   Speicher mit Compare-and-Swap.
 - `src/control/memory-control-plane.mjs`: deterministischer Testadapter; er darf
   nie als Produktionsmodus laufen.
-- `src/auth/github-oauth.mjs`: OAuth-State, kurzlebige serverseitige Session,
-  HttpOnly-Cookie und Allowlist.
+- `src/auth/github-oauth.mjs`: OAuth-State, kurzlebige serverseitige Session
+  mit expliziter Provider-Kennung, HttpOnly-Cookie und Allowlist.
 - `src/api/server.mjs`: PWA-Auslieferung, JSON-API, Fehler- und Security-Header.
 - `src/api/handler.mjs`: gemeinsame Web-Request-/Response-API für den lokalen
   Node-Adapter und den Cloudflare Worker; Same-Origin-Schutz kann serverlos
@@ -64,6 +64,12 @@ nur an `127.0.0.1`.
   menschlich bestätigte Ursachen. Runner-Belege werden gegen terminale
   Control-Plane-Ergebnisse geprüft; Speicherung ist versioniert, begrenzt und
   CAS-geschützt.
+- `src/knowledge/strategy-learning.mjs` und
+  `ProjectService.verifyStrategyEvidence`: strategische Lerndatensätze sind an
+  zusammengeführte PRs, denselben Workflow-Head, den bestandenen Pflichtjob
+  `test` und vollständige geänderte Pfade gebunden. Kritische Übernahmen werden
+  nur mit frischer unabhängiger GitHub-Review und authentifizierter menschlicher
+  API-Freigabe gespeichert.
 - `src/designer/`: mehrstufiger Prompt-Workflow, Versionen, sichere Freigabe und
   austauschbarer `IntelligenceProvider`; kostenfreier Fallback wird ausgewiesen.
 - `src/designer/context-selector.mjs`: wählt aufgabenbezogene Projekt-Auszüge,

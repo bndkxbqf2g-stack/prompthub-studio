@@ -6,6 +6,7 @@ import { createRequestHandler } from "./handler.mjs";
 const ASSET_TYPES = Object.freeze({
   ".html": "text/html; charset=utf-8",
   ".js": "text/javascript; charset=utf-8",
+  ".mjs": "text/javascript; charset=utf-8",
   ".css": "text/css; charset=utf-8",
   ".webmanifest": "application/manifest+json; charset=utf-8",
   ".json": "application/json; charset=utf-8",
@@ -44,8 +45,8 @@ function writeResponse(response, nodeResponse) {
   return response.arrayBuffer().then((body) => nodeResponse.end(Buffer.from(body)));
 }
 
-export function createHttpServer({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, logger = console, assetRoot = join(process.cwd(), "src", "pwa") } = {}) {
-  const handleRequest = createRequestHandler({ config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, logger });
+export function createHttpServer({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, logger = console, assetRoot = join(process.cwd(), "src", "pwa") } = {}) {
+  const handleRequest = createRequestHandler({ config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, strategyLearning, logger });
   return createServer(async (request, response) => {
     try {
       const webRequest = webRequestFromNode(request);

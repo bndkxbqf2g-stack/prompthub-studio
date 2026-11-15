@@ -2,16 +2,22 @@
 
 ## Verifizierter Stand
 
-- Cloudflare-Pages-Projekt `prompthub-studio` ist mit dem privaten GitHub-
+- Cloudflare-Pages-Projekt `prompthub-studio` ist mit dem öffentlichen GitHub-
   Repository `bndkxbqf2g-stack/prompthub-studio` verbunden. Account-ID:
   `19a163849475274c22cb8a8a130d352b`.
 - Die Produktion unter https://prompthub-studio.pages.dev wurde erfolgreich
   veröffentlicht: Deployment `10eb0d77-7b19-4edc-9adc-548518e098f7`, Commit
   `504477dc35dab908c8b3755550866bca071c72db`, Cloudflare-Status `success`.
-  Git-Integration deployt Commits auf `main` automatisch.
-- GitHub bestätigt das Repository weiterhin als `private`, Default-Branch
-  `main`, HEAD `504477dc35dab908c8b3755550866bca071c72db`. Actions-Run 6
-  (`43724681369`) einschließlich Job `test` war erfolgreich.
+  Seit 2026-11-15 sind automatische Production-Deployments deaktiviert;
+  Preview-Deployments stehen auf `None`. Die letzte Veröffentlichung bleibt
+  erreichbar. Projekt und Deployment wurden nicht gelöscht.
+- Das Quell-Repository wurde am 2026-11-15 auf ausdrückliche Nutzeranweisung
+  öffentlich gestellt. Auf `main` ist der Check `test` als Branch-Schutz
+  erforderlich (`strict=true`, Admin-Enforcement); Actions Run 14
+  (`43746180556`) für Feature-Branch-Commit
+  `d45d1514656ce120da54e97de5e02f7ee68db288` war erfolgreich. PR #2 ist offen,
+  nicht gemergt. Der letzte Production-Deploy bleibt der oben genannte ältere
+  Commit auf `main`.
 - `wrangler.toml` beschreibt Pages; der bisherige Workers Static Assets-Modus
   bleibt in `wrangler.worker.toml` erhalten.
 - functions/[[path]].js leitet ausschließlich über _routes.json ausgewählte
@@ -27,6 +33,21 @@
   `cloud_control_plane_not_configured`, weil OAuth-/Runtime-Konfiguration und
   KV-Binding nicht vorhanden sind. Die PWA-Hülle ist live; die Control API ist
   bewusst nicht betriebsbereit.
+- GitHub Pages ist für das Repository auf `main`/`/(root)` aktiviert. Die
+  Projektseite ist unter
+  https://bndkxbqf2g-stack.github.io/prompthub-studio/ erreichbar; die PWA liegt
+  unter `/src/pwa/`. GitHub Pages ist ein statischer Host und stellt weder die
+  Control API noch serverseitige OAuth-Verarbeitung bereit. Die aktuell
+  veröffentlichte PWA lädt wegen Root-relativer Asset-Pfade unvollständig; der
+  relative Pfadfix und Regressionstest sind lokal vorbereitet, aber noch nicht
+  in PR #2 übertragen oder live.
+- Der Quellstand des zuletzt dokumentierten Produktionsdeployments
+  `504477dc35dab908c8b3755550866bca071c72db` verwendet den Service-Worker-Cache
+  `prompthub-static-v3` und enthält noch keinen Update-Button. Lokal liegen die
+  Commits `a1649e6` und `bc84f65` mit dem getesteten Updateablauf und Cache v4.
+  Der Updateablauf liegt auf `codex/oauth-returnto-hardening` in PR #2 und ist
+  deshalb noch nicht Bestandteil des dokumentierten Production-Deployments.
+  Eine erneute Live-HTTP-Prüfung wurde für diesen Feature-Branch nicht ausgeführt.
 - Pages Runtime ist auf `Fail closed` gestellt; der Zustand wurde im Dashboard
   nach dem Speichern erneut geprüft. Für Branch Control wurde die automatische
   Bereitstellung von Preview-Branches auf „None“ gesetzt und gespeichert. Die
@@ -34,7 +55,7 @@
   ausgelesen werden. Preview-Deployments sind standardmäßig öffentlich; Cloudflare
   Access wurde dafür nicht eingerichtet und Preview-Secrets sind nicht gesetzt.
 - Die Cloudflare-GitHub-Integration ist im Projekt aktiv und mit dem
-  ausgewählten privaten Repository verbunden. Sie ist von der GitHub-OAuth-App
+  ausgewählten öffentlichen Quell-Repository verbunden. Sie ist von der GitHub-OAuth-App
   für die Anmeldung von PromptHub-Nutzern zu unterscheiden; diese OAuth-App,
   Runtime-Secrets und das KV-Binding sind nicht eingerichtet.
 - Der Cloud-Browser bestätigte Projekt und Deployment. Die Billing-Seite blieb
@@ -54,7 +75,7 @@
 | Projektname | prompthub-studio |
 | Produktionsadresse | https://prompthub-studio.pages.dev |
 | Letzte Deployment-ID | 10eb0d77-7b19-4edc-9adc-548518e098f7 |
-| GitHub-Repository | bndkxbqf2g-stack/prompthub-studio (privat) |
+| GitHub-Repository | bndkxbqf2g-stack/prompthub-studio (öffentlich, Nutzerentscheidung vom 2026-11-15) |
 | Produktionsbranch | main |
 | Root-Verzeichnis | Repository-Root |
 | Build-Befehl | npm ci --ignore-scripts --no-audit --no-fund && npm test && npm run check |
@@ -72,8 +93,11 @@ werden und muss innerhalb des Free-Kontingents betrieben werden.
 
 ## Deployment-Wege und Berechtigungen
 
-GitHub-Git-Integration ist bereits aktiv. Produktionsbuilds werden von
-Cloudflare Pages auf `main` erstellt und in `src/pwa` veröffentlicht. Der erste
+Die GitHub-Git-Integration ist noch verbunden, aber Branch-Control pausiert
+automatische Deployments auf `main`; Preview-Deployments stehen auf `None`.
+Die letzte Produktion bleibt unter `https://prompthub-studio.pages.dev`
+erreichbar. Historische Builds wurden von Cloudflare Pages auf `main` erstellt
+und in `src/pwa` veröffentlicht. Der erste
 Build schlug bei Commit `d7fc44f` wegen des von Pages nicht unterstützten JSON-
 Import-Attributes fehl. Commit `504477d` erzeugt stattdessen ein geprüftes
 ES-Modul aus der versionierten JSON-Quelle; danach bestanden der Pages-Build
@@ -99,31 +123,49 @@ Die OAuth-Callback-URL lautet
 müssen OAuth-Scopes, Allowlist, Tokenumfang und KV-Free-Kontingent geprüft
 werden. Ohne diese Konfiguration bleiben `/api/*`, `/auth/*` und `/healthz`
 geschlossen (`503`); kein eingeloggter Verwaltungsbereich wird vorgetäuscht.
-Die automatische Preview-Bereitstellung wurde im Branch-Control-Dialog auf
-„None“ gesetzt und gespeichert, konnte nach dem Transportabbruch aber nicht
-erneut ausgelesen werden. Behandle die Persistenz daher als unbestätigt. Falls
-Preview-Builds aktiv sind oder später aktiviert werden, ist Cloudflare Access
-erforderlich, weil Preview-Adressen sonst öffentlich sind.
+Der Branch-Control-Dialog bestätigt `None` für Preview-Builds und deaktivierte
+automatische Production-Deployments. Falls Preview-Builds später aktiviert
+werden, ist Cloudflare Access erforderlich, weil Preview-Adressen sonst
+öffentlich sind.
 
-GitHub branch protection: der Nutzer hat den erforderlichen Check `test`
-ausdrücklich freigegeben. GitHub meldete im Branch-Protection-Dialog jedoch,
-dass Regeln für dieses private Repository einen bezahlten Team- oder Enterprise-
-Organisationsplan benötigen. Da Repository-Privatsphäre und 0-€-Budget verbindlich sind,
-wurde keine unwirksame Regel gespeichert und kein Planwechsel vorgenommen.
-Der CI-Job `test` läuft erfolgreich, erzwingt aber derzeit keine Merge-Sperre.
-Siehe [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
+GitHub-Branch-Schutz: Der Nutzer hat den erforderlichen Check `test`
+ausdrücklich freigegeben. GitHub Free erlaubt Branch Protection für öffentliche
+Repositories. Nach der ausdrücklich autorisierten Veröffentlichung des
+Quell-Repositories wurde `main` per GitHub-API mit `test`, `strict=true` und
+Admin-Enforcement geschützt; der GET-Readback bestätigte diese Werte.
+GitHub Actions Run 14 (`43746180556`) für den aktuellen PR-Head
+`d45d1514656ce120da54e97de5e02f7ee68db288` bestand. Die Regel blockiert PR-Merges,
+wenn `test` fehlt oder fehlschlägt. Sie verlangt keinen PR und beschränkt direkte
+Pushes nicht; solche zusätzlichen Branch-Regeln wurden nicht freigegeben oder
+gesetzt. Es wurde kein bezahlter Plan aktiviert. Quellen:
+[GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) und [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).
 
-Alternative Wrangler Direct Upload: Sie vermeidet eine Cloudflare-App mit
-Schreibzugriff auf GitHub, erfordert aber einen Cloudflare-API-Token mit
-`Cloudflare Pages Edit`. Diese Account-Berechtigung kann Pages-Projekte im
-gesamten Cloudflare-Konto erstellen, ändern und löschen. Außerdem lässt sich
-ein Direct-Upload-Projekt später nicht auf Git-Integration umstellen. Deshalb
-wurde auch dieser Weg nicht begonnen. Ein GitHub-Actions-Workflow würde den
-Token als Repository-Secret benötigen. Der GitHub-Free-Account hat ein
-Actions-Budget von $0 mit Ausgabenblockierung; nach Erschöpfung der enthaltenen
-Usage werden Läufe blockiert. Der Actions-Deployment-Workflow ist nicht
-eingerichtet. Der bestehende GitHub-verbundene Pages-Weg wurde vom Nutzer
-bestätigt; Wrangler Direct Upload wird nicht zusätzlich eingerichtet.
+Die Pages-Git-Integration bleibt verbunden, löst wegen der pausierten
+Branch-Deployments derzeit keine Builds aus. Ein zusätzlicher GitHub-Actions-
+Deploy ist nicht eingerichtet. Eine Wiederaufnahme benötigt eine ausdrückliche
+Nutzerentscheidung.
+
+## Schreibzugriff und Wiederherstellungswege
+
+Fehler beim Schreiben werden nach Ursache getrennt, weil Sandbox-, Netzwerk-,
+Anmelde- und Tarifgrenzen verschiedene Lösungen benötigen:
+
+| Fehlerbild | Sichere Lösung |
+|---|---|
+| Lokale Dateien beschreibbar, `.git` aber schreibgeschützt | Git-Metadatenoperationen gezielt mit dem autorisierten Schreibmodus ausführen. `safe.directory` und Autoridentität nur pro Git-Befehl setzen; keine globale Sicherheitskonfiguration ändern. |
+| `git push` scheitert mit Netzwerkfehler | Den Push zuerst als Dry-Run prüfen und bei isoliertem Netzwerkzugriff für genau diesen Befehl erweiterten Netzwerkzugriff verwenden. Zugangsdaten im Credential Manager belassen, nie in Remote-URL, Kommandozeile oder Logs schreiben. Das wurde für den Feature-Branch erfolgreich angewendet. |
+| GitHub antwortet mit 401/403 | Authentifizierungsfehler von fehlender Repository-Rolle, Token-Scope und Tarifbeschränkung unterscheiden. Für Branch-Schutz braucht ein Fine-Grained Token `Administration: write` nur auf dieses Repository und der Nutzer muss Admin/Owner sein. Ein 403 wegen GitHub-Free-Sichtbarkeit wird durch mehr Tokenrechte nicht behoben. |
+| GitHub Free blockiert Branch-Schutz im privaten Repo | Kostenfreier Weg: öffentliches Quell-Repository, sofern der Nutzer das ausdrücklich entscheidet. Alternativ wäre ein passender bezahlter GitHub-Plan erforderlich; dieser bleibt wegen des 0-€-Budgets deaktiviert. Die Sichtbarkeitsänderung und `test`-Regel sind inzwischen umgesetzt. |
+| Cloudflare-Schreibzugriff fehlt | Bevorzugt die angemeldete Cloudflare-Dashboard-Sitzung nutzen. Alternativ wäre ein API-Token mit `Pages Write` nötig; dies ist kontoweit und kann Pages-Projekte erstellen, ändern und löschen. Für KV-Anlage wäre zusätzlich `Workers KV Storage Write` nötig. Vor jeder API-Mutation Zielprojekt auslesen und ausschließlich gezielte Update-/Create-Methoden verwenden. Keine Ressource löschen. |
+| Wrangler OAuth scheint einfacher | `wrangler login` hat keine granularen Rechteauswahl. Für automatisierte Nutzung nur ein eng begrenztes API-Token verwenden; Token nie im Chat übermitteln. Wrangler Direct Upload ist für das bereits mit GitHub verbundene Pages-Projekt kein geeigneter Weg. |
+
+Für diese Sitzung gibt es kein `gh` und kein `wrangler`, keine Cloudflare-Token-
+Umgebungsvariable und keinen geöffneten Cloud-Browser. Daher sind derzeit nur
+Git/GitHub-Schreibzugriffe nachgewiesen. Die Cloudflare-Berechtigung muss über
+eine wieder verfügbare, angemeldete Dashboard-Sitzung oder einen sicher
+bereitgestellten API-Token hergestellt werden. GitHub- und Cloudflare-Token
+werden niemals im Chat angefordert oder ausgegeben. Cloudflare-Permissions:
+[Pages API](https://developers.cloudflare.com/api/resources/pages/subresources/projects/methods/create/), [Tokenrechte](https://developers.cloudflare.com/workers/authorization/workers/) und [Wrangler-Rechte](https://developers.cloudflare.com/workers/authorization/).
 
 Die vollständige Control-Plane setzt OAuth, privates Control-Repository,
 begrenzten GitHub-Token, Production-KV-Binding und vollständige Secrets voraus.
@@ -170,9 +212,10 @@ gebunden.
 - Der Service Worker entfernt ältere Caches nach Aktivierung einer neuen
   Version. Die PWA zeigt bei fehlender API eine Fehlermeldung statt
   Fortschritt oder Erfolg zu erfinden.
-- Produktionsupdates erfolgen nur über erfolgreiche Commits auf main. Pages
-  Git-Integration stellt für Commits auf main automatisch bereit; Preview-
-  Deployments bleiben deaktiviert.
+- Produktionsupdates erfolgen derzeit nicht automatisch: Production- und
+  Preview-Deployments sind pausiert. Die letzte veröffentlichte Version bleibt
+  erreichbar; ein Update erfordert eine ausdrückliche Entscheidung zur
+  Wiederaufnahme der Deployments.
 - Rollback: den fehlerhaften Quellcommit per neuem Revert auf main zurücksetzen
   und den nachfolgenden Pages-Build abwarten. Keine Cloudflare-Ressource oder
   GitHub-Historie löschen.

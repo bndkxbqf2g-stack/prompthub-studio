@@ -11,6 +11,9 @@
 /app.js
   Cache-Control: no-cache
 
+/service-worker-client.mjs
+  Cache-Control: no-cache
+
 /styles.css
   Cache-Control: no-cache
 

@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#0b1324">
     <meta name="description" content="PromptHub Studio – sichere Verwaltung von Entwicklungsprojekten und Codex-Aufträgen">
-    <link rel="icon" type="image/png" sizes="1254x1254" href="/app-icon-source.png">
-    <link rel="apple-touch-icon" href="/app-icon-source.png">
-    <link rel="manifest" href="/manifest.webmanifest">
-    <link rel="stylesheet" href="/styles.css">
+    <link rel="icon" type="image/png" sizes="1254x1254" href="./app-icon-source.png">
+    <link rel="apple-touch-icon" href="./app-icon-source.png">
+    <link rel="manifest" href="./manifest.webmanifest">
+    <link rel="stylesheet" href="./styles.css">
     <title>PromptHub Studio</title>
   </head>
   <body>
@@ -22,12 +22,13 @@
       </header>
 
       <section id="notice" class="notice" role="status" aria-live="polite"></section>
+      <button id="update-app" class="button secondary update-button" type="button" hidden>Neue Version laden</button>
 
       <section id="auth-panel" class="card auth-card" hidden>
         <p class="eyebrow">ZUGANG</p>
         <h2>GitHub-Sitzung erforderlich</h2>
         <p>GitHub-Zugangsdaten bleiben serverseitig. Melde dich über die konfigurierte OAuth-Anmeldung an.</p>
-        <a class="button primary" href="/auth/github/start">Mit GitHub anmelden</a>
+        <a class="button primary" href="./auth/github/start">Mit GitHub anmelden</a>
       </section>
 
       <section id="app-panel" hidden>
@@ -69,6 +70,26 @@
               <button class="button secondary" type="submit">Fehlerbericht speichern</button>
             </form>
             <div id="incidents" class="incident-list" aria-live="polite"></div>
+          </section>
+          <section id="strategy-panel" class="strategy-panel" hidden aria-labelledby="strategy-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">KONTROLLIERTE VERBESSERUNGEN</p><h3 id="strategy-title">Strategie- und CI-Nachweise</h3></div>
+            </div>
+            <p class="muted">Erfasse eine bereits gemergte Änderung mit erfolgreichem GitHub-Check <code>test</code>. Ein grüner Check allein belegt keine kausale Wirksamkeit. PromptHub ändert das Repository bei diesem Schritt nicht.</p>
+            <form id="strategy-form" class="strategy-form">
+              <label for="strategy-name">Strategie</label>
+              <input id="strategy-name" name="name" maxlength="300" required placeholder="Zum Beispiel: Regressionstest vor Änderung ergänzen">
+              <label for="strategy-hypothesis">Beobachtung oder Hypothese</label>
+              <textarea id="strategy-hypothesis" name="hypothesis" rows="3" maxlength="4000" required placeholder="Was sollte verbessert werden und was ist tatsächlich beobachtet?"></textarea>
+              <div class="strategy-evidence-fields">
+                <label for="strategy-pr">Gemergte PR-Nummer</label>
+                <input id="strategy-pr" name="pullRequestNumber" type="number" min="1" step="1" required inputmode="numeric">
+                <label for="strategy-run">Erfolgreiche Actions-Run-ID</label>
+                <input id="strategy-run" name="workflowRunId" type="number" min="1" step="1" required inputmode="numeric">
+              </div>
+              <button class="button secondary" type="submit">GitHub-Nachweise prüfen</button>
+            </form>
+            <div id="strategies" class="strategy-list" aria-live="polite"></div>
           </section>
         </section>
 
@@ -130,7 +151,7 @@
       </form>
     </dialog>
 
-    <script src="/regression-test-request.js" defer></script>
-    <script src="/app.js" defer></script>
+    <script src="./regression-test-request.js" defer></script>
+    <script type="module" src="./app.js"></script>
   </body>
 </html>

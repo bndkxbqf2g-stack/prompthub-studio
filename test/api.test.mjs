@@ -4,6 +4,7 @@ import { readConfig } from "../src/config.mjs";
 import { LocalAuth } from "../src/auth/github-oauth.mjs";
 import { createControlPlane } from "../src/control/index.mjs";
 import { createHttpServer } from "../src/api/server.mjs";
+import { createRequestHandler } from "../src/api/handler.mjs";
 
 async function withServer(callback) {
   const config = readConfig({ NODE_ENV: "test", PROMPTHUB_MODE: "memory", AUTH_MODE: "local", PROMPTHUB_ALLOWED_PROJECTS: "demo", CODEX_ARGS_JSON: '["exec","--","$PROMPTHUB_PROMPT"]' });
@@ -35,8 +36,12 @@ test("PWA/API vertical slice creates and displays real job states", async () => 
     assert.equal(regressionRequest.status, 200);
     assert.match(regressionRequest.headers.get("content-type"), /javascript/);
     assert.match(await regressionRequest.text(), /PromptHubRegressionTestRequest/);
+    const serviceWorkerClient = await fetch(`${base}/service-worker-client.mjs`);
+    assert.equal(serviceWorkerClient.status, 200);
+    assert.match(serviceWorkerClient.headers.get("content-type"), /javascript/);
+    assert.match(await serviceWorkerClient.text(), /registerServiceWorker/);
     const manifest = await (await fetch(`${base}/manifest.webmanifest`)).json();
-    assert.equal(manifest.icons[0].src, "/app-icon-source.png");
+    assert.equal(manifest.icons[0].src, "./app-icon-source.png");
     const icon = await fetch(`${base}/app-icon-source.png`);
     assert.equal(icon.status, 200);
     assert.equal(icon.headers.get("content-type"), "image/png");
@@ -58,4 +63,20 @@ test("approval endpoint requires the explicit human decision", async () => {
     assert.equal(approve.status, 200);
     assert.equal((await approve.json()).job.status, "queued");
   });
+});
+
+test("OAuth callback handler rejects an external redirect from an auth adapter", async () => {
+  const config = readConfig({ NODE_ENV: "test", PROMPTHUB_MODE: "memory", AUTH_MODE: "local" });
+  const handler = createRequestHandler({
+    config,
+    controlPlane: createControlPlane(config),
+    auth: {
+      async callback() { return { redirectTo: "//attacker.example/phishing", cookie: "prompthub_session=opaque" }; },
+    },
+  });
+  const response = await handler(new Request("https://prompthub.example/auth/github/callback?code=code&state=state", {
+    headers: { cookie: "prompthub_oauth_state=state" },
+  }));
+  assert.equal(response.status, 302);
+  assert.equal(response.headers.get("location"), "/");
 });

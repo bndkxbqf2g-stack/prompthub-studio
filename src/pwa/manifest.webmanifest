@@ -2,14 +2,15 @@
   "name": "PromptHub Studio",
   "short_name": "PromptHub",
   "lang": "de",
-  "start_url": "/",
+  "start_url": "./",
+  "scope": "./",
   "display": "standalone",
   "background_color": "#09101e",
   "theme_color": "#0b1324",
   "description": "Sichere Steuerung von Entwicklungsprojekten und Codex-Aufträgen",
   "icons": [
     {
-      "src": "/app-icon-source.png",
+      "src": "./app-icon-source.png",
       "sizes": "1254x1254",
       "type": "image/png",
       "purpose": "any maskable"

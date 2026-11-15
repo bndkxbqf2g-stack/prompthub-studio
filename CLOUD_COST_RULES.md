@@ -15,9 +15,10 @@
 
 ## Verifizierter Stand
 
-- GitHub MCP ist mit dem Nutzerkonto verbunden. Das private Quell-Repository
-  `bndkxbqf2g-stack/prompthub-studio` ist erstellt; ein separates privates
-  Control-Repository und dessen Runtime-Token sind nicht eingerichtet.
+- GitHub MCP ist mit dem Nutzerkonto verbunden. Das Quell-Repository
+  `bndkxbqf2g-stack/prompthub-studio` wurde am 2026-11-15 auf ausdrückliche
+  Nutzeranweisung öffentlich gestellt. Ein separates privates Control-Repository
+  und dessen Runtime-Token sind nicht eingerichtet.
 - Die Codex-App meldet eine lauffähige Standard-Cloud-Umgebung, aber ohne
   hinterlegte Repositories. Daraus folgt keine nachgewiesene autonome Ausführung
   für dieses Projekt.
@@ -26,40 +27,43 @@
 - Für eine PWA direkt nutzbare, nachweislich kostenlose Codex-LLM-API ist kein
   verfügbarer Zugang nachgewiesen. Prompt-Designer verwendet deshalb bis zu
   einer belegten Integration einen klar markierten strukturierten Fallback.
-- GitHub Actions ist für CI aktiviert; Cloudflare Pages Free stellt die
-  statische PWA bereit. Vor weiterer Runtime-Aktivierung müssen Free-Kontingente
-  und Kostenstopps geprüft sein.
+- GitHub Actions ist für CI aktiviert. GitHub Pages ist für das öffentliche
+  Repository aktiv und stellt statische Dateien bereit; die PWA liegt unter
+  `/src/pwa/`. GitHub Pages hostet keine serverseitige Control API.
 - GitHub zeigt den Plan `GitHub Free`, Actions-Billable-Usage von $0 nach
   Included-Usage-Rabatten und ein Actions-Monatsbudget von $0.00 mit Status
   „Usage blocked“. Included-Usage-Alerts sind eingeschaltet. Bei erreichtem
   kostenfreien Kontingent blockiert GitHub Actions statt Mehrverbrauch zu
   berechnen; ein CI-Lauf bleibt deshalb von der verbleibenden Free-Usage abhängig.
-- Cloudflare Pages Free ist als `prompthub-studio` mit dem privaten Repository
-  verbunden; `https://prompthub-studio.pages.dev` liefert die PWA-Assets über
-  HTTPS. Das erfolgreiche Produktionsdeployment ist `10eb0d77-7b19-4edc-9adc-548518e098f7`
-  für Commit `504477dc35dab908c8b3755550866bca071c72db`. `Fail closed` wurde im
-  Dashboard gespeichert und erneut verifiziert. Die GitHub-Integration für
-  Pages ist aktiv.
+- Cloudflare Pages `prompthub-studio` bleibt mit dem öffentlichen Quell-
+  Repository verbunden; die letzte Veröffentlichung
+  `10eb0d77-7b19-4edc-9adc-548518e098f7` für Commit
+  `504477dc35dab908c8b3755550866bca071c72db` ist weiterhin unter
+  `https://prompthub-studio.pages.dev` erreichbar. Automatische Production-
+  Deployments sind deaktiviert, Preview-Deployments stehen nach Dashboard-
+  Readback auf `None`. Es wurde kein Projekt oder Deployment gelöscht.
+  `Fail closed` bleibt im Dashboard gespeichert und verifiziert.
 - Die Control-Plane-Runtime ist nicht eingerichtet: kein `SESSIONS`-KV-Binding,
   keine PromptHub-GitHub-OAuth-App und keine Runtime-Secrets. Deshalb geben
   `/api/me` und `/healthz` HTTP 503; es gibt keine funktionsfähige Anmeldung,
-  Auftragsverwaltung oder Cloud-Ausführung. Das Repo blieb privat.
-- Cloudflare Pages wurde mit Preview-Branches auf „None“ gestellt; nach dem
-  Speichern konnte die Persistenz wegen eines Browser-Transportabbruchs nicht
-  erneut ausgelesen werden. Preview-Adressen sind standardmäßig öffentlich;
-  Cloudflare Access ist nicht eingerichtet und Preview-Secrets wurden nicht
-  gesetzt.
+  Auftragsverwaltung oder Cloud-Ausführung. Das Quell-Repository ist öffentlich;
+  das separate private Control-Repository existiert noch nicht.
+- Preview-Branches stehen auf `None`; automatische Production-Deployments sind
+  ebenfalls deaktiviert. Preview-Adressen wären bei einer späteren Aktivierung
+  öffentlich; Cloudflare Access ist nicht eingerichtet und Preview-Secrets
+  wurden nicht gesetzt.
 - Die Cloudflare-Billing-Seite lud nicht; der Kontotarif und Zahlungsmittel
   sind daher nicht unabhängig verifiziert. In diesem Arbeitsgang wurde kein
   kostenpflichtiger Tarif, keine kostenpflichtige Ressource und keine
   Abrechnungsfunktion aktiviert. Das 0-€-Budget bleibt verbindlich.
 - Wrangler Direct Upload wäre eine Alternative ohne GitHub-App, erfordert aber
-  `Cloudflare Pages Edit` auf Kontoebene, womit sämtliche Pages-Projekte des
-  Kontos erstellt, geändert oder gelöscht werden können. Ein Direct-Upload-
-  Projekt kann später nicht auf Git-Integration umgestellt werden. Ein
-  Deployment-Workflow über GitHub Actions ist nicht eingerichtet; der
-  verifizierte $0-Actions-Budgetstopp blockiert kostenpflichtigen Mehrverbrauch,
-  sobald die enthaltene Free-Usage erschöpft ist.
+  `Pages Write` auf Kontoebene. Dieses Recht kann Pages-Projekte des Kontos
+  erstellen, ändern und löschen. Das bereits verknüpfte Git-Integrationsprojekt
+  wird nicht auf Direct Upload umgestellt. Für diese Sitzung fehlen Wrangler,
+  Cloudflare-Token und Cloud-Browser; es fand keine Cloudflare-Schreiboperation
+  statt. Ein GitHub-Actions-Deployment-Workflow ist nicht eingerichtet; der
+  verifizierte $0-Actions-Budgetstopp blockiert Mehrverbrauch nach erschöpfter
+  inkludierter Free-Usage.
 - Der Cloudflare-Tarifstand wurde am 2026-11-15 ausschließlich anhand der
   offiziellen Dokumentation recherchiert: Free Workers bis 100.000 Worker-
   Requests/Tag und 10 ms CPU je Aufruf; statische Assets sind kostenfrei und
@@ -72,13 +76,16 @@
   Tarifwechsel und keinen Cloud-Codex-Executor. Ist kein Runner vorhanden, zeigt
   `/healthz` `runner_status: not_configured`. Die Cloud-PWA-Ausführung ist daher
   vorbereitet, aber erst nach Einrichtung und externem Funktionstest abnehmbar.
-- Der Nutzer hat den erforderlichen GitHub-Check `test` ausdrücklich
-  freigegeben. GitHub Branch-Protection meldet, dass Regeln für dieses private
-  Repository einen bezahlten Team- oder Enterprise-Organisationsplan benötigen.
-  Wegen 0-€-Budget und
-  privatem Repository wurde kein Upgrade und keine Sichtbarkeitsänderung
-  vorgenommen. Der Check läuft in CI, ist aber kein erzwungenes Merge-Gate.
-  Aktuelle Verfügbarkeit steht in der [GitHub-Dokumentation zu Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
+- Der Nutzer hat `test` als erforderlichen GitHub-Check ausdrücklich
+  freigegeben und anschließend ausdrücklich die Veröffentlichung des
+  Quell-Repositories angeordnet. GitHub Free erlaubt Branch Protection für
+  öffentliche Repositories. Die Branch-Protection-API bestätigt für `main`
+  den erforderlichen Check `test`, `strict=true` und Admin-Enforcement.
+  GitHub Actions Run 14 (`43746180556`) bestand für Commit
+  `d45d1514656ce120da54e97de5e02f7ee68db288`; `main` verlangt damit `test` für
+  PR-Merges. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht.
+  Es wurde kein kostenpflichtiger Plan aktiviert. Quellen:
+  [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).
 
 ## Laufzeitregeln
 

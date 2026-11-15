@@ -7,6 +7,11 @@ const PROJECT_ID_PATTERN = /^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/;
 const BLOCKING_STATUSES = new Set(["running", "stale"]);
 const PAUSABLE_STATUSES = new Set(["queued", "awaiting_approval"]);
 const MAX_VERIFIED_OUTCOMES = 200;
+const MAX_STRATEGY_EVIDENCE_PAGES = 5;
+const NONCRITICAL_STRATEGY_PATHS = [
+  /^src\/pwa\/styles\.css$/i,
+  /^src\/pwa\/assets\/[A-Za-z0-9._/-]+$/i,
+];
 
 
 function normalizeRepository(value) {
@@ -47,6 +52,37 @@ function safeCiLabel(value) {
   if (!text) return "unknown";
   try { validateJobInput({ prompt: text, project: "owner/ci", priority: 50 }); return text; }
   catch { return "[redacted]"; }
+}
+
+function validGitPath(value) {
+  return typeof value === "string" && value.length > 0 && value.length <= 500 && !value.startsWith("/") && !value.includes("\\") && !value.split("/").some((part) => part === "" || part === "." || part === "..");
+}
+
+async function collectGitHubPages(fetchPage) {
+  const values = [];
+  for (let page = 1; page <= MAX_STRATEGY_EVIDENCE_PAGES; page += 1) {
+    const batch = await fetchPage(page);
+    if (!Array.isArray(batch) || batch.length > 100) throw Object.assign(new Error("strategy evidence response is invalid"), { statusCode: 502 });
+    values.push(...batch);
+    if (batch.length < 100) return { values, complete: true };
+  }
+  return { values, complete: false };
+}
+
+function latestApprovedReviewers(reviews, pullRequestAuthor, headSha) {
+  const latestByUser = new Map();
+  for (const review of reviews) {
+    const login = review?.user?.login;
+    const submittedAt = Date.parse(review?.submitted_at ?? "");
+    if (typeof login !== "string" || !login || review?.user?.type !== "User" || !Number.isFinite(submittedAt) || review.commit_id !== headSha) continue;
+    const existing = latestByUser.get(login);
+    if (!existing || submittedAt > existing.submittedAt) latestByUser.set(login, { login, submittedAt, state: review.state });
+    else if (submittedAt === existing.submittedAt && existing.state !== review.state) existing.state = "AMBIGUOUS";
+  }
+  return [...latestByUser.values()]
+    .filter((review) => review.login.toLowerCase() !== pullRequestAuthor.toLowerCase() && review.state === "APPROVED")
+    .map(({ login, submittedAt }) => ({ login, reviewed_at: new Date(submittedAt).toISOString() }))
+    .sort((a, b) => a.login.localeCompare(b.login));
 }
 
 export class ProjectService {
@@ -197,6 +233,83 @@ export class ProjectService {
     if (!project) throw new Error("project is not known");
     if (typeof this.store.updateProjectData !== "function") throw new Error("project store does not support atomic project-data updates");
     return this.store.updateProjectData(project.id, updater);
+  }
+
+  async verifyStrategyEvidence(input, { pullRequestNumber, workflowRunId, checkName = "test" } = {}) {
+    const id = normalizeRepository(input);
+    if (!Number.isSafeInteger(pullRequestNumber) || pullRequestNumber < 1 || !Number.isSafeInteger(workflowRunId) || workflowRunId < 1 || checkName !== "test") {
+      throw Object.assign(new Error("strategy evidence reference is invalid"), { statusCode: 400 });
+    }
+    const project = await this.store.get(id);
+    if (!project || project.status !== "connected") throw Object.assign(new Error("project is not connected"), { statusCode: 409 });
+    for (const method of ["getPullRequest", "getWorkflowRun", "listWorkflowRunJobs", "listPullRequestFiles", "listPullRequestReviews"]) {
+      if (typeof this.client[method] !== "function") throw Object.assign(new Error("verified GitHub strategy evidence is unavailable"), { statusCode: 503 });
+    }
+
+    const [pullRequest, run] = await Promise.all([
+      this.client.getPullRequest(id, pullRequestNumber),
+      this.client.getWorkflowRun(id, workflowRunId),
+    ]);
+    const headSha = pullRequest?.head?.sha;
+    const author = pullRequest?.user?.login;
+    const baseRepository = pullRequest?.base?.repo?.full_name?.toLowerCase();
+    const headRepository = pullRequest?.head?.repo?.full_name?.toLowerCase();
+    if (pullRequest?.number !== pullRequestNumber || pullRequest?.state !== "closed" || pullRequest?.merged !== true || !Number.isFinite(Date.parse(pullRequest.merged_at ?? "")) || baseRepository !== id || headRepository !== id || typeof author !== "string" || !author || !/^[a-f0-9]{40}$/i.test(headSha ?? "")) {
+      throw Object.assign(new Error("strategy evidence requires a merged same-repository pull request"), { statusCode: 409 });
+    }
+    const runPullRequest = (run?.pull_requests ?? []).some((item) => item?.number === pullRequestNumber && item?.head?.sha === headSha);
+    if (run?.id !== workflowRunId || run?.status !== "completed" || run?.conclusion !== "success" || run?.head_sha !== headSha || !runPullRequest || !Number.isFinite(Date.parse(run.completed_at ?? "")) || run?.repository?.full_name?.toLowerCase() !== id) {
+      throw Object.assign(new Error("strategy evidence does not match a completed passing workflow run for this pull request head"), { statusCode: 409 });
+    }
+
+    const jobs = await collectGitHubPages((page) => this.client.listWorkflowRunJobs(id, workflowRunId, 100, page).then((response) => response?.jobs));
+    if (!jobs.complete) throw Object.assign(new Error("strategy evidence job listing is incomplete"), { statusCode: 409 });
+    const check = jobs.values.find((item) => item?.name === checkName);
+    if (!check || check.conclusion !== "success" || !Number.isFinite(Date.parse(check.completed_at ?? ""))) {
+      throw Object.assign(new Error("strategy evidence is missing a passing required test job"), { statusCode: 409 });
+    }
+
+    const files = await collectGitHubPages((page) => this.client.listPullRequestFiles(id, pullRequestNumber, { perPage: 100, page }));
+    const paths = [];
+    let malformedPaths = false;
+    for (const file of files.values) {
+      if (!validGitPath(file?.filename)) malformedPaths = true;
+      else paths.push(file.filename);
+      if (file?.previous_filename !== undefined) {
+        if (!validGitPath(file.previous_filename)) malformedPaths = true;
+        else paths.push(file.previous_filename);
+      }
+    }
+    const uniquePaths = [...new Set(paths)].sort();
+    const critical = !files.complete || malformedPaths || uniquePaths.length === 0 || uniquePaths.some((path) => !NONCRITICAL_STRATEGY_PATHS.some((pattern) => pattern.test(path)));
+    let independentReviewers = [];
+    let reviewsComplete = true;
+    if (critical) {
+      const reviews = await collectGitHubPages((page) => this.client.listPullRequestReviews(id, pullRequestNumber, { perPage: 100, page }));
+      independentReviewers = latestApprovedReviewers(reviews.values, author, headSha);
+      reviewsComplete = reviews.complete;
+    }
+    return {
+      schema_version: 1,
+      project_id: id,
+      pull_request_number: pullRequestNumber,
+      pull_request_author: author,
+      head_sha: headSha.toLowerCase(),
+      workflow_run_id: workflowRunId,
+      check_name: checkName,
+      check_completed_at: new Date(Date.parse(check.completed_at)).toISOString(),
+      run_completed_at: new Date(Date.parse(run.completed_at)).toISOString(),
+      merged_at: new Date(Date.parse(pullRequest.merged_at)).toISOString(),
+      changed_file_count: uniquePaths.length,
+      changed_files_digest: await sha256Hex(JSON.stringify(uniquePaths)),
+      file_list_complete: files.complete,
+      file_list_valid: !malformedPaths,
+      critical,
+      independent_reviewers: independentReviewers,
+      review_list_complete: reviewsComplete,
+      verified: true,
+      source: "github_pull_request_and_actions_api",
+    };
   }
 
   async recordVerifiedJobOutcome(jobId) {

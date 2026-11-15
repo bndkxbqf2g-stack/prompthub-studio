@@ -32,6 +32,8 @@ p { color: var(--muted); line-height: 1.55; }
 .notice { min-height: 0; margin-bottom: 12px; color: var(--warning); }
 .notice.error { color: var(--danger); }
 .notice.success { color: var(--success); }
+.update-button { margin: 0 0 14px; }
+.update-button[hidden] { display: none; }
 .icon-button, .text-button { border: 0; color: var(--muted); background: transparent; cursor: pointer; }
 .icon-button { width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 50%; font-size: 1.5rem; }
 .text-button { padding: 8px 0; font-size: .85rem; }
@@ -87,9 +89,22 @@ textarea:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .inline-form input { min-width: 0; }
 .project-detail { margin-top: 14px; padding: 15px; border-left: 2px solid var(--accent); background: rgba(5, 11, 22, .3); }
 .incident-panel { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(5, 11, 22, .24); }
+.strategy-panel { margin-top: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: rgba(5, 11, 22, .24); }
 .incident-panel h3 { margin: 0; font-size: .98rem; }
+.strategy-panel h3 { margin: 0; font-size: .98rem; }
 .incident-report-form { padding: 12px; border: 1px solid rgba(43, 59, 91, .65); border-radius: 13px; }
 .incident-report-form textarea, .hypothesis-form textarea { min-height: 78px; }
+.strategy-form { padding: 12px; border: 1px solid rgba(43, 59, 91, .65); border-radius: 13px; }
+.strategy-form textarea { min-height: 84px; }
+.strategy-evidence-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
+.strategy-list { display: grid; gap: 10px; margin-top: 14px; }
+.strategy-card { min-width: 0; padding: 14px; border: 1px solid rgba(43, 59, 91, .65); border-radius: 13px; background: rgba(17, 27, 46, .65); }
+.strategy-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
+.strategy-card h4 { margin: 0; font-size: .9rem; overflow-wrap: anywhere; }
+.strategy-card p { margin: 8px 0; overflow-wrap: anywhere; font-size: .82rem; }
+.strategy-hypothesis { color: var(--text); white-space: pre-wrap; }
+.critical-chip { color: var(--warning); }
+.strategy-card .button { min-height: 40px; margin-top: 5px; padding: 0 12px; font-size: .8rem; }
 .incident-list { display: grid; gap: 10px; margin-top: 14px; }
 .incident-card { min-width: 0; padding: 14px; border: 1px solid rgba(43, 59, 91, .65); border-radius: 13px; background: rgba(17, 27, 46, .65); }
 .incident-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
@@ -128,4 +143,4 @@ textarea:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .dialog-actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; margin-top: 16px; }
 .list-heading { margin-top: 34px; }
 @media (max-width: 430px) { .shell { width: min(100% - 24px, 720px); padding-top: 20px; } .card { padding: 18px; } .form-grid { grid-template-columns: 1fr; gap: 0; } }
-@media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } .inline-form { grid-template-columns: 1fr; } .inline-form label { grid-column: 1; } .interview-answer { grid-template-columns: 1fr; } .interview-answer .button { grid-column: 1; } .toolbar-row .button, .file-button { flex: 0 0 auto; } }
+@media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } .inline-form { grid-template-columns: 1fr; } .inline-form label { grid-column: 1; } .strategy-evidence-fields { grid-template-columns: 1fr; } .interview-answer { grid-template-columns: 1fr; } .interview-answer .button { grid-column: 1; } .toolbar-row .button, .file-button { flex: 0 0 auto; } }

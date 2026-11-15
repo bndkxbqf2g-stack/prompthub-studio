@@ -265,13 +265,298 @@
   erneute Kontrolle war wegen geschlossenem Cloud-Browser-Transport nicht
   möglich. Preview-Access wurde nicht eingerichtet; Preview-Secrets sind nicht
   gesetzt.
-- GitHub bleibt privat. Der Nutzer hat den erforderlichen CI-Check `test`
-  freigegeben; GitHub Branch-Protection meldete im Dashboard, dass private
-  Repositories dafür einen bezahlten Team- oder Enterprise-Organisationsplan
-  benötigen. Kein Upgrade
-  und keine Sichtbarkeitsänderung vorgenommen; Merge-Gate fehlt.
+- GitHub blieb privat. Der Nutzer hat den erforderlichen CI-Check `test`
+  freigegeben. Der Branch-Protection-Dialog meldete, dass das private
+  Repository einen geeigneten bezahlten Plan braucht; die spätere Rulesets-API-
+  Prüfung für das persönliche Repository dokumentiert CP-010 präziser. Kein
+  Upgrade und keine Sichtbarkeitsänderung wurden vorgenommen; Merge-Gate fehlt.
 - Cloudflare-Billing-Seite konnte nicht verifiziert werden. In diesem
   Arbeitsgang wurde kein kostenpflichtiger Tarif oder Dienst aktiviert.
 - Echtes iPhone-Installations-/E2E-Testing und unabhängiger Quoten-/Ausfalltest
   stehen aus. Vollständige Abnahme bleibt offen; Details in
   `ACCEPTANCE_CRITERIA.md` und `CLOUDFLARE_OPERATIONS.md`.
+
+## CP-010 – Branch-Gate unter GitHub Free geprüft
+
+- Datum: 2026-11-15, 15:14 UTC
+- Repository `bndkxbqf2g-stack/prompthub-studio` wurde per GitHub-API erneut als
+  privat, persönliches Konto und Default-Branch `main` bestätigt.
+- Nutzerfreigabe für den Pflichtcheck `test` liegt vor. Ein GET auf die
+  Rulesets-API liefert HTTP 403 mit `Upgrade to GitHub Pro or make this
+  repository public to enable this feature.` Die Branch-Protection-GET ist für
+  die verbundene Integration nicht zugänglich (403). GitHub-Dokumentation
+  bestätigt: Free schützt öffentliche Repositories; private Repositories
+  benötigen Pro für persönliche Konten oder Team/Enterprise für Organisationen.
+- Unter den verbindlichen Vorgaben „privat“ und „0 €“ gibt es keine kostenlose
+  serverseitige GitHub-Branch-Regel. Es wurde kein Plan aktiviert und das Repo
+  blieb privat. CI Run 9 (`43727273718`) für `8f0fdc2` bestand. Pages führt
+  `npm test` und `npm run check` erneut vor Veröffentlichung aus; das blockiert
+  fehlerhafte Deployments, aber kein Merge. A09 bleibt offen.
+- In der verwalteten Windows-Shell ist `codex-cli 0.167.0-alpha.4.1` installiert,
+  aber `codex login status` schlägt mit `Could not find home directory` fehl.
+  Damit ist hier kein authentifizierter lokaler Codex-Executor belegt; ein
+  Mac-Runner wurde nicht getestet.
+- Lokale Prüfungen nach den Dokumentationsänderungen: `npm test` 75/75;
+  `npm run check` erfolgreich (88 Dateien, Prompt-Library synchron);
+  `git diff --check` erfolgreich.
+
+## CP-011 – Codex-Ausführungszugänge erneut geprüft
+
+- Datum: 2026-11-15, 15:22 UTC
+- `codex-cli 0.167.0-alpha.4.1` ist installiert. `codex login status` endet
+  mit Exitcode 1 und `Could not find home directory`. Die Präsenzprüfung zeigte
+  `USERPROFILE` vorhanden, `HOME` und `CODEX_HOME` nicht; diese Variablen wurden
+  nicht gesetzt oder verändert. GitHub- und Cloudflare-Token waren in dieser
+  Shell nicht vorhanden.
+- Die Codex-Cloud-Umgebungsabfrage meldet `asenvcfg_base` als `ready` und
+  `runnable`, jedoch ohne verknüpfte Repositories (`repositories: []`). Die
+  Antwort enthielt denselben Environment-Eintrag doppelt. Es wurde kein Task
+  gestartet; damit ist kein autonomer Cloud-Runner für das private PromptHub-
+  Repository nachgewiesen.
+- Nach dieser Bestandsaufnahme: `npm test` 75/75 bestanden; `npm run check`
+  erfolgreich für 88 Dateien und Prompt-Library-Synchronität;
+  `git diff --check` erfolgreich. Keine produktiven Einstellungen, Secrets,
+  Kostenoptionen oder Repository-Sichtbarkeit geändert.
+
+## CP-012 – OAuth-Rücksprung gegen externe Weiterleitung gehärtet
+
+- Datum: 2026-11-15, 15:36 UTC
+- Eine unabhängige Prüfung bestätigte einen ausnutzbaren Open Redirect:
+  `returnTo=//example.org/...` wurde beim OAuth-Start gespeichert und nach
+  erfolgreichem Callback unverändert als `Location` ausgegeben. Die Reproduktion
+  erfolgte lokal mit einem Mock-GitHub-Transport; es gab keinen externen Login.
+- `safeLocalRedirectPath` akzeptiert nur normalisierte relative Same-Origin-
+  Pfade. Die Prüfung erfolgt beim Start, erneut beim Callback und nochmals vor
+  dem `Location`-Header im HTTP-Handler. Ungültige Werte fallen auf `/` zurück.
+- Regressionstests decken protokollrelative und absolute Ziele, Backslashes,
+  URL-normalisierte `%2e%2e`-Pfade, rohe CR/LF-Zeichen, gültige interne Ziele,
+  manipulierten OAuth-State, bösartige Auth-Adapter-Antworten sowie encodierte
+  Slash-/Backslash-Sequenzen ab. Eine zweite unabhängige Prüfung gab den Fix
+  frei; es wurden keine Dateien durch Reviewer-Agenten verändert.
+- Nachweis: `npm test` 79/79 bestanden; `npm run check` erfolgreich für 88
+  Dateien und synchronisierte Prompt-Library; `npm run demo` beendete einen
+  Mock-Auftrag mit `succeeded` und sieben Ereignissen; `git diff --check`
+  erfolgreich.
+- Der Stand liegt auf dem lokalen Branch `codex/oauth-returnto-hardening` und ist
+  noch nicht auf GitHub veröffentlicht. Für diesen Fix wurde kein GitHub-CI-
+  Lauf und kein Produktionsdeployment ausgeführt. OAuth-Secrets,
+  Cloudflare-Runtime und Repository-Einstellungen blieben unverändert.
+
+## CP-013 – PWA-Update nach Nutzerentscheidung
+
+- Datum: 2026-11-15, 16:10 UTC; Arbeitsbasis `6123cf79120f97f73dd11fb56ecf64def385b2ab`.
+- Der Service Worker verwendet `prompthub-static-v4`, löscht nur ältere
+  PromptHub-Caches, beansprucht Clients nach Aktivierung und umgeht API-,
+  OAuth-, Health- sowie Nicht-GET-Anfragen. Statische GET-Assets bleiben bei
+  Netzwerkausfall aus dem Cache verfügbar.
+- Ein sichtbarer Update-Button erscheint erst, wenn eine neue Worker-Version
+  installiert ist. Sie aktiviert sich nach Antippen und löst genau einen Reload
+  aus; die erste Installation lädt nicht automatisch neu. Das neue
+  `service-worker-client.mjs` wird für Offline-Start mitgecacht und erhält
+  `text/javascript` im lokalen Server.
+- Regressionstests prüfen Update-Race, einmaligen Reload, Erstinstallation,
+  Offline-Fallback, Cache-Isolation, No-Cache-Header sowie den Ausschluss von
+  API-, OAuth-, Health-, Cross-Origin- und Nicht-GET-Anfragen.
+- Nachweis: `npm test` 82/82 bestanden; `npm run check` erfolgreich für 90
+  Dateien; `git diff --check` erfolgreich; `npm run demo` endete mit
+  `succeeded` und sieben Ereignissen.
+- A17 bleibt teilweise offen, bis Installation und Aktualisierung auf einem
+  echten iPhone geprüft wurden. Das Paket ist lokal als Commit `a1649e6` auf dem
+  Branch `codex/oauth-returnto-hardening` gesichert, aber nicht gepusht oder
+  nach Cloudflare Pages deployed. GitHub-PR #2 und
+  Repository-Einstellungen wurden nicht verändert.
+
+## CP-014 – Production- und Arbeitsstand getrennt dokumentiert
+
+- Datum: 2026-11-15, 16:21 UTC.
+- GitHub-Leseabfrage bestätigt weiterhin privates Repository, PR #2 offen auf
+  Head `6123cf79120f97f73dd11fb56ecf64def385b2ab` und CI Run 11 erfolgreich
+  ausschließlich für diesen Head. Die lokalen Commits `a1649e6` und `bc84f65`
+  sind nicht auf GitHub.
+- Der letzte dokumentierte Production-Commit `504477dc35dab908c8b3755550866bca071c72db`
+  wurde direkt aus dem lokalen Git-Objekt geprüft: `src/pwa/sw.js` enthält
+  Cache v3 und `index.html` kein Update-Steuerelement. Die PWA-Änderung aus CP-013
+  ist nur lokal vorhanden.
+- Eine erneute HTTP-Prüfung von `prompthub-studio.pages.dev` war in dieser
+  Shell wegen eines Netzwerkfehlers nicht möglich. Der aktuelle Live-Zustand
+  wird daher nicht neu behauptet. Sichtbarkeit, Deployment und Branch-Regeln
+  wurden nicht verändert.
+- Nachweis für den aktuellen Workspace: `npm test` 82/82 bestanden;
+  `npm run check` erfolgreich für 90 Dateien; `git diff --check` erfolgreich.
+
+## CP-015 – A14-Freigabe-Gate geprüft und Status korrigiert
+
+- Datum: 2026-11-15, 16:42 UTC.
+- Eine unabhängige, ausschließlich lesende Prüfung bestätigte, dass
+  `KnowledgeStore.adoptStrategy()` bei kritischen Strategien jeden nichtleeren
+  `approvedBy`-Text akzeptiert und `evidenceRefs` nur als freie Strings speichert.
+  Die Anzahl von zwei Referenzen belegt keine tatsächlichen Test- oder CI-
+  Ergebnisse.
+- `KnowledgeStore` wird derzeit nur von `test/knowledge-recovery.test.mjs`
+  importiert und ist nicht mit der Produktions-App verbunden. Der Fehler ist
+  deshalb eine unsichere vorbereitete Kontrollkomponente, kein nachgewiesener
+  Produktionspfad.
+- A14 wurde in `ACCEPTANCE_CRITERIA.md` auf `teilweise` gesetzt. Es wurden keine
+  Freigabe-Gates oder Sicherheitsregeln verändert; deren Korrektur benötigt die
+  vorgeschriebene menschliche Freigabe und unabhängige Prüfung.
+- Nachweis: `npm test` 82/82 bestanden; `npm run check` erfolgreich für 90
+  Dateien; `git diff --check` erfolgreich.
+- GitHub bestätigt weiterhin `private`. Ein Browser-Schreibzugang ist in dieser
+  Sitzung nicht verfügbar; Credential Manager und GitHub-Connector stellten
+  keinen nutzbaren Einstellungs-Schreibweg bereit. Es gab keine Remoteänderung.
+
+## CP-016 – A14-Freigabe-Gate implementiert und unabhängig geprüft
+
+- Datum: 2026-11-15, 17:20 UTC.
+- Die unsicheren freien Strategie-Evidenz- und `approvedBy`-Methoden aus
+  `KnowledgeStore` wurden entfernt. `StrategyLearningEngine` ist in Node- und
+  Cloudflare-Laufzeit sowie über die authentifizierte Projekt-API eingebunden.
+- Die Approver-Identität wird aus der serverseitigen Sitzung gelesen. Kritische
+  Freigaben verlangen `provider: "github"`, sind für lokale oder unmarkierte
+  Sessions gesperrt und ignorieren vom Client gelieferte Identitäts- und
+  Authentifizierungsfelder.
+- GitHub-Nachweise sind auf eine gemergte PR desselben Repositories, passenden
+  PR-/Workflow-Head, erfolgreich abgeschlossenen Run und erfolgreichen Job
+  `test` gebunden. Unvollständige Job-, Datei- oder Review-Seiten werden
+  bei der Adoption abgewiesen. Eine Dateiliste muss vollständig, valide und
+  nicht leer sein. Nur PWA-Styles und statische PWA-Assets gelten als
+  unkritisch; unbekannte und funktionale Pfade lösen das kritische Gate aus.
+- Kritische Übernahmen benötigen eine vollständige aktuelle Review-Liste mit
+  unabhängigem APPROVED-Review desselben Heads, eine exakte Bestätigungsphrase
+  und einen angemeldeten Approver, der weder Strategie-Proposer noch PR-Autor
+  ist. Evidenz wird im CAS-Update erneut geprüft; neuere Review-Status,
+  Dismissals und veraltete CI-Nachweise zählen nicht als Freigabe.
+- Regressionen: `test/strategy-learning.test.mjs`, `test/auth.test.mjs` und
+  `test/cloudflare-worker.test.mjs` decken Evidenzbindung, vollständige
+  Auflistungen, kritische Pfade, unabhängige Reviews, Dismissals, Provider- und
+  Session-Gates ab.
+- Unabhängige, ausschließlich lesende Prüfung: keine kritischen, hohen oder
+  mittleren Befunde; als niedriger Hinweis bleibt, dass Sessionstores den
+  Provider-Wert technisch entgegennehmen. Im Produktionspfad setzt ihn nur
+  `GitHubOAuth` nach erfolgreichem OAuth-Callback; die API erzwingt den
+  Provider zusätzlich. Die Prüfung bestätigte die Regressionen und änderte
+  keine Dateien.
+- Nachweis: gezielte A14/Auth-Tests 17/17 bestanden; `npm test` 94/94
+  bestanden; `npm run check` erfolgreich für 92 Dateien und synchronisierte
+  Prompt-Bibliothek; `git diff --check` bestanden. Implementierungs-Commit:
+  `4e71d0e` (lokal, nicht gepusht).
+- Abnahme A14 bleibt teilweise: echte GitHub-PR-/Review-/Actions-Nachweise und
+  eine PWA-Verwaltung der Strategiebewertungen sind noch nicht live abgenommen.
+- Der A14-Fix wurde lokal ausgeführt und geprüft. Es erfolgten kein Push,
+  Deployment oder Änderung der GitHub-Repository-Einstellungen.
+
+## CP-017 – A14-PWA-Verwaltung und Projektansichten
+
+- Datum: 2026-11-15, 17:43 UTC.
+- Die iPhone-PWA kann Strategiebewertungen projektbezogen erfassen und anzeigen.
+  Freigaben kritischer Strategien werden nur bei passender GitHub-Sitzung und
+  vollständigen Review-/CI-Nachweisen angeboten; der Server prüft Nachweise
+  erneut. Gemessene CI-Ergebnisse werden nicht als kausale Wirksamkeit ausgegeben.
+- Job- und Fehlerhistorie-Ansichten laden nur Daten des ausgewählten Projekts.
+  Antworten aus inzwischen verlassenen Projekten werden ignoriert. Ladefehler
+  und erfolgreich leere Zustände werden getrennt dargestellt. Felder für
+  Fehlerursachenbestätigungen haben zugeordnete barrierefreie Beschriftungen.
+- Die erste unabhängige UI-Prüfung fand einen mittleren Befund zu verspäteten
+  Antworten bei Projektwechseln sowie einen niedrigen Befund zu unbeschrifteten
+  Job-ID-Feldern. Beide wurden behoben. Eine erneute unabhängige Prüfung meldete
+  keine konkreten Befunde und bestätigte den Projektfilter, die Antwort-Guards,
+  die Zustandsanzeigen, die Beschriftungen und das Strategie-Freigabe-Gate.
+- Regressionen: `test/pwa-strategy.test.mjs` prüft die PWA-Freigabe und
+  Projektwechsel-Guards; `test/api-projects.test.mjs` prüft den API-Projektfilter.
+  Die unabhängige Prüfung meldete 24/24 gezielte Tests bestanden.
+- Nachweis: `npm test` 103/103 bestanden; `npm run check` erfolgreich für
+  94 Dateien und synchronisierte Prompt-Bibliothek; `git diff --check` bestanden.
+  Paket-Commit: `46711f0` (lokal, nicht gepusht).
+- A14 bleibt teilweise abgenommen, da reale GitHub-PR-/Review-/Actions-Belege
+  und produktive Control-API-Konfiguration noch fehlen. Es erfolgten kein Push,
+  Deployment oder Änderungen an externen GitHub-/Cloudflare-Einstellungen.
+
+## CP-018 – lokale HTTP- und Runner-Demonstration
+
+- Datum: 2026-11-15, 17:48 UTC.
+- `npm run demo` erzeugte im isolierten Memory-Modus den Auftrag
+  `job_4883cfd5-d035-47ef-b9de-d0bcce8095f7`. Der geskriptete Executor bestand
+  den Demo-Pflichtcheck; der Job endete mit `succeeded` und sieben Ereignissen.
+  Dies belegt die lokale Control-Plane-/Runner-Demo, nicht die Codex-CLI oder
+  einen echten Mac-/Cloud-Runner.
+- `src/server.mjs` wurde auf `127.0.0.1:18787` gestartet. `/`,
+  `/manifest.webmanifest`, `/app-icon-source.png`, `/healthz` und `/api/me`
+  lieferten HTTP 200. Security-Header einschließlich CSP waren gesetzt; die
+  lokale Sitzung gab keinen Token zurück. `/healthz` meldete
+  `runner_inbound_port:false`, `runner_status:not_observed` und
+  `runner_configured:false`.
+- Der Server wurde beendet und danach bestätigt, dass auf Port 18787 kein
+  Listener verblieb.
+- Nachweis: `npm test` 103/103 bestanden; `npm run check` erfolgreich für
+  94 Dateien und synchronisierte Prompt-Bibliothek; `git diff --check` bestanden.
+- Die GitHub-Repository-Metadaten wurden schreibgeschützt erneut abgerufen und
+  melden weiterhin `visibility: private`. Der Cloud Browser bleibt nicht
+  verbunden; die bereits genehmigte Sichtbarkeitsänderung und Branch-Regel
+  wurden nicht ausgeführt. Kein Push, Deployment oder Kostenwechsel.
+
+## CP-019 – GitHub-Schreibzugriff und Pflichtcheck wiederhergestellt
+
+- Datum: 2026-11-15, 18:22 UTC.
+- Diagnose: lokale Git-Metadaten waren durch die Sandbox blockiert; der erste
+  Git-Netzwerkversuch scheiterte ebenfalls in der eingeschränkten Umgebung.
+  Mit gezielter Rechteausweitung für die nötigen Git-Befehle, per-Befehl
+  `safe.directory` und dem bereits angemeldeten Git Credential Manager gelang
+  der Dry-Run und anschließend der normale Push. Die globale Git-Konfiguration
+  blieb unverändert. Credential-Ausgaben und Token wurden nicht offengelegt.
+- GitHub bestätigte für den vorhandenen Credential-Manager-Zugang
+  `admin=true` und `push=true`. Das Quell-Repository
+  `bndkxbqf2g-stack/prompthub-studio` wurde auf ausdrückliche Nutzeranweisung
+  öffentlich gestellt; die Repository-API bestätigte HTTP 200 und anschließend
+  `visibility=public`. Kein bezahlter Plan und kein kostenpflichtiger Dienst
+  wurde aktiviert.
+- Die zuvor freigegebene Branch-Regel wurde für `main` gesetzt und erneut
+  ausgelesen: erforderlicher Check `test`, `strict=true`, Admin-Enforcement.
+  GitHub Free konnte die Regel nach der Sichtbarkeitsänderung bereitstellen.
+  Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht; weitere
+  Branch-Schutzoptionen wurden nicht verändert.
+- Feature-Branch `codex/oauth-returnto-hardening` wurde auf Commit
+  `0a9e105641a17db91988c6848778b62cafbbcd40` gepusht. PR #2 bleibt offen und
+  ungemergt. Run 13 (`43744475969`) war für diesen damaligen Head erfolgreich.
+  Nach dem Dokumentations-Commit `d45d1514656ce120da54e97de5e02f7ee68db288`
+  bestanden auch GitHub Actions Run 14 (Push, `43746180556`) und Run 15 (PR,
+  `43746186693`) vollständig; Job `test` und alle Schritte waren erfolgreich.
+- Cloudflare-Schreibzugriff bleibt nicht verfügbar: `gh` und `wrangler` sind
+  nicht installiert, Cloudflare-Token-Umgebungsvariablen fehlen und der
+  Cloud-Browser ist nicht verbunden. Es wurde keine Cloudflare-Änderung,
+  kein Deployment und keine Ressource angelegt. Minimale sichere Optionen,
+  Rechteumfang und Wiederherstellungsweg sind in `CLOUDFLARE_OPERATIONS.md`
+  dokumentiert. Kontobilling bleibt ungeprüft; es wurde kein Tarif aktiviert.
+- Dokumentation aktualisiert: `README.md`, `ACCEPTANCE_CRITERIA.md`,
+  `CLOUD_COST_RULES.md`, `CLOUDFLARE_OPERATIONS.md`, `DEVELOPMENT_PLAN.md` und
+  `OPERATIONS.md`.
+- Pflichtnachweis vor dem Checkpoint: `npm test` 103/103 bestanden;
+  `npm run check` bestanden (94 Dateien, Prompt-Library synchron);
+  `git diff --check` bestanden.
+
+## CP-020 – GitHub Pages geprüft, Cloudflare-Builds pausiert
+
+- Datum: 2026-11-15 18:50 UTC.
+- Auf Nutzerwunsch wurde im Cloudflare-Dashboard die automatische Production-
+  Bereitstellung deaktiviert. Preview-Deployments stehen auf `None`; beides
+  wurde in den gespeicherten Projekteinstellungen erneut angezeigt. Das letzte
+  Deployment und das Cloudflare-Pages-Projekt wurden nicht gelöscht; die alte
+  Adresse bleibt erreichbar. Kein kostenpflichtiger Tarif wurde aktiviert.
+- GitHub Pages ist für `bndkxbqf2g-stack/prompthub-studio` auf `main`/`/(root)`
+  aktiv. Der Repository-Root liefert eine README-Seite; die PWA-HTML ist unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/` erreichbar.
+  Die Browseransicht zeigte dort nur die ungestaltete HTML-Hülle. Codeprüfung
+  bestätigte Root-absolute Pfade, die am Repository-Unterpfad scheitern.
+  GitHub Pages stellt statische Dateien, aber keine serverseitige Control API
+  bereit.
+- Commit `9938c58499eaf0b28362c611e7016b226847d378` auf PR #2 stellt PWA-Assets,
+  Manifest-Start-/Scope und Service-Worker-Registrierung auf relative Pfade um,
+  erhöht die Cache-Version und ergänzt einen Regressionstest für den
+  GitHub-Pages-Unterpfad. PR #2 ist offen und nicht gemergt; der Fix ist noch
+  nicht live.
+- `npm test`: 104/104 bestanden. Der erste Lauf deckte eine veraltete
+  Cacheversions-Assertion im bestehenden PWA-Test auf; der Test wurde auf v6
+  aktualisiert und der vollständige zweite Lauf bestand. `npm run check`
+  bestand (94 Dateien, Prompt-Library synchron); `git diff --check` bestand.
+  GitHub Actions Run 17 (`43748927468`) bestand für den Commit oben: Pflichtjob
+  `test` und alle Schritte erfolgreich.
+- Die Control API bleibt mangels Backend-Konfiguration nicht betriebsbereit.

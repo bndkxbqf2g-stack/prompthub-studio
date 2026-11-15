@@ -85,40 +85,4 @@ export class KnowledgeStore {
     return collection.entries.filter((entry) => includeSuperseded || !entry.superseded_by).map((entry) => structuredClone(entry));
   }
 
-  async recordStrategyEvaluation({ name, hypothesis, outcome, evidenceRefs = [], metrics = {}, critical = false } = {}) {
-    await this.init();
-    if (!["success", "failure", "inconclusive"].includes(outcome)) throw new Error("strategy outcome is invalid");
-    const entry = {
-      id: `strategy_${randomUUID()}`,
-      type: "strategy_evaluation",
-      name: safeText(name, "name", 300),
-      hypothesis: safeText(hypothesis, "hypothesis"),
-      outcome,
-      evidence_refs: safeRefs(evidenceRefs),
-      metrics: metrics && typeof metrics === "object" && !Array.isArray(metrics) ? structuredClone(metrics) : {},
-      critical: critical === true,
-      adopted: false,
-      adopted_by: null,
-      created_at: this.now().toISOString(),
-      rule_version: this.ruleVersion,
-    };
-    const path = join(this.root, "strategies.json");
-    const collection = await readCollection(path, "strategies.json");
-    collection.entries.push(entry);
-    await writeJsonAtomic(path, collection);
-    return structuredClone(entry);
-  }
-
-  async adoptStrategy(strategyId, { approvedBy = "" } = {}) {
-    const path = join(this.root, "strategies.json");
-    const collection = await readCollection(path, "strategies.json");
-    const entry = collection.entries.find((candidate) => candidate.id === strategyId);
-    if (!entry) throw new Error("strategy evaluation not found");
-    if (entry.outcome !== "success" || entry.evidence_refs.length < 2) throw new Error("insufficient evidence to adopt strategy");
-    if (entry.critical && !approvedBy) throw new Error("critical strategy adoption requires human approval");
-    entry.adopted = true;
-    entry.adopted_by = approvedBy || "evidence-gate";
-    await writeJsonAtomic(path, collection);
-    return structuredClone(entry);
-  }
 }
