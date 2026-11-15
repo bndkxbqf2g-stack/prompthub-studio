@@ -42,8 +42,8 @@ angeordneten Veröffentlichung des Quell-Repositories als Branch-Regel auf
 Cloudflare-Billing-Status konnte wegen der nicht ladenden Abrechnungsseite
 nicht unabhängig verifiziert werden. Die
 Abnahmematrix, Kostenregeln und aktuellen Betriebseinschränkungen stehen in
-`ACCEPTANCE_CRITERIA.md`, `CLOUD_COST_RULES.md` und
-`CLOUDFLARE_OPERATIONS.md`.
+`ACCEPTANCE_CRITERIA.md`, `CLOUD_COST_RULES.md`,
+`CLOUDFLARE_OPERATIONS.md` und `HOSTING_OPTIONS.md`.
 
 ## Schnellstart
 
@@ -66,10 +66,11 @@ npm run demo
 ```
 
 Die serverlose Cloudflare-Variante und ihre verbindlichen Setup-/Kostenlimits
-stehen in `CLOUDFLARE_OPERATIONS.md`. GitHub Pages dient derzeit als statischer
-Host; Cloudflare-Builds sind pausiert. Ohne privates Control-Repository,
-OAuth-Secrets und KV-Binding bleibt die Control API absichtlich nicht verfügbar.
-Ein Codex-Cloud-Runner ist nicht konfiguriert.
+stehen in `CLOUDFLARE_OPERATIONS.md`; automatische Deployments bleiben pausiert.
+GitHub Pages dient derzeit als statischer Host und stellt keine Control API
+bereit. Netlify Free ist als Cloudflare-Alternative geprüft, aber noch nicht
+verbunden oder freigegeben; Bedingungen und offene Sicherheitsentscheidungen
+stehen in `HOSTING_OPTIONS.md`. Ein Codex-Cloud-Runner ist nicht konfiguriert.
 
 Für den echten GitHub-Betrieb müssen ein privates Control-Repository, ein
 serverseitiger Token, eine OAuth-App mit Login-Allowlist, ein freigegebener
