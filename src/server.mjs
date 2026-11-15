@@ -3,6 +3,7 @@ import { createControlPlane, createGitHubClient } from "./control/index.mjs";
 import { GitHubProjectStore } from "./projects/project-store.mjs";
 import { ProjectService } from "./projects/project-service.mjs";
 import { ErrorLearningEngine } from "./knowledge/error-learning.mjs";
+import { StrategyLearningEngine } from "./knowledge/strategy-learning.mjs";
 import { PromptDesigner } from "./designer/prompt-designer.mjs";
 import { loadPromptLibrary } from "./research/load-prompt-library.mjs";
 import { LocalAuth, GitHubOAuth } from "./auth/github-oauth.mjs";
@@ -22,6 +23,7 @@ const projectService = githubClient
   : null;
 const promptLibrary = await loadPromptLibrary();
 const errorLearning = projectService ? new ErrorLearningEngine({ projectService }) : null;
+const strategyLearning = projectService ? new StrategyLearningEngine({ projectService }) : null;
 const promptDesigner = projectService ? new PromptDesigner({ projectService, controlPlane, promptLibrary, errorLearning }) : null;
 const auth = config.authMode === "github"
   ? new GitHubOAuth({
@@ -34,7 +36,7 @@ const auth = config.authMode === "github"
       production: config.nodeEnv === "production",
     })
   : new LocalAuth({ production: config.nodeEnv === "production" });
-const server = createHttpServer({ config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning });
+const server = createHttpServer({ config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, strategyLearning });
 server.listen(config.port, config.host, () => {
   console.log(`PromptHub Studio listening on ${config.publicOrigin}`);
   console.log("Runner inbound port: disabled");

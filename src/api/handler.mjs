@@ -94,7 +94,7 @@ async function handleDesigner({ request, url, pathname, promptDesigner, actor })
   return json(404, { error: "not_found" });
 }
 
-export function createRequestHandler({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, logger = console, enforceSameOrigin = false, beforeProtectedApi = null } = {}) {
+export function createRequestHandler({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, logger = console, enforceSameOrigin = false, beforeProtectedApi = null } = {}) {
   if (!config || !controlPlane || !auth) throw new Error("config, controlPlane and auth are required");
   let metricCache = null;
   let metricPending = null;
@@ -200,6 +200,22 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
         if (!incidentId && request.method === "POST") return json(201, { incident: await errorLearning.report(projectId, await bodyJson(request, 10_000), session.user.login) });
         if (incidentId && action === "hypotheses" && request.method === "POST") return json(201, { incident: await errorLearning.addHypothesis(projectId, incidentId, await bodyJson(request, 10_000), session.user.login) });
         if (incidentId && action === "confirm" && request.method === "POST") return json(200, { incident: await errorLearning.confirmCause(projectId, incidentId, await bodyJson(request, 10_000), session.user.login) });
+        return json(405, { error: "method_not_allowed" });
+      }
+      const strategyMatch = /^\/api\/projects\/([^/]+)\/strategies(?:\/([^/]+)\/(adopt))?$/.exec(pathname);
+      if (strategyMatch) {
+        if (!strategyLearning) return json(501, { error: "strategy_learning_not_configured" });
+        const projectId = decodeURIComponent(strategyMatch[1]);
+        const strategyId = strategyMatch[2] ?? null;
+        const action = strategyMatch[3] ?? null;
+        if (!strategyId && request.method === "GET") return json(200, { strategies: await strategyLearning.list(projectId) });
+        if (!strategyId && request.method === "POST") return json(201, { strategy: await strategyLearning.evaluate(projectId, await bodyJson(request, 10_000), session.user.login) });
+        if (strategyId && action === "adopt" && request.method === "POST") {
+          if (session.provider !== "github" || session.local === true) return json(403, { error: "critical_strategy_adoption_requires_github_authentication" });
+          const payload = await bodyJson(request, 10_000);
+          const strategy = await strategyLearning.adopt(projectId, strategyId, { confirmation: payload.confirmation, actor: session.user.login, authenticatedGithub: true });
+          return json(200, { strategy });
+        }
         return json(405, { error: "method_not_allowed" });
       }
       const projectMatch = /^\/api\/projects\/([^/]+)(?:\/(remove|reconnect|data))?$/.exec(pathname);

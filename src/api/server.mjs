@@ -45,8 +45,8 @@ function writeResponse(response, nodeResponse) {
   return response.arrayBuffer().then((body) => nodeResponse.end(Buffer.from(body)));
 }
 
-export function createHttpServer({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, logger = console, assetRoot = join(process.cwd(), "src", "pwa") } = {}) {
-  const handleRequest = createRequestHandler({ config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, logger });
+export function createHttpServer({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, logger = console, assetRoot = join(process.cwd(), "src", "pwa") } = {}) {
+  const handleRequest = createRequestHandler({ config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, strategyLearning, logger });
   return createServer(async (request, response) => {
     try {
       const webRequest = webRequestFromNode(request);

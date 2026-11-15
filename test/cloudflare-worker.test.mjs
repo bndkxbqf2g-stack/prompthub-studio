@@ -30,7 +30,7 @@ function configuredEnv({ fetchImpl = async () => new Response(JSON.stringify({ p
 
 async function sessionCookie(env) {
   const id = "test-session";
-  const session = { id, user: { login: "allowed-user", id: 7 }, token: "private-user-token", createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 60_000).toISOString() };
+  const session = { id, user: { login: "allowed-user", id: 7 }, token: "private-user-token", provider: "github", createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 60_000).toISOString() };
   await env.SESSIONS.put(`prompthub:session:${id}`, JSON.stringify(session), { expirationTtl: 60 });
   return `prompthub_session=${id}.${await hmacBase64Url(id, env.SESSION_SECRET)}`;
 }

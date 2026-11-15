@@ -40,10 +40,10 @@ export class CloudflareKVSessionStore {
     this.ttlMs = ttlMs;
   }
 
-  async create({ user, token }) {
+  async create({ user, token, provider = null }) {
     const id = globalThis.crypto.randomUUID();
     const now = this.now();
-    const session = { id, user, token, createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + this.ttlMs).toISOString() };
+    const session = { id, user, token, provider, createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + this.ttlMs).toISOString() };
     await putJson(this.namespace, `${SESSION_PREFIX}${id}`, session, Math.ceil(this.ttlMs / 1000));
     return id;
   }

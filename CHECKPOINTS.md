@@ -404,3 +404,42 @@
 - GitHub bestätigt weiterhin `private`. Ein Browser-Schreibzugang ist in dieser
   Sitzung nicht verfügbar; Credential Manager und GitHub-Connector stellten
   keinen nutzbaren Einstellungs-Schreibweg bereit. Es gab keine Remoteänderung.
+
+## CP-016 – A14-Freigabe-Gate implementiert und unabhängig geprüft
+
+- Datum: 2026-11-15, 17:20 UTC.
+- Die unsicheren freien Strategie-Evidenz- und `approvedBy`-Methoden aus
+  `KnowledgeStore` wurden entfernt. `StrategyLearningEngine` ist in Node- und
+  Cloudflare-Laufzeit sowie über die authentifizierte Projekt-API eingebunden.
+- Die Approver-Identität wird aus der serverseitigen Sitzung gelesen. Kritische
+  Freigaben verlangen `provider: "github"`, sind für lokale oder unmarkierte
+  Sessions gesperrt und ignorieren vom Client gelieferte Identitäts- und
+  Authentifizierungsfelder.
+- GitHub-Nachweise sind auf eine gemergte PR desselben Repositories, passenden
+  PR-/Workflow-Head, erfolgreich abgeschlossenen Run und erfolgreichen Job
+  `test` gebunden. Unvollständige Job-, Datei- oder Review-Seiten werden
+  bei der Adoption abgewiesen. Eine Dateiliste muss vollständig, valide und
+  nicht leer sein. Nur PWA-Styles und statische PWA-Assets gelten als
+  unkritisch; unbekannte und funktionale Pfade lösen das kritische Gate aus.
+- Kritische Übernahmen benötigen eine vollständige aktuelle Review-Liste mit
+  unabhängigem APPROVED-Review desselben Heads, eine exakte Bestätigungsphrase
+  und einen angemeldeten Approver, der weder Strategie-Proposer noch PR-Autor
+  ist. Evidenz wird im CAS-Update erneut geprüft; neuere Review-Status,
+  Dismissals und veraltete CI-Nachweise zählen nicht als Freigabe.
+- Regressionen: `test/strategy-learning.test.mjs`, `test/auth.test.mjs` und
+  `test/cloudflare-worker.test.mjs` decken Evidenzbindung, vollständige
+  Auflistungen, kritische Pfade, unabhängige Reviews, Dismissals, Provider- und
+  Session-Gates ab.
+- Unabhängige, ausschließlich lesende Prüfung: keine kritischen, hohen oder
+  mittleren Befunde; als niedriger Hinweis bleibt, dass Sessionstores den
+  Provider-Wert technisch entgegennehmen. Im Produktionspfad setzt ihn nur
+  `GitHubOAuth` nach erfolgreichem OAuth-Callback; die API erzwingt den
+  Provider zusätzlich. Die Prüfung bestätigte die Regressionen und änderte
+  keine Dateien.
+- Nachweis: gezielte A14/Auth-Tests 17/17 bestanden; `npm test` 94/94
+  bestanden; `npm run check` erfolgreich für 92 Dateien und synchronisierte
+  Prompt-Bibliothek; `git diff --check` bestanden.
+- Abnahme A14 bleibt teilweise: echte GitHub-PR-/Review-/Actions-Nachweise und
+  eine PWA-Verwaltung der Strategiebewertungen sind noch nicht live abgenommen.
+- Der A14-Fix wurde lokal ausgeführt und geprüft. Es erfolgten kein Push,
+  Deployment oder Änderung der GitHub-Repository-Einstellungen.

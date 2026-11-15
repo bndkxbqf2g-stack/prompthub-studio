@@ -30,6 +30,7 @@ test("GitHub OAuth uses server-side token storage and validates state", async ()
   assert.equal(result.user.login, "allowed-user");
   const session = await auth.getSession({ headers: { cookie: result.cookie } });
   assert.equal(session.user.login, "allowed-user");
+  assert.equal(session.provider, "github");
   assert.equal(session.token, "server-side-only");
   assert.doesNotMatch(result.cookie, /server-side-only/);
   await auth.logout({ headers: { cookie: result.cookie } });

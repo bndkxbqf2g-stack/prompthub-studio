@@ -72,6 +72,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   derselben Korrektur. Promptkontext und Fehlerdashboard weisen Datenquelle,
   Belegstatus und Stichproben-/Aufbewahrungsgrenzen aus. CI speichert keine
   vollständigen Logs.
+- A14-Strategiebewertungen sind über API und GitHub-Evidenz-Gate angebunden.
+  Eine eigene PWA-Verwaltung, echte Review-/Actions-Nachweise und kontrollierte
+  Wirksamkeitsvergleiche bleiben offene Arbeit.
 - Offene Wissensarbeit: kontrollierte, explizit geprüfte projektübergreifende
   Übertragung und gepaarte Strategieexperimente mit Commit-/CI-Vergleich.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;

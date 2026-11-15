@@ -68,6 +68,35 @@ Quellen werden über Commit-SHAs, Testnamen, Issue-Nummern oder URLs erhalten.
   Pflichtchecks bestimmten Jobstatus nicht; der Runner protokolliert den
   Speicherfehler geheimnisfrei.
 
+## Strategiebewertung und kontrollierte Übernahme (A14)
+
+- `StrategyLearningEngine` speichert Strategiebewertungen getrennt je Projekt.
+  Die API nimmt Repository, PR-Nummer und Workflow-Run-ID entgegen; der Akteur
+  stammt ausschließlich aus der serverseitigen Sitzung. Kritische Freigaben
+  akzeptieren nur Sessions mit explizitem `provider: "github"`.
+- Vor dem Speichern prüft `ProjectService` eine zusammengeführte PR desselben
+  Repositories, den übereinstimmenden PR-/Workflow-Head, einen abgeschlossenen
+  erfolgreichen Actions-Run und dessen erfolgreichen Job `test`. Die Liste der
+  geänderten Pfade wird paginiert, validiert und gehasht; unvollständige,
+  fehlerhafte oder leere Listen können keine kritische Adoption passieren.
+- Nur `src/pwa/styles.css` und statische Dateien unter `src/pwa/assets/` gelten
+  als unkritisch. Jeder unbekannte, funktionale, geschützte oder unvollständig
+  gelistete Pfad gilt als kritisch.
+- Eine kritische Übernahme verlangt eine aktuelle unabhängige GitHub-Review
+  desselben Heads von einer Person, die weder die PR erstellt noch die Strategie
+  vorgeschlagen hat, eine vollständige Review-Liste, den exakten
+  Bestätigungstext und eine angemeldete GitHub-Person, die weder Bewertung noch
+  PR erstellt hat. Lokale Authentifizierung reicht nicht.
+- Bei der Übernahme werden Evidenz und Digest innerhalb des projektbezogenen
+  CAS-Updates erneut geprüft. Veraltete Evidenz, gelöschte/veränderte Reviews,
+  ungültige Datensätze und Grenzfehler werden geschlossen abgewiesen.
+- Ein grüner Pflichtcheck belegt nur, dass dieser Check auf einer
+  zusammengeführten Änderung bestanden wurde. Er ist allein kein kausaler
+  Wirksamkeitsnachweis und keine gemessene Qualitäts- oder Leistungsaussage.
+- Derzeit sind die Endpunkte implementiert; eine eigene PWA-Oberfläche zur
+  Verwaltung der Strategiebewertungen und Live-Nachweise aus GitHub sind noch
+  nicht abgenommen.
+
 ## Fehlerprävention und Lernen
 
 - Verbindliche Umsetzung und Datenlimits sind in `ERROR_PREVENTION.md`

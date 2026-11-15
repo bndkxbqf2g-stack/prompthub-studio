@@ -10,7 +10,7 @@ async function tempDirectory(prefix) {
   return mkdtemp(join(tmpdir(), prefix));
 }
 
-test("knowledge store preserves sources, supersession and evidence gates", async () => {
+test("knowledge store preserves sources and supersession", async () => {
   const root = await tempDirectory("prompthub-knowledge-");
   try {
     const store = new KnowledgeStore({ root });
@@ -18,9 +18,6 @@ test("knowledge store preserves sources, supersession and evidence gates", async
     const second = await store.recordDecision({ title: "Use CAS leases", context: "Two runners may race", decision: "Contents API update with SHA", sourceRefs: ["SECURITY_RULES.md", "test/lease-store.test.mjs"] });
     await store.supersede(first.id, second.id);
     assert.equal((await store.listDecisions()).length, 1);
-    const evaluation = await store.recordStrategyEvaluation({ name: "bounded retries", hypothesis: "Two retries handle transient failures", outcome: "success", evidenceRefs: ["test/lease-store.test.mjs", "CHECKPOINTS.md"] });
-    const adopted = await store.adoptStrategy(evaluation.id);
-    assert.equal(adopted.adopted, true);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

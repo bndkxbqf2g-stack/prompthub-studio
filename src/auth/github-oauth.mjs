@@ -45,10 +45,10 @@ export class SessionStore {
     this.sessions = new Map();
   }
 
-  create({ user, token }) {
+  create({ user, token, provider = null }) {
     const id = globalThis.crypto.randomUUID();
     const now = this.now();
-    this.sessions.set(id, { id, user, token, createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + this.ttlMs).toISOString() });
+    this.sessions.set(id, { id, user, token, provider, createdAt: now.toISOString(), expiresAt: new Date(now.getTime() + this.ttlMs).toISOString() });
     return id;
   }
 
@@ -81,7 +81,7 @@ export class LocalAuth {
   }
 
   async getSession() {
-    return { user: this.user, local: true };
+    return { user: this.user, provider: "local", local: true };
   }
 
   async logout() {}
@@ -137,7 +137,7 @@ export class GitHubOAuth {
     const github = new GitHubClient({ token: tokenPayload.access_token, fetchImpl: this.fetchImpl });
     const profile = await github.getUser();
     if (this.allowedLogins.size > 0 && !this.allowedLogins.has(profile.login)) throw new Error("GitHub account is not allowed");
-    const sessionId = await this.store.create({ user: { login: profile.login, id: profile.id, name: profile.name ?? profile.login, avatar_url: profile.avatar_url }, token: tokenPayload.access_token });
+    const sessionId = await this.store.create({ user: { login: profile.login, id: profile.id, name: profile.name ?? profile.login, avatar_url: profile.avatar_url }, token: tokenPayload.access_token, provider: "github" });
     const cookieValue = `${sessionId}.${await hmacBase64Url(sessionId, this.sessionSecret)}`;
     return {
       redirectTo: safeLocalRedirectPath(pending.returnTo, this.publicOrigin),

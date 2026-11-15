@@ -4,6 +4,7 @@ import { createRequestHandler } from "../api/handler.mjs";
 import { createControlPlane, createGitHubClient } from "../control/index.mjs";
 import { PromptDesigner } from "../designer/prompt-designer.mjs";
 import { ErrorLearningEngine } from "../knowledge/error-learning.mjs";
+import { StrategyLearningEngine } from "../knowledge/strategy-learning.mjs";
 import { ProjectService } from "../projects/project-service.mjs";
 import { GitHubProjectStore } from "../projects/project-store.mjs";
 import { PromptLibrary } from "../research/prompt-library.mjs";
@@ -86,6 +87,7 @@ function createRuntime(env, origin) {
   });
   const promptLibrary = new PromptLibrary({ entries: promptLibraryData.entries });
   const errorLearning = new ErrorLearningEngine({ projectService });
+  const strategyLearning = new StrategyLearningEngine({ projectService });
   const promptDesigner = new PromptDesigner({ projectService, controlPlane, promptLibrary, errorLearning });
   const sessions = new CloudflareKVSessionStore({ namespace: env.SESSIONS });
   const auth = new GitHubOAuth({
@@ -108,6 +110,7 @@ function createRuntime(env, origin) {
     promptDesigner,
     promptLibrary,
     errorLearning,
+    strategyLearning,
     enforceSameOrigin: true,
     beforeProtectedApi: async () => assertPrivateControlRepository(controlPlane),
   });
