@@ -21,21 +21,62 @@ Projekt-Allowlist und `CODEX_EXECUTABLE`. Ohne diese Werte bleibt er in einem
 expliziten `not_configured`-Zustand. Der Testmodus verwendet nur den
 Memory-Control-Plane-Adapter.
 
-## Serverlose PWA
+### Codex CLI unter Windows
 
-Cloudflare Pages `prompthub-studio` bleibt mit dem GitHub-Quell-Repository
-verbunden; das letzte Deployment unter https://prompthub-studio.pages.dev bleibt
-erreichbar. Seit 2026-11-15 sind automatische Production-Deployments deaktiviert
-und Preview-Deployments auf `None` gesetzt. Die vorhandene Ressource wurde nicht
-gelöscht. `wrangler.toml` enthält die Pages-Konfiguration; das frühere
-Workers-Static-Assets-Profil bleibt in `wrangler.worker.toml` erhalten.
+Wenn `codex login status` mit `Could not find home directory` endet, kann
+`CODEX_HOME` nur für den einzelnen CLI-Aufruf auf das bestehende
+`%USERPROFILE%\.codex` zeigen. Das folgende Beispiel stellt einen bereits
+gesetzten Wert wieder her und legt weder Zugangsdaten noch eine dauerhafte
+Umgebungsvariable an:
 
-GitHub Pages ist unter https://bndkxbqf2g-stack.github.io/prompthub-studio/
-aktiv. Die PWA-Dateien liegen unter `/src/pwa/`; GitHub Pages bietet dort nur
+```powershell
+$codexHomePath = Join-Path $env:USERPROFILE '.codex'
+if (-not (Test-Path -LiteralPath $codexHomePath -PathType Container)) {
+  throw 'The Codex state directory does not exist.'
+}
+$hadCodexHome = Test-Path Env:CODEX_HOME
+$previousCodexHome = $env:CODEX_HOME
+try {
+  $env:CODEX_HOME = $codexHomePath
+  codex login status
+}
+finally {
+  if ($hadCodexHome) {
+    $env:CODEX_HOME = $previousCodexHome
+  }
+  else {
+    Remove-Item Env:CODEX_HOME -ErrorAction SilentlyContinue
+  }
+}
+```
+
+`CODEX_HOME` ist eine unterstützte Codex-Variable und muss auf ein vorhandenes
+Verzeichnis zeigen ([Umgebungsvariablen](https://learn.chatgpt.com/docs/config-file/environment-variables),
+[Authentifizierung](https://learn.chatgpt.com/docs/auth?surface=cli)). Diese
+Prüfung bestätigt nur den CLI-Login des aktuellen Hosts. Sie konfiguriert weder
+den PromptHub-Runner noch einen Cloud-Executor. Zugangsdaten aus `auth.json`
+werden weder kopiert noch in PromptHub gespeichert.
+
+## PWA-Veröffentlichung
+
+GitHub Pages ist der aktive statische PWA-Host:
+
+https://bndkxbqf2g-stack.github.io/prompthub-studio/
+
+Die PWA-Dateien liegen unter `/src/pwa/`; GitHub Pages bietet dort nur
 statische Assets, keine Control API oder serverseitige Anmeldung. PR #2 wurde
 mit dem Unterpfad-Fix gemergt. Eine Live-Browserprüfung bestätigte das gerenderte
 PWA-UI und geladene Styles sowie relative Icon-/Manifest-Pfade; die Oberfläche
 meldet weiterhin, dass die Control API nicht erreichbar ist.
+
+Cloudflare Pages `prompthub-studio` bleibt mit dem GitHub-Quell-Repository
+verbunden, wird aber nicht mehr als Veröffentlichungsziel verwendet. Das
+Cloudflare-Dashboard zeigte am 2026-11-15 den Projektstatus `Deployments
+paused`; Production-Deployments sind pausiert und Preview-Deployments stehen auf
+`None`. Die letzte Veröffentlichung unter https://prompthub-studio.pages.dev
+bleibt öffentlich erreichbar. Das Projekt wurde nicht gelöscht. `wrangler.toml`
+enthält weiterhin die Pages-Konfiguration; das frühere Workers-Static-Assets-
+Profil bleibt in `wrangler.worker.toml` erhalten.
 
 Die statische PWA-Hülle ist erreichbar. Die Control API antwortet mit HTTP 503,
 bis ein Production-KV-Binding `SESSIONS`, die GitHub-OAuth-App, eine Login-
