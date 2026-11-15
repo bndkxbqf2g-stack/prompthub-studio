@@ -39,10 +39,36 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
   können bis zu 60 Sekunden benötigen. Site-weite Stores sind über Deployments
   hinweg geteilt und haben keine eingebaute TTL; Preview-Deployments dürfen daher
   keine Produktions-Sitzungen lesen oder verändern.
+- Die Blobs-API bietet bedingte Einzel-Key-Schreibvorgänge (`onlyIfNew`,
+  `onlyIfMatch`); sie ersetzen keine Transaktion über mehrere Keys. Der aktuelle
+  OAuth-State-Store führt `take()` als Lesen plus Löschen aus und ist deshalb
+  kein bereits geprüfter atomarer Consume-Adapter. Netlify müsste dafür einen
+  gezielten Compare-and-set-Adapter mit Race-Regressionstest erhalten. Sitzungs-
+  `expiresAt`-Werte müssen serverseitig erzwungen und abgelaufene Blobs begrenzt
+  bereinigt werden, da site-weite Stores keine automatische TTL haben.
 - Eine GitHub-Integration benötigt die Verknüpfung des Netlify-Kontos mit dem
   persönlichen GitHub-Repository. Die Repository-API weist den Eigentümer als
   persönlichen Account aus; Netlify dokumentiert persönliche öffentliche und
   private Repositories als unterstützt.
+- Netlify dokumentiert teamweite Credit-Warnungen bei 50 %, 75 % und 100 % per
+  E-Mail und In-App-Mitteilung. Die öffentliche Netlify-API-Referenz wurde nach
+  einer maschinenlesbaren Team-Credit-/Usage-API durchsucht; ein solcher
+  Endpunkt wurde dort nicht gefunden. Das ist ein Recherchebefund, kein Beweis,
+  dass Netlify intern oder künftig keinen unterstützten Endpunkt anbietet.
+  Solange kein autoritativer maschinenlesbarer Verbrauch vorliegt, kann PromptHub
+  die erforderliche automatische 75-%-Jobpause nicht nachweisen und muss neue
+  Cloud-Jobs bei unbekanntem Verbrauch geschlossen halten.
+
+## Ergebnis der unabhängigen Sicherheitsprüfung
+
+Eine unabhängige, rein lesende Prüfung vom 2026-11-15 empfiehlt **No-Go für
+produktive Aktivierung**. Der Netlify-Free-Tarif bleibt ein technisch plausibler
+Kandidat für statische PWA und API-Funktionen, aber OAuth-/Session-Adapter,
+Production-/Preview-Isolation, Storage-Fail-Closed-Tests, Kontoverknüpfung,
+Kosten-Readback und Live-Smoke sind nicht vorhanden. Die Prüfung fand außerdem
+keinen nachgewiesenen Weg, den teamweiten Verbrauch automatisch in PromptHub
+auszulesen. Daher ist der vollständige autonome Cloud-Betrieb noch nicht
+abnahmefähig.
 
 ## Vor Implementierung erforderliche Freigaben
 
@@ -72,6 +98,10 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
    teamweiten Kontingents pausieren; fehlt ein verlässlicher Nutzungsstand,
    werden keine neuen Jobs gestartet. Diese Kontrolle ist noch nicht
    implementiert oder live nachgewiesen.
+6. **Verbrauchsmessung:** Vor Jobfreigabe einen unterstützten, teamweiten
+   maschinenlesbaren Credit-Readback nachweisen. Netlify-Dashboard-Warnungen
+   allein belegen keine automatische Jobpause in PromptHub. Ohne aktuelle
+   verifizierte Messung bleibt die Cloud-Ausführung gesperrt.
 
 Bis diese Freigaben und die Netlify-Kontoverknüpfung vorliegen, bleibt GitHub
 Pages der statische PWA-Einstieg. Es wird keine produktive Control API auf
@@ -84,6 +114,8 @@ GitHub Pages behauptet und Cloudflare bleibt unverändert pausiert.
 - [Netlify Free-Pause bei Kontingentgrenze](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/billing-faq-for-credit-based-plans/)
 - [Netlify-Function-Handler](https://docs.netlify.com/build/functions/get-started/)
 - [Netlify Blobs: Konsistenz, TTL-Metadaten und Laufzeitlimits](https://docs.netlify.com/build/data-and-storage/netlify-blobs/)
+- [Netlify: teamweite Credit-Nutzung und 50/75/100-%-Benachrichtigungen](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/monitor-usage-for-credit-based-plans/)
+- [Netlify öffentliche API-Referenz](https://open-api.netlify.com/)
 - [Netlify-GitHub-Repository-Unterstützung](https://docs.netlify.com/build/git-workflows/overview/)
 - [Vercel Hobby-Kontingente und Pause bei Überschreitung](https://vercel.com/docs/plans/hobby)
 - [Vercel-Hobby-Nutzung nur persönlich/nicht-kommerziell und Git-Provider-Limits](https://vercel.com/docs/limits)

@@ -726,3 +726,29 @@
 - Pflichtprüfungen vor dem Checkpoint: `npm test` 105/105 bestanden;
   `npm run check` bestanden (96 Dateien, Prompt-Library synchron);
   `git diff --check` bestanden.
+
+## CP-028 – unabhängige Hosting-Sicherheitsprüfung abgeschlossen
+
+- Datum: 2026-11-15, 20:56 UTC.
+- Eine separate, rein lesende Sicherheitsprüfung empfiehlt No-Go für eine
+  produktive Netlify-Aktivierung, bis Provider-/Auth-Freigaben, Integration,
+  Production-/Preview-Isolation, Fail-Closed-Tests, Quotenmessung und Live-Smoke
+  nachgewiesen sind.
+- Der Review bestätigte im Code die serverseitige Session-Token-Ablage,
+  HttpOnly-/SameSite-/Secure-Cookieattribute und die vorhandenen OAuth-State-
+  sowie Ablaufprüfungen. Der Cloudflare-Store ist kein Netlify-Adapter; der
+  aktuelle `take()`-Pfad liest und löscht getrennt und hat daher keinen
+  Netlify-spezifischen atomaren Consume-Nachweis.
+- Aktuelle offizielle Netlify-Dokumentation beschreibt Blobs mit optional
+  starker Konsistenz, site-weiten Stores ohne automatische TTL und bedingten
+  Einzel-Key-Schreibvorgängen. Das öffentliche API-Referenzverzeichnis zeigte
+  bei der Suche keinen teamweiten Credit-Readback-Endpunkt. Netlify dokumentiert
+  50/75/100-%-Benachrichtigungen im Dashboard per E-Mail/In-App; ob ein
+  unterstützter maschinenlesbarer Endpoint außerhalb der öffentlichen
+  Referenz verfügbar ist, bleibt ungeklärt. Bis dahin dürfen neue Cloud-Jobs bei
+  unbekanntem Verbrauch nicht starten.
+- Keine Dateien wurden durch den unabhängigen Reviewer geändert. Keine Netlify-
+  Verbindung, Abhängigkeit, OAuth-App, Secret, Site oder kostenpflichtige
+  Ressource wurde angelegt.
+- Pflichtprüfungen nach den Dokumentationsänderungen: `npm test` 105/105;
+  `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
