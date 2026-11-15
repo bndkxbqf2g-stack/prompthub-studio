@@ -656,6 +656,12 @@
   (`43755283240`) bestand. Der Job `test` führte den Schritt
   `Check pull request patch whitespace` erfolgreich aus; der Push-spezifische
   Schritt war beim PR-Ereignis erwartungsgemäß übersprungen.
+- Der Checkpoint-Commit ergänzte danach CRLF-Text. GitHub Actions Runs 35
+  (`43755413707`, Push) und 36 (`43755417249`, PR) fanden dadurch, dass der
+  Runner CR am Zeilenende anders als die lokale Git-Konfiguration als
+  Whitespace wertete. Die beiden CI-Kommandos setzen jetzt lokal und explizit
+  `core.whitespace=cr-at-eol`; Leerzeichen vor CR bleiben prüfbar. PR #7 war
+  für Auto-Merge vorgemerkt; GitHub blockierte die Integration beim Fehler.
 - Pflichtprüfungen lokal: `npm test` 105/105 bestanden; `npm run check`
   erfolgreich (96 Dateien, Prompt-Library synchron); `git diff --check`
   erfolgreich. Keine Pflichtprüfung wurde abgeschwächt; ein Regressionstest

@@ -32,10 +32,10 @@ jobs:
         env:
           PR_BASE_SHA: ${{ github.event.pull_request.base.sha }}
           PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: git diff --check "$PR_BASE_SHA...$PR_HEAD_SHA"
+        run: git -c core.whitespace=cr-at-eol diff --check "$PR_BASE_SHA...$PR_HEAD_SHA"
       - name: Check pushed patch whitespace
         if: github.event_name == 'push' && github.event.before != '0000000000000000000000000000000000000000'
         env:
           PUSH_BEFORE_SHA: ${{ github.event.before }}
           PUSH_HEAD_SHA: ${{ github.sha }}
-        run: git diff --check "$PUSH_BEFORE_SHA...$PUSH_HEAD_SHA"
+        run: git -c core.whitespace=cr-at-eol diff --check "$PUSH_BEFORE_SHA...$PUSH_HEAD_SHA"
