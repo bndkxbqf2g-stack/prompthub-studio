@@ -753,6 +753,33 @@
 - Pflichtprüfungen nach den Dokumentationsänderungen: `npm test` 105/105;
   `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
 
+## CP-031 – aktuellen Merge-, Pages- und Cloudflare-Status geprüft
+
+- Datum: 2026-11-15.
+- Der lokale `main`-Stand war sauber auf `884fa5740b371a7b8de610e5c031237cce388463`.
+  GitHub Actions Main-Run 60 (`43762780380`) meldet den Pflichtjob `test` als
+  erfolgreich. GitHub Pages Run 14 (`43762779516`) meldet `build`, `deploy` und
+  `report-build-status` als erfolgreich. PR #14 wurde nach erfolgreichem
+  Pflichtcheck automatisch gemergt.
+- GitHub meldet `allow_auto_merge=true`. Der Nutzer hat am 2026-11-15
+  automatische Merges zukünftiger PRs ausdrücklich autorisiert, sofern die
+  erforderlichen Gates bestanden sind. Der letzte verfügbare Branch-Regel-
+  Readback bestätigte `test`, `strict=true` und Admin-Enforcement; ein neuer
+  Readback war über die verbundene GitHub-Schnittstelle nicht verfügbar.
+- Die Live-Startseite unter GitHub Pages und die PWA unter
+  `/prompthub-studio/src/pwa/` wurden im Browser geladen. Die PWA zeigt weiter
+  korrekt an, dass auf GitHub Pages keine Control API erreichbar ist.
+- Cloudflare listet weiterhin genau das Pages-Projekt `prompthub-studio`.
+  Dashboard und Projekteinstellungen zeigen pausierte Deployments sowie
+  deaktivierte automatische Production-Deployments; die GitHub-Verknüpfung und
+  die letzte veröffentlichte `pages.dev`-Adresse bestehen fort. Das Projekt
+  wurde nicht gelöscht. Die irreversible Löschaktion wartet auf die
+  ausdrückliche Bestätigung des Nutzers.
+- `ACCEPTANCE_CRITERIA.md` wurde auf Main-Run 60 und Pages-Run 14 aktualisiert.
+  Pflichtprüfungen nach den Dokumentationsänderungen: `npm test` 105/105;
+  `npm run check` bestanden (96 Dateien, Prompt-Library synchron);
+  `git diff --check` bestanden.
+
 ## CP-029 – Abnahmeevidenz auf aktuellen Main- und Pages-Stand gebracht
 
 - Datum: 2026-11-15, 21:06 UTC.
