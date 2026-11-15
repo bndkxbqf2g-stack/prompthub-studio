@@ -10,7 +10,8 @@
     "start": "node --env-file-if-exists=.env src/server.mjs",
     "runner": "node --env-file-if-exists=.env src/runner-cli.mjs",
     "test": "node --test",
-    "check": "node scripts/check.mjs",
+    "check": "node scripts/check.mjs && node scripts/sync-prompt-library.mjs --check",
+    "sync:prompt-library": "node scripts/sync-prompt-library.mjs",
     "demo": "node scripts/vertical-slice.mjs"
   }
 }

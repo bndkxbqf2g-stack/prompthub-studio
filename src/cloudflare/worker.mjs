@@ -1,4 +1,4 @@
-import promptLibraryData from "../../knowledge/prompt-library.json" with { type: "json" };
+import promptLibraryData from "./prompt-library-data.mjs";
 import { GitHubOAuth } from "../auth/github-oauth.mjs";
 import { createRequestHandler } from "../api/handler.mjs";
 import { createControlPlane, createGitHubClient } from "../control/index.mjs";
