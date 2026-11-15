@@ -76,6 +76,10 @@ Run 80 (`43770627889`) auf beiden macOS-Architekturen und für `test`; GitHub
 führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte die
 Erklärung zur fehlenden Control API; ein Klick auf Aktualisieren erhielt den
 Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
+Der aktuelle Main-Stand ist der Dokumentationscommit
+`9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; Main-CI-Run 84 (`43771264550`)
+bestand beide macOS-Lanes und `test`, Pages-Run 22 (`43771264030`) bestand
+Build, Deployment und Statusreport. Dieser Commit änderte keine PWA-Dateien.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte

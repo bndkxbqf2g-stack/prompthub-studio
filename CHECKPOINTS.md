@@ -922,3 +922,20 @@
   Prüfung bleiben offen.
 - Lokale Pflichtprüfungen: `npm test` 108/108; `npm run check` bestand für 97
   Dateien und bestätigte die Prompt-Library; `git diff --check` ohne Befund.
+
+## CP-037 – Aktuelle Main- und Deployment-Nachweise abgeglichen
+
+- Datum: 2026-11-16.
+- GitHub bestätigt Repository `bndkxbqf2g-stack/prompthub-studio` öffentlich,
+  Default-Branch `main` und `allow_auto_merge=true`. Der aktuelle Main-Commit ist
+  `9c5e4b40adaaccfb6065e177cdad01ab7fd3d816` (PR #22).
+- Main-CI-Run 84 (`43771264550`) auf diesem Commit bestand `macos-15-intel`,
+  `macos-latest` und `test`. Pages-Run 22 (`43771264030`) bestand `build`,
+  `deploy` und `report-build-status`.
+- `ACCEPTANCE_CRITERIA.md`, `DEVELOPMENT_PLAN.md` und `OPERATIONS.md` nennen
+  nun den aktuellen Stand. Der Produktcode und Branch-Schutz wurden nicht
+  geändert. Die letzte Settings-Prüfung zeigte weiterhin keine PR-Pflicht;
+  eine erneute Readback-Möglichkeit über die GitHub-API fehlt.
+- Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 108/108;
+  `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
+  `git diff --check` ohne Befund.
