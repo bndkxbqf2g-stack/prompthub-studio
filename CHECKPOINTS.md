@@ -980,3 +980,20 @@
 - Lokale Pflichtprüfungen dieser Evidenzaktualisierung: `npm test` 108/108;
   `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
   `git diff --check` ohne Befund.
+
+## CP-040 – Live-HTTPS-Smoke der statischen PWA wiederholt
+
+- Datum: 2026-11-16.
+- Read-only HTTPS-GETs an GitHub Pages ergaben HTTP 200 für die PWA-Startseite,
+  `manifest.webmanifest`, `app-icon-source.png`, `sw.js`, `app.js`, `styles.css`
+  und `service-worker-client.mjs`; die Content-Types passten zu HTML, Manifest-
+  JSON, PNG, JavaScript und CSS.
+- Die gelieferte Manifestantwort enthält `display=standalone`, `start_url=./`,
+  `scope=./` und genau ein Icon. Eine erneute Browseransicht war wegen zweier
+  Desktop-Capture-Timeouts nicht möglich; eine aktuelle visuelle oder iPhone-
+  Installation wird daher nicht behauptet.
+- Der Web-Reader konnte die GitHub-Pages-Adresse ebenfalls nicht öffnen. Es wurde
+  kein Deployment ausgelöst; Cloudflare blieb pausiert.
+- Lokale Pflichtprüfungen dieser Aktualisierung: `npm test` 108/108;
+  `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
+  `git diff --check` ohne Befund.
