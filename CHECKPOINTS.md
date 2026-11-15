@@ -997,3 +997,24 @@
 - Lokale Pflichtprüfungen dieser Aktualisierung: `npm test` 108/108;
   `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
   `git diff --check` ohne Befund.
+
+## CP-041 – Hosting-Kandidaten nach Vertragsprüfung neu bewertet
+
+- Datum: 2026-11-16.
+- Netlify Self-Serve-Vertrag § 6.2 untersagt das Training/Fine-Tuning von
+  Modellen mit Customer Content ohne ausdrückliches Opt-in. Der Free-Tarif hat
+  300 Credits/Monat, ein Hard Limit und kein Auto-Recharge; bei Erreichen pausiert
+  Netlify alle Sites des Teams.
+- Die öffentliche Netlify-OpenAPI dokumentiert `getAccountBuildStatus` mit
+  Build-Minuten, aber keinen vollständigen teamweiten Credit-Verbrauch. Die
+  dokumentierte API-Referenz wurde nach Credit-/Billing-Endpunkten durchsucht;
+  ohne frischen vollständigen Readback bleiben Cloud-Jobs gesperrt.
+- Vercel Terms, zuletzt geändert 2026-10-19, beschränken Hobby auf persönliche,
+  nicht-kommerzielle Nutzung und erlauben die Nutzung von Hobby-Customer-Content
+  zum Modelltraining sowie zur Weitergabe dafür. Vercel wird daher nicht für
+  PromptHub-Daten verwendet, solange kein anwendbarer Opt-out belegt ist.
+- Netlify Free ist der bevorzugte, aber nicht freigegebene Kandidat. Kein Konto
+  wurde verbunden, keine Integration umgesetzt und kein Deployment ausgelöst.
+- Lokale Pflichtprüfungen dieser Dokumentationsänderung: `npm test` 108/108;
+  `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
+  `git diff --check` ohne Befund.
