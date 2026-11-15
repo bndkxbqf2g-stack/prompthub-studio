@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal verifiziert: gestarteter lokaler Server meldete `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen; echter Mac-Runner weiterhin offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; PR-/Push-Patchvergleich, erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | Letzter Code-Stand `0670942982a1a68b305229251b99a8e4a28b6662` bestand in Main-Run 48; Pages-Run 10 bestand. Dokumentations-PR #13 brachte `main` auf `65f0b8fbee80ede6cd25b3163b962cda3ffee953`; PR-Run 56 (`43762006861`), Main-Run 57 (`43762108744`) und Pages-Run 13 (`43762107596`) bestanden. PR #13 wurde nach bestandenem Pflichtcheck automatisch gemergt. Bei PR #12 war Auto-Merge aktiviert, führte den Merge aber nicht aus; nach Prüfung des grünen Checks und gepinntem Head-SHA wurde der PR über die Merge-API abgeschlossen. `allow_auto_merge=true` ist im Repository bestätigt. Letzter erfolgreicher Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; erneutes Lesen ist für die aktuelle GitHub-Integration mit 403 nicht verfügbar. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht. Details zu früheren Läufen in CP-021 bis CP-024, CP-029 und CP-030 |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | Main-Commit `884fa5740b371a7b8de610e5c031237cce388463`: Main-CI-Run 60 (`43762780380`), Job `test`, erfolgreich. Pages-Run 14 (`43762779516`) bestand mit `build`, `deploy` und `report-build-status`. PR #14 wurde nach bestandenem Pflichtcheck automatisch gemergt. GitHub bestätigt `allow_auto_merge=true`; der Nutzer hat am 2026-11-15 automatische Merges zukünftiger PRs ausdrücklich autorisiert, wenn die erforderlichen Gates bestanden sind. Der letzte erfolgreiche Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die verbundene GitHub-Schnittstelle nicht verfügbar. Laut diesem Readback verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-031 |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,15 +46,15 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. Der zuletzt
-funktionsseitig geprüfte Main-Stand `0670942982a1a68b305229251b99a8e4a28b6662`
-bestand in Main-Run 48; Pages-Run 10 bestand mit Build und Deployment. Die
-anschließenden PRs #11 bis #13 enthielten Dokumentationsänderungen. Main-Run 57
-und Pages-Run 13 bestanden auf dem Dokumentationsstand `65f0b8f`.
+A27/A28 sind durch reproduzierbare Tests belegt. Main-Commit
+`884fa5740b371a7b8de610e5c031237cce388463` bestand in Main-CI-Run 60
+(`43762780380`) mit dem Pflichtjob `test`; Pages-Run 14 (`43762779516`)
+bestand mit Build und Deployment. PR #14 wurde nach bestandenem Pflichtcheck
+automatisch gemergt.
 Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich; kein
 kostenpflichtiger Plan wurde aktiviert. Aktueller dokumentierter Main-Commit
-ist `65f0b8fbee80ede6cd25b3163b962cda3ffee953`; Main-Run 57 und Pages-Run 13
-bestanden. Cloudflare bleibt pausiert. GitHub Pages stellt keine Control API
+ist `884fa5740b371a7b8de610e5c031237cce388463`. Cloudflare bleibt pausiert.
+GitHub Pages stellt keine Control API
 bereit, und es ist noch kein alternativer API-Host freigegeben oder konfiguriert.
 Der letzte erfolgreiche Branch-API-Readback bestätigte den erforderlichen Check
 `test`, `strict=true` und Admin-Enforcement; direkte Pushes sind weiterhin nicht
