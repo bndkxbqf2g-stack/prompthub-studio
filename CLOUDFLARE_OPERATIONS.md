@@ -8,12 +8,14 @@
 - Die Produktion unter https://prompthub-studio.pages.dev wurde erfolgreich
   veröffentlicht: Deployment `10eb0d77-7b19-4edc-9adc-548518e098f7`, Commit
   `504477dc35dab908c8b3755550866bca071c72db`, Cloudflare-Status `success`.
-  Git-Integration deployt Commits auf `main` automatisch.
+  Seit 2026-11-15 sind automatische Production-Deployments deaktiviert;
+  Preview-Deployments stehen auf `None`. Die letzte Veröffentlichung bleibt
+  erreichbar. Projekt und Deployment wurden nicht gelöscht.
 - Das Quell-Repository wurde am 2026-11-15 auf ausdrückliche Nutzeranweisung
   öffentlich gestellt. Auf `main` ist der Check `test` als Branch-Schutz
-  erforderlich (`strict=true`, Admin-Enforcement); Actions Run 13
-  (`43744475969`) für Feature-Branch-Commit
-  `0a9e105641a17db91988c6848778b62cafbbcd40` war erfolgreich. PR #2 ist offen,
+  erforderlich (`strict=true`, Admin-Enforcement); Actions Run 14
+  (`43746180556`) für Feature-Branch-Commit
+  `d45d1514656ce120da54e97de5e02f7ee68db288` war erfolgreich. PR #2 ist offen,
   nicht gemergt. Der letzte Production-Deploy bleibt der oben genannte ältere
   Commit auf `main`.
 - `wrangler.toml` beschreibt Pages; der bisherige Workers Static Assets-Modus
@@ -31,6 +33,14 @@
   `cloud_control_plane_not_configured`, weil OAuth-/Runtime-Konfiguration und
   KV-Binding nicht vorhanden sind. Die PWA-Hülle ist live; die Control API ist
   bewusst nicht betriebsbereit.
+- GitHub Pages ist für das Repository auf `main`/`/(root)` aktiviert. Die
+  Projektseite ist unter
+  https://bndkxbqf2g-stack.github.io/prompthub-studio/ erreichbar; die PWA liegt
+  unter `/src/pwa/`. GitHub Pages ist ein statischer Host und stellt weder die
+  Control API noch serverseitige OAuth-Verarbeitung bereit. Die aktuell
+  veröffentlichte PWA lädt wegen Root-relativer Asset-Pfade unvollständig; der
+  relative Pfadfix und Regressionstest sind lokal vorbereitet, aber noch nicht
+  in PR #2 übertragen oder live.
 - Der Quellstand des zuletzt dokumentierten Produktionsdeployments
   `504477dc35dab908c8b3755550866bca071c72db` verwendet den Service-Worker-Cache
   `prompthub-static-v3` und enthält noch keinen Update-Button. Lokal liegen die
@@ -83,8 +93,11 @@ werden und muss innerhalb des Free-Kontingents betrieben werden.
 
 ## Deployment-Wege und Berechtigungen
 
-GitHub-Git-Integration ist bereits aktiv. Produktionsbuilds werden von
-Cloudflare Pages auf `main` erstellt und in `src/pwa` veröffentlicht. Der erste
+Die GitHub-Git-Integration ist noch verbunden, aber Branch-Control pausiert
+automatische Deployments auf `main`; Preview-Deployments stehen auf `None`.
+Die letzte Produktion bleibt unter `https://prompthub-studio.pages.dev`
+erreichbar. Historische Builds wurden von Cloudflare Pages auf `main` erstellt
+und in `src/pwa` veröffentlicht. Der erste
 Build schlug bei Commit `d7fc44f` wegen des von Pages nicht unterstützten JSON-
 Import-Attributes fehl. Commit `504477d` erzeugt stattdessen ein geprüftes
 ES-Modul aus der versionierten JSON-Quelle; danach bestanden der Pages-Build
@@ -110,29 +123,27 @@ Die OAuth-Callback-URL lautet
 müssen OAuth-Scopes, Allowlist, Tokenumfang und KV-Free-Kontingent geprüft
 werden. Ohne diese Konfiguration bleiben `/api/*`, `/auth/*` und `/healthz`
 geschlossen (`503`); kein eingeloggter Verwaltungsbereich wird vorgetäuscht.
-Die automatische Preview-Bereitstellung wurde im Branch-Control-Dialog auf
-„None“ gesetzt und gespeichert, konnte nach dem Transportabbruch aber nicht
-erneut ausgelesen werden. Behandle die Persistenz daher als unbestätigt. Falls
-Preview-Builds aktiv sind oder später aktiviert werden, ist Cloudflare Access
-erforderlich, weil Preview-Adressen sonst öffentlich sind.
+Der Branch-Control-Dialog bestätigt `None` für Preview-Builds und deaktivierte
+automatische Production-Deployments. Falls Preview-Builds später aktiviert
+werden, ist Cloudflare Access erforderlich, weil Preview-Adressen sonst
+öffentlich sind.
 
 GitHub-Branch-Schutz: Der Nutzer hat den erforderlichen Check `test`
 ausdrücklich freigegeben. GitHub Free erlaubt Branch Protection für öffentliche
 Repositories. Nach der ausdrücklich autorisierten Veröffentlichung des
 Quell-Repositories wurde `main` per GitHub-API mit `test`, `strict=true` und
 Admin-Enforcement geschützt; der GET-Readback bestätigte diese Werte.
-GitHub Actions Run 13 (`43744475969`) für den aktuellen PR-Head
-`0a9e105641a17db91988c6848778b62cafbbcd40` bestand. Die Regel blockiert PR-Merges,
+GitHub Actions Run 14 (`43746180556`) für den aktuellen PR-Head
+`d45d1514656ce120da54e97de5e02f7ee68db288` bestand. Die Regel blockiert PR-Merges,
 wenn `test` fehlt oder fehlschlägt. Sie verlangt keinen PR und beschränkt direkte
 Pushes nicht; solche zusätzlichen Branch-Regeln wurden nicht freigegeben oder
 gesetzt. Es wurde kein bezahlter Plan aktiviert. Quellen:
 [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) und [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).
 
-Die Pages-Git-Integration ist der gewählte Deployment-Weg. Für reine
-Quellcode-Commits auf `main` ist kein eigener Cloudflare-Token nötig; Cloudflare
-erstellt nach dem GitHub-Check automatisch das Production-Deployment. Ein
-zusätzlicher GitHub-Actions-Deploy würde ein Repository-Secret mit Cloudflare-
-Schreibzugriff benötigen und ist nicht eingerichtet.
+Die Pages-Git-Integration bleibt verbunden, löst wegen der pausierten
+Branch-Deployments derzeit keine Builds aus. Ein zusätzlicher GitHub-Actions-
+Deploy ist nicht eingerichtet. Eine Wiederaufnahme benötigt eine ausdrückliche
+Nutzerentscheidung.
 
 ## Schreibzugriff und Wiederherstellungswege
 
@@ -201,9 +212,10 @@ gebunden.
 - Der Service Worker entfernt ältere Caches nach Aktivierung einer neuen
   Version. Die PWA zeigt bei fehlender API eine Fehlermeldung statt
   Fortschritt oder Erfolg zu erfinden.
-- Produktionsupdates erfolgen nur über erfolgreiche Commits auf main. Pages
-  Git-Integration stellt für Commits auf main automatisch bereit; Preview-
-  Deployments bleiben deaktiviert.
+- Produktionsupdates erfolgen derzeit nicht automatisch: Production- und
+  Preview-Deployments sind pausiert. Die letzte veröffentlichte Version bleibt
+  erreichbar; ein Update erfordert eine ausdrückliche Entscheidung zur
+  Wiederaufnahme der Deployments.
 - Rollback: den fehlerhaften Quellcommit per neuem Revert auf main zurücksetzen
   und den nachfolgenden Pages-Build abwarten. Keine Cloudflare-Ressource oder
   GitHub-Historie löschen.

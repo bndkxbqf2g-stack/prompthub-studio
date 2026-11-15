@@ -1,13 +1,14 @@
 export async function registerServiceWorker({
   navigatorObject = globalThis.navigator,
+  locationObject = globalThis.location,
   updateButton,
   reload = () => globalThis.location.reload(),
 } = {}) {
-  if (!navigatorObject?.serviceWorker || !updateButton) return null;
+  if (!navigatorObject?.serviceWorker || !locationObject?.href || !updateButton) return null;
 
   let registration;
   try {
-    registration = await navigatorObject.serviceWorker.register("/sw.js");
+    registration = await navigatorObject.serviceWorker.register(new URL("./sw.js", locationObject.href).href);
   } catch {
     updateButton.hidden = true;
     return null;

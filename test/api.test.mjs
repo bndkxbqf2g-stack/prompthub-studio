@@ -41,7 +41,7 @@ test("PWA/API vertical slice creates and displays real job states", async () => 
     assert.match(serviceWorkerClient.headers.get("content-type"), /javascript/);
     assert.match(await serviceWorkerClient.text(), /registerServiceWorker/);
     const manifest = await (await fetch(`${base}/manifest.webmanifest`)).json();
-    assert.equal(manifest.icons[0].src, "/app-icon-source.png");
+    assert.equal(manifest.icons[0].src, "./app-icon-source.png");
     const icon = await fetch(`${base}/app-icon-source.png`);
     assert.equal(icon.status, 200);
     assert.equal(icon.headers.get("content-type"), "image/png");

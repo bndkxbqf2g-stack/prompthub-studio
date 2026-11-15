@@ -27,30 +27,31 @@
 - Für eine PWA direkt nutzbare, nachweislich kostenlose Codex-LLM-API ist kein
   verfügbarer Zugang nachgewiesen. Prompt-Designer verwendet deshalb bis zu
   einer belegten Integration einen klar markierten strukturierten Fallback.
-- GitHub Actions ist für CI aktiviert; Cloudflare Pages Free stellt die
-  statische PWA bereit. Vor weiterer Runtime-Aktivierung müssen Free-Kontingente
-  und Kostenstopps geprüft sein.
+- GitHub Actions ist für CI aktiviert. GitHub Pages ist für das öffentliche
+  Repository aktiv und stellt statische Dateien bereit; die PWA liegt unter
+  `/src/pwa/`. GitHub Pages hostet keine serverseitige Control API.
 - GitHub zeigt den Plan `GitHub Free`, Actions-Billable-Usage von $0 nach
   Included-Usage-Rabatten und ein Actions-Monatsbudget von $0.00 mit Status
   „Usage blocked“. Included-Usage-Alerts sind eingeschaltet. Bei erreichtem
   kostenfreien Kontingent blockiert GitHub Actions statt Mehrverbrauch zu
   berechnen; ein CI-Lauf bleibt deshalb von der verbleibenden Free-Usage abhängig.
-- Cloudflare Pages Free ist als `prompthub-studio` mit dem öffentlichen Quell-Repository
-  verbunden; `https://prompthub-studio.pages.dev` liefert die PWA-Assets über
-  HTTPS. Das erfolgreiche Produktionsdeployment ist `10eb0d77-7b19-4edc-9adc-548518e098f7`
-  für Commit `504477dc35dab908c8b3755550866bca071c72db`. `Fail closed` wurde im
-  Dashboard gespeichert und erneut verifiziert. Die GitHub-Integration für
-  Pages ist aktiv.
+- Cloudflare Pages `prompthub-studio` bleibt mit dem öffentlichen Quell-
+  Repository verbunden; die letzte Veröffentlichung
+  `10eb0d77-7b19-4edc-9adc-548518e098f7` für Commit
+  `504477dc35dab908c8b3755550866bca071c72db` ist weiterhin unter
+  `https://prompthub-studio.pages.dev` erreichbar. Automatische Production-
+  Deployments sind deaktiviert, Preview-Deployments stehen nach Dashboard-
+  Readback auf `None`. Es wurde kein Projekt oder Deployment gelöscht.
+  `Fail closed` bleibt im Dashboard gespeichert und verifiziert.
 - Die Control-Plane-Runtime ist nicht eingerichtet: kein `SESSIONS`-KV-Binding,
   keine PromptHub-GitHub-OAuth-App und keine Runtime-Secrets. Deshalb geben
   `/api/me` und `/healthz` HTTP 503; es gibt keine funktionsfähige Anmeldung,
   Auftragsverwaltung oder Cloud-Ausführung. Das Quell-Repository ist öffentlich;
   das separate private Control-Repository existiert noch nicht.
-- Cloudflare Pages wurde mit Preview-Branches auf „None“ gestellt; nach dem
-  Speichern konnte die Persistenz wegen eines Browser-Transportabbruchs nicht
-  erneut ausgelesen werden. Preview-Adressen sind standardmäßig öffentlich;
-  Cloudflare Access ist nicht eingerichtet und Preview-Secrets wurden nicht
-  gesetzt.
+- Preview-Branches stehen auf `None`; automatische Production-Deployments sind
+  ebenfalls deaktiviert. Preview-Adressen wären bei einer späteren Aktivierung
+  öffentlich; Cloudflare Access ist nicht eingerichtet und Preview-Secrets
+  wurden nicht gesetzt.
 - Die Cloudflare-Billing-Seite lud nicht; der Kontotarif und Zahlungsmittel
   sind daher nicht unabhängig verifiziert. In diesem Arbeitsgang wurde kein
   kostenpflichtiger Tarif, keine kostenpflichtige Ressource und keine
@@ -80,8 +81,8 @@
   Quell-Repositories angeordnet. GitHub Free erlaubt Branch Protection für
   öffentliche Repositories. Die Branch-Protection-API bestätigt für `main`
   den erforderlichen Check `test`, `strict=true` und Admin-Enforcement.
-  GitHub Actions Run 13 (`43744475969`) bestand für Commit
-  `0a9e105641a17db91988c6848778b62cafbbcd40`; `main` verlangt damit `test` für
+  GitHub Actions Run 14 (`43746180556`) bestand für Commit
+  `d45d1514656ce120da54e97de5e02f7ee68db288`; `main` verlangt damit `test` für
   PR-Merges. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht.
   Es wurde kein kostenpflichtiger Plan aktiviert. Quellen:
   [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).

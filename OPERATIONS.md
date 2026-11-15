@@ -23,20 +23,25 @@ Memory-Control-Plane-Adapter.
 
 ## Serverlose PWA
 
-Cloudflare Pages `prompthub-studio` ist mit dem öffentlichen GitHub-Quell-Repository
-verbunden und unter https://prompthub-studio.pages.dev veröffentlicht. Commits
-auf `main` lösen Production-Builds aus. `wrangler.toml` enthält die Pages-
-Konfiguration; das frühere Workers-Static-Assets-Profil bleibt in
-`wrangler.worker.toml` erhalten.
+Cloudflare Pages `prompthub-studio` bleibt mit dem GitHub-Quell-Repository
+verbunden; das letzte Deployment unter https://prompthub-studio.pages.dev bleibt
+erreichbar. Seit 2026-11-15 sind automatische Production-Deployments deaktiviert
+und Preview-Deployments auf `None` gesetzt. Die vorhandene Ressource wurde nicht
+gelöscht. `wrangler.toml` enthält die Pages-Konfiguration; das frühere
+Workers-Static-Assets-Profil bleibt in `wrangler.worker.toml` erhalten.
+
+GitHub Pages ist unter https://bndkxbqf2g-stack.github.io/prompthub-studio/
+aktiv. Die PWA-Dateien liegen unter `/src/pwa/`; GitHub Pages bietet dort nur
+statische Assets, keine Control API oder serverseitige Anmeldung. Der PWA-Fix
+für diesen Unterpfad ist lokal vorbereitet, aber noch nicht in PR #2 übertragen.
 
 Die statische PWA-Hülle ist erreichbar. Die Control API antwortet mit HTTP 503,
 bis ein Production-KV-Binding `SESSIONS`, die GitHub-OAuth-App, eine Login-
 Allowlist und die dokumentierten serverseitigen Variablen/Secrets eingerichtet
 sind. Der Pages-Runtime-Schalter `Fail closed` ist gespeichert und verifiziert.
-Die automatische Preview-Bereitstellung wurde auf „None“ gestellt; ihre
-Persistenz ließ sich nach einem Browser-Transportabbruch nicht erneut prüfen.
-Preview-Adressen sind öffentlich, sofern sie aktiviert werden; daher keine
-Preview-Secrets setzen und vor Aktivierung Cloudflare Access konfigurieren.
+Die Preview-Bereitstellung steht laut erneutem Dashboard-Readback auf `None`.
+Preview-Adressen wären bei Aktivierung öffentlich; daher keine Preview-Secrets
+setzen und vor einer Aktivierung Cloudflare Access konfigurieren.
 
 Die Cloudflare-GitHub-Integration ist nicht die GitHub-OAuth-Anmeldung innerhalb
 der PWA. `main` verlangt für PR-Merges den Statuscheck `test`; die Regel verlangt

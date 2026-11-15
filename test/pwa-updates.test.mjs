@@ -23,13 +23,13 @@ test("PWA update prompts only after install and reloads once after user action",
   const registration = eventTarget({ waiting: null, installing: worker });
   const serviceWorker = eventTarget({ controller: {} });
   serviceWorker.register = async (path) => {
-    assert.equal(path, "/sw.js");
+    assert.equal(path, "https://example.test/prompthub-studio/src/pwa/sw.js");
     return registration;
   };
   const updateButton = eventTarget({ hidden: true });
   let reloads = 0;
 
-  await registerServiceWorker({ navigatorObject: { serviceWorker }, updateButton, reload: () => { reloads += 1; } });
+  await registerServiceWorker({ navigatorObject: { serviceWorker }, locationObject: { href: "https://example.test/prompthub-studio/src/pwa/" }, updateButton, reload: () => { reloads += 1; } });
   registration.dispatch("updatefound");
   worker.state = "installed";
   worker.dispatch("statechange");
@@ -50,7 +50,7 @@ test("first service worker install does not prompt or reload automatically", asy
   const updateButton = eventTarget({ hidden: true });
   let reloads = 0;
 
-  await registerServiceWorker({ navigatorObject: { serviceWorker }, updateButton, reload: () => { reloads += 1; } });
+  await registerServiceWorker({ navigatorObject: { serviceWorker }, locationObject: { href: "https://example.test/prompthub-studio/src/pwa/" }, updateButton, reload: () => { reloads += 1; } });
   registration.dispatch("updatefound");
   worker.state = "installed";
   worker.dispatch("statechange");

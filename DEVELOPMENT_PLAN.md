@@ -88,11 +88,13 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
-- Cloudflare Pages ist mit dem öffentlichen Quell-Repository verbunden und die
-  PWA-Hülle unter `https://prompthub-studio.pages.dev` live. Production bleibt
-  auf dem zuletzt nachgewiesenen erfolgreichen Deployment für Commit
-  `504477dc35dab908c8b3755550866bca071c72db`. GitHub Actions Run 13
-  (`43744475969`) für den offenen PR-Head `0a9e105641a17db91988c6848778b62cafbbcd40`
+- Die letzte Cloudflare-Pages-Veröffentlichung unter
+  `https://prompthub-studio.pages.dev` bleibt erreichbar; automatische
+  Production- und Preview-Deployments sind pausiert. GitHub Pages ist unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/` aktiv; die PWA-Dateien
+  sind unter `/src/pwa/`. GitHub Pages stellt keine Control API bereit. GitHub
+  Actions Run 14
+  (`43746180556`) für den offenen PR-Head `d45d1514656ce120da54e97de5e02f7ee68db288`
   ist erfolgreich. Das Control-API-KV-Binding, die OAuth-App und Runtime-Secrets
   sind weiterhin nicht eingerichtet; die API liefert deshalb HTTP 503.
   Cloudflare Fail closed ist verifiziert.
@@ -103,8 +105,8 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Erledigt: GitHub Actions Run 13 (`43744475969`) war für den offenen PR-Head
-  `0a9e105641a17db91988c6848778b62cafbbcd40` erfolgreich; Pflichtjob `test`
+- Erledigt: GitHub Actions Run 14 (`43746180556`) war für den offenen PR-Head
+  `d45d1514656ce120da54e97de5e02f7ee68db288` erfolgreich; Pflichtjob `test`
   und die Schritte `npm test`, `npm run check`, `git diff --check` bestanden.
 - Merge-Gate: Nach der ausdrücklichen Freigabe von `test` und der autorisierten
   Veröffentlichung des Quell-Repositories wurde `main` mit erforderlichem
@@ -118,7 +120,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 ### Phase 3 – produktionsnahe Sicherheit
 
-- Die statische PWA ist auf Cloudflare Pages HTTPS veröffentlicht.
+- Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; der
+  Unterpfad-Fix ist lokal vorbereitet. Der vorhandene Cloudflare-Deploy bleibt
+  erreichbar, wird aber nicht mehr automatisch aktualisiert.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.

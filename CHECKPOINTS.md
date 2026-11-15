@@ -496,7 +496,7 @@
 
 ## CP-019 – GitHub-Schreibzugriff und Pflichtcheck wiederhergestellt
 
-- Datum: 2026-11-15, 18:18 UTC.
+- Datum: 2026-11-15, 18:22 UTC.
 - Diagnose: lokale Git-Metadaten waren durch die Sandbox blockiert; der erste
   Git-Netzwerkversuch scheiterte ebenfalls in der eingeschränkten Umgebung.
   Mit gezielter Rechteausweitung für die nötigen Git-Befehle, per-Befehl
@@ -516,9 +516,10 @@
   Branch-Schutzoptionen wurden nicht verändert.
 - Feature-Branch `codex/oauth-returnto-hardening` wurde auf Commit
   `0a9e105641a17db91988c6848778b62cafbbcd40` gepusht. PR #2 bleibt offen und
-  ungemergt. GitHub Actions Run 13 (`43744475969`) bestand vollständig,
-  einschließlich Job `test`, `npm test`, `npm run check` und
-  `git diff --check`.
+  ungemergt. Run 13 (`43744475969`) war für diesen damaligen Head erfolgreich.
+  Nach dem Dokumentations-Commit `d45d1514656ce120da54e97de5e02f7ee68db288`
+  bestanden auch GitHub Actions Run 14 (Push, `43746180556`) und Run 15 (PR,
+  `43746186693`) vollständig; Job `test` und alle Schritte waren erfolgreich.
 - Cloudflare-Schreibzugriff bleibt nicht verfügbar: `gh` und `wrangler` sind
   nicht installiert, Cloudflare-Token-Umgebungsvariablen fehlen und der
   Cloud-Browser ist nicht verbunden. Es wurde keine Cloudflare-Änderung,
@@ -531,3 +532,4 @@
 - Pflichtnachweis vor dem Checkpoint: `npm test` 103/103 bestanden;
   `npm run check` bestanden (94 Dateien, Prompt-Library synchron);
   `git diff --check` bestanden.
+

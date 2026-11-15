@@ -48,11 +48,24 @@ test("Pages health endpoint reports missing setup instead of fake availability",
 
 test("PWA service worker caches the second application script for offline launch", async () => {
   const worker = await readFile(new URL("../src/pwa/sw.js", import.meta.url), "utf8");
-  assert.match(worker, /"\/regression-test-request\.js"/);
-  assert.match(worker, /"\/service-worker-client\.mjs"/);
+  assert.match(worker, /"regression-test-request\.js"/);
+  assert.match(worker, /"service-worker-client\.mjs"/);
   assert.match(headersConfig, /^\/service-worker-client\.mjs\r?\n\s+Cache-Control: no-cache$/m);
   assert.match(pwaHtml, /id="update-app"[^>]*hidden/);
-  assert.match(pwaHtml, /<script type="module" src="\/app\.js"><\/script>/);
+  assert.match(pwaHtml, /<script type="module" src="\.\/app\.js"><\/script>/);
+});
+
+test("PWA assets and install scope resolve under the GitHub Pages repository path", async () => {
+  const base = new URL("https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/");
+  const manifest = JSON.parse(await readFile(new URL("../src/pwa/manifest.webmanifest", import.meta.url), "utf8"));
+  const serviceWorkerClient = await readFile(new URL("../src/pwa/service-worker-client.mjs", import.meta.url), "utf8");
+
+  assert.equal(new URL(manifest.start_url, base).href, base.href);
+  assert.equal(new URL(manifest.scope, base).href, base.href);
+  assert.equal(new URL(manifest.icons[0].src, base).href, new URL("app-icon-source.png", base).href);
+  assert.match(pwaHtml, /href="\.\/styles\.css"/);
+  assert.match(pwaHtml, /src="\.\/app\.js"/);
+  assert.match(serviceWorkerClient, /new URL\("\.\/sw\.js", locationObject\.href\)/);
 });
 
 test("service worker preserves unrelated caches and waits for a user-requested update", async () => {
@@ -64,12 +77,12 @@ test("service worker preserves unrelated caches and waits for a user-requested u
       calls.opened = name;
       return { async addAll(paths) { calls.added = paths; } };
     },
-    async keys() { return ["prompthub-static-v3", "prompthub-static-v4", "other-app-cache", "prompthub-static-v5"]; },
+    async keys() { return ["prompthub-static-v3", "prompthub-static-v4", "other-app-cache", "prompthub-static-v6"]; },
     async delete(name) { calls.deleted.push(name); },
     async match() { calls.matched += 1; return new Response("cached offline asset"); },
   };
   const self = {
-    location: { origin: "https://prompthub.example" },
+    location: { origin: "https://prompthub.example", href: "https://prompthub.example/src/pwa/sw.js" },
     clients: { async claim() { calls.claimed += 1; } },
     async skipWaiting() { calls.skipped += 1; },
     addEventListener(type, listener) { listeners.set(type, listener); },
@@ -79,9 +92,9 @@ test("service worker preserves unrelated caches and waits for a user-requested u
   const waits = [];
   listeners.get("install")({ waitUntil(promise) { waits.push(promise); } });
   await Promise.all(waits);
-  assert.equal(calls.opened, "prompthub-static-v5");
-  assert.ok(calls.added.includes("/strategy-presentation.mjs"));
-  assert.ok(calls.added.includes("/service-worker-client.mjs"));
+  assert.equal(calls.opened, "prompthub-static-v6");
+  assert.ok(calls.added.includes("https://prompthub.example/src/pwa/strategy-presentation.mjs"));
+  assert.ok(calls.added.includes("https://prompthub.example/src/pwa/service-worker-client.mjs"));
 
   listeners.get("activate")({ waitUntil(promise) { waits.push(promise); } });
   await Promise.all(waits);
@@ -95,7 +108,7 @@ test("service worker preserves unrelated caches and waits for a user-requested u
   assert.equal(calls.skipped, 1);
 
   let responsePromise;
-  listeners.get("fetch")({ request: new Request("https://prompthub.example/styles.css"), respondWith(promise) { responsePromise = promise; } });
+  listeners.get("fetch")({ request: new Request("https://prompthub.example/src/pwa/styles.css"), respondWith(promise) { responsePromise = promise; } });
   assert.equal(await (await responsePromise).text(), "cached offline asset");
   assert.equal(calls.matched, 1);
   const excludedRequests = [
