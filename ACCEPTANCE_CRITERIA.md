@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal bestanden; Mac offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI und Pflichtchecks | `.github/workflows/ci.yml`; GitHub Actions Run 3 für Commit `3e92f9c2919fe7026eb3eddd4421d46a7358d903` | Pflicht | bestanden: Run 43720677933 erfolgreich; Tests, statische Prüfung und Whitespace-Check erfolgreich |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | teilweise: Run 4 (`43720935247`, Commit `076af3c5d33dbba5fb7290a1b6d6a9df6734399b`) und Job `test` erfolgreich; Branch-API meldet `protected=false` und keine erforderlichen Checks; Merge-Gate fehlt |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -45,9 +45,9 @@ ausgewiesen und nicht als bestanden markiert.
 
 ## Aktueller Status
 
-Aktueller Status: `conditional_local_pass`. Die lokale Implementierung und A27/
-A28 sind durch reproduzierbare Tests belegt. Die Erstabnahme ist noch nicht
-vollständig bestanden, weil ein erfolgreicher GitHub-Workflow-Run, ein
-verifiziertes Cloudflare-Free-Konto, ein echtes Pages-HTTPS-/OAuth-Deployment
-und ein echter Mac-/Cloud-Runner nicht nachgewiesen sind.
-
+Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
+A27/A28 sind durch reproduzierbare Tests belegt. Der GitHub-CI-Lauf 4 ist
+erfolgreich, aber `main` erzwingt den Check `test` derzeit nicht. Die Erstabnahme
+ist außerdem noch nicht vollständig bestanden, weil Cloudflare-Konto und
+Abrechnung, Pages-HTTPS-/OAuth-Deployment sowie ein echter Mac-/Cloud-Runner
+nicht nachgewiesen sind.

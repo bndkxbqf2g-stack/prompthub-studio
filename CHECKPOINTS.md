@@ -1,6 +1,3 @@
-Warning: truncated output (original token count: 3434)
-Total output lines: 218
-
 # Checkpoints
 
 ## CP-000 – Inventar und Schutzrahmen
@@ -99,7 +96,35 @@ Total output lines: 218
   Regressionen, CI-Signale und Belegstatus.
 - Wissen bleibt im ausgewählten Projekt. Prompts trennen bestätigte
   Anforderungen, Diagnosehinweise und Hypothesen. Gealterte Belege zählen nicht
-  als aktuell verifizierte Regression. Aufbewa…434 tokens truncated… konnte mit der verfügbaren UI-Automation nicht sicher bedient werden. Das
+  als aktuell verifizierte Regression. Aufbewahrung ist auf 200 Ergebnisse,
+  500 Vorfälle je Projekt, 20 Hypothesen je Vorfall und 40 Historieneinträge je
+  Vorfall begrenzt.
+- Tests: `npm test` erfolgreich, 68/68; umfasst Runner-Ingestion,
+  Wiederholungsgruppierung, datensparsame Fehlerklassifikation,
+  exakte Bestätigung mit verknüpften Belegen, Projekttrennung, Manipulations-
+  und Schemafehler, CI-Schrittbegrenzung, Promptkontext und Dashboard.
+- Statische Analyse: `npm run check` erfolgreich, 81 Dateien;
+  `node --check src/pwa/app.js` erfolgreich; `npm run demo` erfolgreich mit
+  `queued → running → succeeded` und sieben Ereignissen.
+- `git diff --check` erfolgreich; Git meldet lediglich die konfigurierte
+  LF/CRLF-Konvertierung für Arbeitsdateien.
+- Abnahmereferenz: A27 und A28 lokal bestanden. A23 bleibt für kontrollierte
+  gepaarte Commit-/CI-Experimente teilweise offen. Echte GitHub-CI-Läufe,
+  private Remote-Control-Repository-Konfiguration, HTTPS/OAuth, Cloud-Binding
+  und Mac-/Cloud-Runner wurden nicht ausgeführt oder vorgetäuscht.
+- Implementierungscommit: `2e747ad` (`Implement error prevention learning engine`).
+- Kosten: keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
+
+## CP-005 – GitHub-Zuordnung und Laufzeitinventar
+
+- Datum: 2026-11-15
+- Nutzerentscheidung: Das bestehende Angebotsküche-Projekt heißt auf GitHub
+  `Einkaufen`. Sein Inhalt bleibt bis zur bestandenen technischen PromptHub-
+  Abnahme und anschließenden einmaligen MVP-Umfangsbestätigung unangetastet.
+- PromptHub-Remote: Der Nutzer hat `prompthub-studio` ausdrücklich zur Anlage
+  auf GitHub freigegeben. GitHub-Connector und lokaler Credential-Manager stellen
+  derzeit keinen Repository-Erstellungszugang bereit; die GitHub-Weboberfläche
+  konnte mit der verfügbaren UI-Automation nicht sicher bedient werden. Das
   Formular blieb ungesendet und mit Standard-Sichtbarkeit Public geöffnet.
   Repository-Erstellung, Push und GitHub-CI sind daher noch nicht erfolgt. Der
   Nutzer richtet einen Erstellungszugang ein.
@@ -191,3 +216,31 @@ Total output lines: 218
   `CLOUDFLARE_OPERATIONS.md` und `CLOUD_COST_RULES.md`.
 - Es wurden keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
 
+## CP-008 – Abnahmestatus und Laufzeit erneut verifiziert
+
+- Datum: 2026-11-15, 13:58 UTC
+- Lokaler Stand: `0b740002d430b099f9c736a86b5597b6705d2cb3`, Arbeitsbaum vor
+  dieser Dokumentationsänderung sauber.
+- Reproduzierbare Prüfungen: `npm test` 75/75 bestanden; `npm run check`
+  erfolgreich für 86 Dateien; `git diff --check` erfolgreich; `npm run demo`
+  beendete einen Auftrag mit Status `succeeded` und sieben Ereignissen.
+- Lokaler Laufzeittest auf einem separaten Port: `/healthz` meldete
+  `control_plane=memory`, `auth_mode=local`, `runner_inbound_port=false` und
+  `runner_configured=false`; PWA und Manifest antworteten mit HTTP 200. Der
+  sichtbare lokale Modus meldet korrekt, dass die GitHub-Control-Plane fehlt.
+  Der bereits belegte Port 8787 wurde nicht verändert.
+- Remote: GitHub bestätigt `bndkxbqf2g-stack/prompthub-studio` weiterhin als
+  privat, Standardbranch `main`, Kopf `076af3c5d33dbba5fb7290a1b6d6a9df6734399b`.
+  Actions-Run 4 (`43720935247`) für diesen Commit und Job `test` sind
+  erfolgreich.
+- Kritischer offener Gate-Nachweis: GitHub-Branch-API meldet
+  `protected=false`, `required_status_checks.enforcement_level=off` und keine
+  erforderlichen Checks. A09 wurde deshalb präzisiert und auf `teilweise`
+  gesetzt. Ein Merge-Gate für `test` ist nötig; die Repository-Sicherheitsregel
+  wird ohne ausdrückliche Nutzerfreigabe nicht geändert.
+- Browser-Prüfung: Cloud-Browser blieb auf der Installation der Cloudflare-
+  GitHub-App; nur das PromptHub-Repository ist ausgewählt, die weitreichenden
+  App-Schreibrechte wurden nicht autorisiert. Es gibt kein Pages-Projekt und
+  keine HTTPS-Veröffentlichung.
+- Kosten: in diesem Durchlauf wurden keine Cloud-Ressourcen, kostenpflichtigen
+  Tarife oder neuen Dienste aktiviert.

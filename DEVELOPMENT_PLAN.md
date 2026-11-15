@@ -85,9 +85,14 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Erledigt: tatsächlicher GitHub-Actions-`push`-Lauf 43720677933 auf `main`
-  war für Commit `3e92f9c2919fe7026eb3eddd4421d46a7358d903` erfolgreich. Weitere
-  Remote-Control- und Runner-Integrationschecks sind noch offen.
+- Erledigt: GitHub-Actions-Run 4 (`43720935247`) war für Commit
+  `076af3c5d33dbba5fb7290a1b6d6a9df6734399b` erfolgreich; der Job `test`
+  einschließlich Tests, statischer Analyse und Whitespace-Prüfung bestand.
+- Offen und freigabepflichtig: GitHub-API meldet `main` mit
+  `protected=false`, `required_status_checks.enforcement_level=off` und ohne
+  erforderliche Checks. Der verpflichtende Merge-Gate muss nach ausdrücklicher
+  Zustimmung als Repository-Sicherheitsregel auf den Check `test` gesetzt
+  werden. Remote-Control- und Runner-Integrationschecks sind ebenfalls offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.
@@ -116,4 +121,3 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 Nach jedem Paket: `npm test`, `npm run check`, `git diff --check`, Ergebnis in
 `CHECKPOINTS.md`, Status der Abnahmematrix aktualisieren. Ein Fehlschlag stoppt
 die nächste Phase nicht automatisch, aber es darf kein Erfolg behauptet werden.
-
