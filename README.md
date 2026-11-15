@@ -6,28 +6,26 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 
 ## Status
 
-Die Implementierung befindet sich in der technischen Erstabnahme. Der lokale
-Memory-Modus ist für reproduzierbare Tests und die vertikale Demo gedacht. Das
-private GitHub-Repository [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-enthält den lokalen Quellstand `ec8dc42` auf `main` (Remote-Snapshot-Commit
-`ca6210a`). Der Snapshot wurde über die verbundene GitHub-API importiert, weil
-für Git-Transport hier keine Anmeldung eingerichtet ist; die ursprüngliche
-lokale Commit-Abstammung wurde dabei nicht übernommen.
+Die technische Erstabnahme ist noch offen. Das private GitHub-Repository
+[`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
+ist die dauerhafte Quelle für den Quellcode. GitHub Actions Run 9 für Commit
+`8f0fdc25e90f0ba32d0ed79c724ff136aed14881` bestand mit Job `test` erfolgreich.
 
-Die GitHub-CI-Konfiguration ist enthalten. GitHub Actions Run 3 für den privaten
-main-Commit `3e92f9c2919fe7026eb3eddd4421d46a7358d903` war erfolgreich:
-75 Tests, statische Prüfung und Whitespace-Prüfung bestanden. Der GitHub-Betrieb
-der Anwendung benötigt weiterhin ein separat konfiguriertes privates
-Control-Repository, Token und OAuth-Zugangsdaten. Ein Deployment wurde nicht
-erstellt.
+Die PWA-Hülle ist unter [prompthub-studio.pages.dev](https://prompthub-studio.pages.dev)
+veröffentlicht. Cloudflare Pages ist mit dem privaten Repository verbunden;
+Commits auf `main` lösen Production-Builds aus. Startseite, Manifest, Icon,
+JavaScript und Service Worker wurden über HTTPS mit HTTP 200 geprüft. Die
+Control API ist noch nicht eingerichtet: `/api/me` und `/healthz` antworten
+deshalb mit HTTP 503 (`cloud_control_plane_not_configured`). OAuth, KV-Binding
+und Runtime-Secrets fehlen; die PWA ist derzeit keine betriebsbereite
+Auftragssteuerung.
 
-Ein Cloudflare-Pages-Profil liegt in `wrangler.toml`; die API-Routen nutzen den
-vorhandenen Worker-Handler und schlagen ohne sichere Production-Bindings mit
-`503` fehl. Im Cloud-Dashboard wurden keine vorhandenen Projekte gefunden und
-0/100.000 Requests für den Tag angezeigt. Ein Pages-Projekt wurde noch nicht
-angelegt oder veröffentlicht: Die Cloudflare-GitHub-App verlangt weitreichende
-Schreibrechte auf das verbundene Repository. Abrechnung blieb ungeprüft, da die
-Billing-Seite nicht lud. Details und der Wrangler-Alternativweg stehen in
+GitHub Free erzwingt in diesem privaten Repository den freigegebenen Check
+`test` nicht. Es wurde weder ein kostenpflichtiger Plan aktiviert noch die
+Repository-Sichtbarkeit geändert. Der Cloudflare-Billing-Status konnte wegen
+der nicht ladenden Abrechnungsseite nicht unabhängig verifiziert werden. Die
+Abnahmematrix, Kostenregeln und aktuellen Betriebseinschränkungen stehen in
+`ACCEPTANCE_CRITERIA.md`, `CLOUD_COST_RULES.md` und
 `CLOUDFLARE_OPERATIONS.md`.
 
 ## Schnellstart
@@ -51,10 +49,9 @@ npm run demo
 ```
 
 Die serverlose Cloudflare-Variante und ihre verbindlichen Setup-/Kostenlimits
-stehen in `CLOUDFLARE_OPERATIONS.md`. Sie ist vorbereitet, aber nicht deployed;
-ohne privates Control-Repository, OAuth-Secrets und KV-Binding bleibt die
-Control API absichtlich nicht verfügbar. Ein Codex-Cloud-Runner ist nicht
-konfiguriert.
+stehen in `CLOUDFLARE_OPERATIONS.md`. Die statische PWA ist live; ohne privates
+Control-Repository, OAuth-Secrets und KV-Binding bleibt die Control API
+absichtlich nicht verfügbar. Ein Codex-Cloud-Runner ist nicht konfiguriert.
 
 Für den echten GitHub-Betrieb müssen ein privates Control-Repository, ein
 serverseitiger Token, eine OAuth-App mit Login-Allowlist, ein freigegebener

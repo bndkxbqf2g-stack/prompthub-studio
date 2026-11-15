@@ -72,13 +72,20 @@
   Tarifwechsel und keinen Cloud-Codex-Executor. Ist kein Runner vorhanden, zeigt
   `/healthz` `runner_status: not_configured`. Die Cloud-PWA-Ausführung ist daher
   vorbereitet, aber erst nach Einrichtung und externem Funktionstest abnehmbar.
-- Der Nutzer hat den erforderlichen GitHub-Check `test` ausdrücklich
-  freigegeben. GitHub Branch-Protection meldet, dass Regeln für dieses private
-  Repository einen bezahlten Team- oder Enterprise-Organisationsplan benötigen.
-  Wegen 0-€-Budget und
-  privatem Repository wurde kein Upgrade und keine Sichtbarkeitsänderung
-  vorgenommen. Der Check läuft in CI, ist aber kein erzwungenes Merge-Gate.
-  Aktuelle Verfügbarkeit steht in der [GitHub-Dokumentation zu Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
+- Der Nutzer hat `test` als erforderlichen GitHub-Check ausdrücklich
+  freigegeben. Die Rulesets-API antwortet für dieses private Repository mit
+  HTTP 403: „Upgrade to GitHub Pro or make this repository public to enable this
+  feature.“ Das Repository gehört einem persönlichen GitHub-Konto; die
+  kostenpflichtige private Option wäre GitHub Pro. Wegen 0-€-Budget und
+  Privatheit wurde weder ein Upgrade noch eine Sichtbarkeitsänderung vorgenommen.
+  CI läuft, aber erzwingt keinen Merge-Gate. Der Cloudflare-Pages-Build führt
+  `npm test` und `npm run check` vor Veröffentlichung aus und hält fehlerhafte
+  Builds von Production fern; ein Merge verhindert das nicht. Bis eine
+  technische Branch-Regel erlaubt ist, Änderungen nur über PRs mergen und erst,
+  wenn `test` für den unveränderten PR-Head erfolgreich ist; direkte Pushes auf
+  `main` sind im Arbeitsablauf tabu. Das bleibt eine manuelle Regel, keine
+  serverseitige Sperre. Siehe [GitHub
+  branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches) und [Rulesets availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
 
 ## Laufzeitregeln
 

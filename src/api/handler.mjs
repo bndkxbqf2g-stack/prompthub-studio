@@ -1,4 +1,4 @@
-import { parseCookies } from "../auth/github-oauth.mjs";
+import { parseCookies, safeLocalRedirectPath } from "../auth/github-oauth.mjs";
 import { STATUS_LABELS, publicJob, validateJobInput } from "../domain/job.mjs";
 import { summarizeResourceMetrics } from "../metrics/resource-metrics.mjs";
 
@@ -166,7 +166,7 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
         if (typeof auth.callback !== "function") return json(501, { error: "GitHub OAuth is not configured" });
         try {
           const result = await auth.callback({ code: url.searchParams.get("code"), state: url.searchParams.get("state"), cookies: parseCookies(request.headers.get("cookie") ?? "") });
-          return redirect(result.redirectTo, { "Set-Cookie": result.cookie });
+          return redirect(safeLocalRedirectPath(result.redirectTo, url.origin), { "Set-Cookie": result.cookie });
         } catch {
           return redirect("/?auth_error=oauth_failed");
         }

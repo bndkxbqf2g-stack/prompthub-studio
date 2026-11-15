@@ -23,12 +23,25 @@ Memory-Control-Plane-Adapter.
 
 ## Serverlose PWA
 
-Cloudflare Pages ist mit `wrangler.toml`, begrenzten Function-Routen und dem
-vorhandenen Worker-Handler vorbereitet. Das frühere Workers-Static-Assets-Profil
-liegt in `wrangler.worker.toml`. Cloudflare-Konto, Pages-Projekt, KV-/OAuth-
-Bindings und GitHub-Integration sind nicht konfiguriert; ein Deployment wurde
-nicht ausgeführt. Einzelheiten stehen in `CLOUDFLARE_OPERATIONS.md`. Ein
-Cloud-Codex-Runner ist nicht vorhanden; `not_configured` bleibt der echte Zustand.
+Cloudflare Pages `prompthub-studio` ist mit dem privaten GitHub-Repository
+verbunden und unter https://prompthub-studio.pages.dev veröffentlicht. Commits
+auf `main` lösen Production-Builds aus. `wrangler.toml` enthält die Pages-
+Konfiguration; das frühere Workers-Static-Assets-Profil bleibt in
+`wrangler.worker.toml` erhalten.
+
+Die statische PWA-Hülle ist erreichbar. Die Control API antwortet mit HTTP 503,
+bis ein Production-KV-Binding `SESSIONS`, die GitHub-OAuth-App, eine Login-
+Allowlist und die dokumentierten serverseitigen Variablen/Secrets eingerichtet
+sind. Der Pages-Runtime-Schalter `Fail closed` ist gespeichert und verifiziert.
+Die automatische Preview-Bereitstellung wurde auf „None“ gestellt; ihre
+Persistenz ließ sich nach einem Browser-Transportabbruch nicht erneut prüfen.
+Preview-Adressen sind öffentlich, sofern sie aktiviert werden; daher keine
+Preview-Secrets setzen und vor Aktivierung Cloudflare Access konfigurieren.
+
+Die GitHub-Pages-Integration ist nicht die GitHub-OAuth-Anmeldung innerhalb der
+PWA. Details zu Build, Bindings, HTTPS-Prüfungen, kostenfreien Kontingenten und
+offenen Abnahmepunkten stehen in `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-
+Runner bleibt mangels verifizierter Laufzeitschnittstelle `not_configured`.
 
 ## Konfiguration
 

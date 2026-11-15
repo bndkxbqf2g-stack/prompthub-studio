@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal bestanden; Mac offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | teilweise: Run 6 (`43724681369`, Commit `504477dc35dab908c8b3755550866bca071c72db`) und Job `test` erfolgreich; Nutzer hat `test` als Pflichtcheck freigegeben, aber GitHub blockiert Branch-Schutz für dieses private Repo auf Free; Merge-Gate fehlt |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | teilweise: Run 9 (`43727273718`, Commit `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`) Job `test` erfolgreich; Regeln-API antwortet 403 „Upgrade to GitHub Pro or make this repository public“; `main` bleibt ungeschützt. Pages baut `npm test` und `npm run check` vor Veröffentlichung, blockiert damit fehlerhafte Deployments, aber nicht Merges |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,11 +46,13 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. GitHub Actions Run 6 und der
+A27/A28 sind durch reproduzierbare Tests belegt. GitHub Actions Run 9 und der
 Pages-Produktionsbuild für `504477dc35dab908c8b3755550866bca071c72db` sind
 erfolgreich; die PWA-Assets sind über HTTPS erreichbar. `main` erzwingt den
-freigegebenen Check `test` nicht, weil GitHub Branch-Schutz für das private
-Repository auf dem vorhandenen Free-Plan nicht anbietet. Die Control API ist
+freigegebenen Check `test` nicht: die Rulesets-API antwortet mit HTTP 403 und
+verlangt GitHub Pro für private Repositories oder eine öffentliche Sichtbarkeit.
+Der Pages-Build führt die Pflichtprüfungen unabhängig vor jeder Veröffentlichung
+aus, verhindert aber keinen Merge. Die Control API ist
 noch nicht konfiguriert (503); OAuth/KV, ein echter Mac-/Cloud-Runner,
 iPhone-Installation und Kontobilling sind nicht nachgewiesen. Die vollständige
 technische Erstabnahme ist daher nicht bestanden.

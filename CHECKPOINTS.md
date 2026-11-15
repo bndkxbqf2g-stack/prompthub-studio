@@ -265,13 +265,79 @@
   erneute Kontrolle war wegen geschlossenem Cloud-Browser-Transport nicht
   möglich. Preview-Access wurde nicht eingerichtet; Preview-Secrets sind nicht
   gesetzt.
-- GitHub bleibt privat. Der Nutzer hat den erforderlichen CI-Check `test`
-  freigegeben; GitHub Branch-Protection meldete im Dashboard, dass private
-  Repositories dafür einen bezahlten Team- oder Enterprise-Organisationsplan
-  benötigen. Kein Upgrade
-  und keine Sichtbarkeitsänderung vorgenommen; Merge-Gate fehlt.
+- GitHub blieb privat. Der Nutzer hat den erforderlichen CI-Check `test`
+  freigegeben. Der Branch-Protection-Dialog meldete, dass das private
+  Repository einen geeigneten bezahlten Plan braucht; die spätere Rulesets-API-
+  Prüfung für das persönliche Repository dokumentiert CP-010 präziser. Kein
+  Upgrade und keine Sichtbarkeitsänderung wurden vorgenommen; Merge-Gate fehlt.
 - Cloudflare-Billing-Seite konnte nicht verifiziert werden. In diesem
   Arbeitsgang wurde kein kostenpflichtiger Tarif oder Dienst aktiviert.
 - Echtes iPhone-Installations-/E2E-Testing und unabhängiger Quoten-/Ausfalltest
   stehen aus. Vollständige Abnahme bleibt offen; Details in
   `ACCEPTANCE_CRITERIA.md` und `CLOUDFLARE_OPERATIONS.md`.
+
+## CP-010 – Branch-Gate unter GitHub Free geprüft
+
+- Datum: 2026-11-15, 15:14 UTC
+- Repository `bndkxbqf2g-stack/prompthub-studio` wurde per GitHub-API erneut als
+  privat, persönliches Konto und Default-Branch `main` bestätigt.
+- Nutzerfreigabe für den Pflichtcheck `test` liegt vor. Ein GET auf die
+  Rulesets-API liefert HTTP 403 mit `Upgrade to GitHub Pro or make this
+  repository public to enable this feature.` Die Branch-Protection-GET ist für
+  die verbundene Integration nicht zugänglich (403). GitHub-Dokumentation
+  bestätigt: Free schützt öffentliche Repositories; private Repositories
+  benötigen Pro für persönliche Konten oder Team/Enterprise für Organisationen.
+- Unter den verbindlichen Vorgaben „privat“ und „0 €“ gibt es keine kostenlose
+  serverseitige GitHub-Branch-Regel. Es wurde kein Plan aktiviert und das Repo
+  blieb privat. CI Run 9 (`43727273718`) für `8f0fdc2` bestand. Pages führt
+  `npm test` und `npm run check` erneut vor Veröffentlichung aus; das blockiert
+  fehlerhafte Deployments, aber kein Merge. A09 bleibt offen.
+- In der verwalteten Windows-Shell ist `codex-cli 0.167.0-alpha.4.1` installiert,
+  aber `codex login status` schlägt mit `Could not find home directory` fehl.
+  Damit ist hier kein authentifizierter lokaler Codex-Executor belegt; ein
+  Mac-Runner wurde nicht getestet.
+- Lokale Prüfungen nach den Dokumentationsänderungen: `npm test` 75/75;
+  `npm run check` erfolgreich (88 Dateien, Prompt-Library synchron);
+  `git diff --check` erfolgreich.
+
+## CP-011 – Codex-Ausführungszugänge erneut geprüft
+
+- Datum: 2026-11-15, 15:22 UTC
+- `codex-cli 0.167.0-alpha.4.1` ist installiert. `codex login status` endet
+  mit Exitcode 1 und `Could not find home directory`. Die Präsenzprüfung zeigte
+  `USERPROFILE` vorhanden, `HOME` und `CODEX_HOME` nicht; diese Variablen wurden
+  nicht gesetzt oder verändert. GitHub- und Cloudflare-Token waren in dieser
+  Shell nicht vorhanden.
+- Die Codex-Cloud-Umgebungsabfrage meldet `asenvcfg_base` als `ready` und
+  `runnable`, jedoch ohne verknüpfte Repositories (`repositories: []`). Die
+  Antwort enthielt denselben Environment-Eintrag doppelt. Es wurde kein Task
+  gestartet; damit ist kein autonomer Cloud-Runner für das private PromptHub-
+  Repository nachgewiesen.
+- Nach dieser Bestandsaufnahme: `npm test` 75/75 bestanden; `npm run check`
+  erfolgreich für 88 Dateien und Prompt-Library-Synchronität;
+  `git diff --check` erfolgreich. Keine produktiven Einstellungen, Secrets,
+  Kostenoptionen oder Repository-Sichtbarkeit geändert.
+
+## CP-012 – OAuth-Rücksprung gegen externe Weiterleitung gehärtet
+
+- Datum: 2026-11-15, 15:36 UTC
+- Eine unabhängige Prüfung bestätigte einen ausnutzbaren Open Redirect:
+  `returnTo=//example.org/...` wurde beim OAuth-Start gespeichert und nach
+  erfolgreichem Callback unverändert als `Location` ausgegeben. Die Reproduktion
+  erfolgte lokal mit einem Mock-GitHub-Transport; es gab keinen externen Login.
+- `safeLocalRedirectPath` akzeptiert nur normalisierte relative Same-Origin-
+  Pfade. Die Prüfung erfolgt beim Start, erneut beim Callback und nochmals vor
+  dem `Location`-Header im HTTP-Handler. Ungültige Werte fallen auf `/` zurück.
+- Regressionstests decken protokollrelative und absolute Ziele, Backslashes,
+  URL-normalisierte `%2e%2e`-Pfade, rohe CR/LF-Zeichen, gültige interne Ziele,
+  manipulierten OAuth-State, bösartige Auth-Adapter-Antworten sowie encodierte
+  Slash-/Backslash-Sequenzen ab. Eine zweite unabhängige Prüfung gab den Fix
+  frei; es wurden keine Dateien durch Reviewer-Agenten verändert.
+- Nachweis: `npm test` 79/79 bestanden; `npm run check` erfolgreich für 88
+  Dateien und synchronisierte Prompt-Library; `npm run demo` beendete einen
+  Mock-Auftrag mit `succeeded` und sieben Ereignissen; `git diff --check`
+  erfolgreich.
+- Der Stand liegt auf dem lokalen Branch `codex/oauth-returnto-hardening` und ist
+  noch nicht auf GitHub veröffentlicht. Für diesen Fix wurde kein GitHub-CI-
+  Lauf und kein Produktionsdeployment ausgeführt. OAuth-Secrets,
+  Cloudflare-Runtime und Repository-Einstellungen blieben unverändert.

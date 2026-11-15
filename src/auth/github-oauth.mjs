@@ -6,6 +6,18 @@ function cookieHeader(request) {
   return request?.headers?.cookie ?? "";
 }
 
+export function safeLocalRedirectPath(value, origin) {
+  if (typeof value !== "string" || !value.startsWith("/") || value.startsWith("//") || value.includes("\\") || /[\u0000-\u001f\u007f]/.test(value)) return "/";
+  try {
+    const base = new URL(origin);
+    const target = new URL(value, base);
+    if (target.origin !== base.origin || target.pathname.startsWith("//") || target.pathname.includes("\\")) return "/";
+    return `${target.pathname}${target.search}${target.hash}`;
+  } catch {
+    return "/";
+  }
+}
+
 export function parseCookies(header = "") {
   const result = {};
   for (const part of header.split(";")) {
@@ -96,7 +108,7 @@ export class GitHubOAuth {
 
   async start({ returnTo = "/" } = {}) {
     const state = randomBase64Url(24);
-    const pending = { returnTo: returnTo.startsWith("/") ? returnTo : "/", createdAt: this.now().toISOString() };
+    const pending = { returnTo: safeLocalRedirectPath(returnTo, this.publicOrigin), createdAt: this.now().toISOString() };
     if (this.stateStore) await this.stateStore.put(state, pending, 600);
     else this.states.set(state, pending);
     const url = new URL("https://github.com/login/oauth/authorize");
@@ -128,7 +140,7 @@ export class GitHubOAuth {
     const sessionId = await this.store.create({ user: { login: profile.login, id: profile.id, name: profile.name ?? profile.login, avatar_url: profile.avatar_url }, token: tokenPayload.access_token });
     const cookieValue = `${sessionId}.${await hmacBase64Url(sessionId, this.sessionSecret)}`;
     return {
-      redirectTo: pending.returnTo,
+      redirectTo: safeLocalRedirectPath(pending.returnTo, this.publicOrigin),
       cookie: serializeCookie("prompthub_session", cookieValue, { maxAge: 8 * 60 * 60, secure: this.cookieSecure }),
       user: { login: profile.login, id: profile.id, name: profile.name ?? profile.login, avatar_url: profile.avatar_url },
     };

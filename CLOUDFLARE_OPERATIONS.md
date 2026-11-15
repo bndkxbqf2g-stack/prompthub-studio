@@ -10,8 +10,8 @@
   `504477dc35dab908c8b3755550866bca071c72db`, Cloudflare-Status `success`.
   Git-Integration deployt Commits auf `main` automatisch.
 - GitHub bestätigt das Repository weiterhin als `private`, Default-Branch
-  `main`, HEAD `504477dc35dab908c8b3755550866bca071c72db`. Actions-Run 6
-  (`43724681369`) einschließlich Job `test` war erfolgreich.
+  `main`, HEAD `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`. Actions-Run 9
+  (`43727273718`) einschließlich Job `test` war erfolgreich.
 - `wrangler.toml` beschreibt Pages; der bisherige Workers Static Assets-Modus
   bleibt in `wrangler.worker.toml` erhalten.
 - functions/[[path]].js leitet ausschließlich über _routes.json ausgewählte
@@ -106,12 +106,21 @@ Preview-Builds aktiv sind oder später aktiviert werden, ist Cloudflare Access
 erforderlich, weil Preview-Adressen sonst öffentlich sind.
 
 GitHub branch protection: der Nutzer hat den erforderlichen Check `test`
-ausdrücklich freigegeben. GitHub meldete im Branch-Protection-Dialog jedoch,
-dass Regeln für dieses private Repository einen bezahlten Team- oder Enterprise-
-Organisationsplan benötigen. Da Repository-Privatsphäre und 0-€-Budget verbindlich sind,
-wurde keine unwirksame Regel gespeichert und kein Planwechsel vorgenommen.
-Der CI-Job `test` läuft erfolgreich, erzwingt aber derzeit keine Merge-Sperre.
-Siehe [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
+ausdrücklich freigegeben. Der Repository-Eigentümer ist ein persönliches Konto;
+die Rulesets-API antwortet aktuell mit HTTP 403:
+`Upgrade to GitHub Pro or make this repository public to enable this feature.`
+GitHub Free ermöglicht keine erzwungenen Branch-Regeln für private Repositories.
+GitHub dokumentiert Pro für private persönliche Repositories sowie Team/Enterprise
+für private Organisations-Repositories. Wegen des verbindlichen 0-€-Budgets und
+der privaten Sichtbarkeit wurde weder ein Upgrade noch eine Veröffentlichung
+vorgenommen. `test` läuft in CI, ist aber kein serverseitiges Merge-Gate.
+Der Cloudflare-Pages-Build führt Tests und statische Prüfung vor dem Deploy aus;
+ein fehlgeschlagener Pflichtcheck blockiert dadurch die Veröffentlichung, nicht
+den Merge. Bis ein zulässiger Plan aktiviert wird, gilt daher als manueller
+Arbeitsablauf: Änderungen nur per PR, `test` für genau den PR-Head erfolgreich
+abwarten und vor dem Merge erneut prüfen; kein direkter Push auf `main`. Das ist
+eine Prozessregel und keine technische Sperre gegen einen Maintainer. Quellen:
+[GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches) und [Verfügbarkeit von Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
 
 Alternative Wrangler Direct Upload: Sie vermeidet eine Cloudflare-App mit
 Schreibzugriff auf GitHub, erfordert aber einen Cloudflare-API-Token mit
