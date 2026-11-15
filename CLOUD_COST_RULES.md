@@ -30,15 +30,17 @@
 - Für eine PWA direkt nutzbare, nachweislich kostenlose Codex-LLM-API ist kein
   verfügbarer Zugang nachgewiesen. Prompt-Designer verwendet deshalb bis zu
   einer belegten Integration einen klar markierten strukturierten Fallback.
-- Vercel Hobby ist nach aktueller offizieller Dokumentation ein möglicher
-  0-€-Serverless-Kandidat für persönliche, nicht-kommerzielle Nutzung. Der Tarif
-  hat harte Nutzungslimits; bei Überschreitung werden Funktionen gesperrt und
-  Hobby kann keine Zusatznutzung kaufen. Die dokumentierte
-  `vercel billing usage --json`-Abfrage könnte Kontingente maschinenlesbar
-  überwachen. Vercel Blob bietet private Speicherung und CAS-Schreibvorgänge.
-  Das Nutzerkonto, der Tarif, die Nutzungsabfrage und die Nicht-Kommerz-Bedingung
-  sind nicht verifiziert. Vercel ist weder autorisiert noch verbunden oder
-  deployed; bis zum Readback bleiben Cloud-Jobs gesperrt.
+- Netlify Free ist nach aktueller offizieller Dokumentation ein möglicher
+  0-€-Serverless-Kandidat mit 300 Credits/Monat, Hard Limit und ohne Auto-
+  Recharge. Der Free-Vertrag untersagt KI-/ML-Training auf Customer Content ohne
+  ausdrückliches Opt-in. Die öffentliche API-Referenz dokumentiert Build-Minuten,
+  aber keinen vollständigen teamweiten Credit-Readback. Das konkrete Konto, der
+  Teamverbrauch und die automatische 75-%-Jobpause sind nicht verifiziert;
+  Cloud-Jobs bleiben bei unbekanntem Verbrauch gesperrt.
+- Vercel Hobby wird für PromptHub-Daten nicht als Kandidat geführt: die aktuellen
+  Terms beschränken Hobby auf persönliche, nicht-kommerzielle Nutzung und
+  erlauben Training/Weitergabe von Hobby-Customer-Content für KI-/ML-Modelle.
+  Es wurde kein Opt-out nachgewiesen. Vercel ist nicht verbunden oder deployed.
 - GitHub Actions ist für CI aktiviert. GitHub Pages ist für das öffentliche
   Repository aktiv und stellt statische Dateien bereit; die PWA liegt unter
   `/src/pwa/`. GitHub Pages hostet keine serverseitige Control API.
@@ -149,6 +151,14 @@
   (abgerufen am 2026-11-15; Standard-GitHub-Runner sind für öffentliche Repositories kostenlos und unbegrenzt).
 - [GitHub Free Plan enthaltene Nutzung](https://docs.github.com/en/billing/reference/product-usage-included)
   (abgerufen am 2026-11-15).
+- [Netlify Free Hard Limit und 300 Credits](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/)
+  (abgerufen am 2026-11-16).
+- [Netlify Self-Serve-Vertrag: Customer Content und KI-Training](https://www.netlify.com/pdf/self-serve-subscription-agreement.pdf)
+  (abgerufen am 2026-11-16; § 6.2).
+- [Netlify API-Referenz mit Build-Status-Endpunkt](https://open-api.netlify.com/)
+  (abgerufen am 2026-11-16; kein vollständiger teamweiter Credit-Endpunkt in der öffentlichen Referenz gefunden).
+- [Vercel Terms of Service: Hobby und Customer Content/AI-Training](https://vercel.com/legal/terms)
+  (abgerufen am 2026-11-16; Terms zuletzt geändert am 2026-10-19).
 - [Vercel Hobby Plan, Limits und Überschreitungsverhalten](https://vercel.com/docs/plans/hobby)
   (abgerufen am 2026-11-16; konkretes Konto nicht geprüft).
 - [Vercel Usage CLI, JSON und Projektgruppierung](https://vercel.com/docs/cli/usage)
