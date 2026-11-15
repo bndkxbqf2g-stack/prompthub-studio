@@ -752,3 +752,22 @@
   Ressource wurde angelegt.
 - Pflichtprüfungen nach den Dokumentationsänderungen: `npm test` 105/105;
   `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
+
+## CP-029 – Abnahmeevidenz auf aktuellen Main- und Pages-Stand gebracht
+
+- Datum: 2026-11-15, 21:06 UTC.
+- GitHub bestätigt `main` auf `cf348e610c381071aa56bb89c0f5aa5753e4cfad`.
+  PR #11 ist mit `5c6f93b199127eea0b301b534f8b3e0375c834ce`, PR #12 mit dem
+  aktuellen Main-Commit gemergt.
+- Main-Run 54 (`43761269714`) enthält den erfolgreichen Pflichtjob `test`.
+  Pages-Run 12 (`43761268857`) enthält erfolgreiche Build-, Upload- und
+  Deployment-Schritte. PR #12 bestand PR-Run 53 (`43760996745`).
+- PR #11 wurde nach bestandenem Pflichtcheck automatisch gemergt. Für PR #12
+  war Auto-Merge eingeschaltet, GitHub ließ den PR trotz grünem Check jedoch
+  offen; nach erneuter Prüfung des erfolgreichen Checks wurde er mit exakt
+  gepinntem Head-SHA über die Merge-API abgeschlossen. Das Repository erlaubt
+  Auto-Merge (`allow_auto_merge=true`).
+- `ACCEPTANCE_CRITERIA.md` verweist jetzt auf diese aktuellen externen Nachweise
+  und hält die weiterhin fehlende Branch-Protection-Neulesung mit HTTP 403 fest.
+- Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 105/105;
+  `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
