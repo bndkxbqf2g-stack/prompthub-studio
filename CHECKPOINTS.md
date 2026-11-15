@@ -666,3 +666,20 @@
   erfolgreich (96 Dateien, Prompt-Library synchron); `git diff --check`
   erfolgreich. Keine Pflichtprüfung wurde abgeschwächt; ein Regressionstest
   wurde ergänzt.
+
+## CP-025 – Abnahmematrix an Hosting-Entscheidung und aktuelle CI angepasst
+
+- Datum: 2026-11-15, 20:07 UTC.
+- A16 ist jetzt hosting-neutral formuliert: der kostenlose serverlose
+  Control-Plane-Betrieb bleibt Pflicht, Cloudflare ist aber nach ausdrücklicher
+  Nutzerentscheidung kein Zielanbieter mehr. GitHub Pages bleibt als statischer
+  PWA-Host ausgewiesen; Netlify ist nicht aktiviert und wartet auf die getrennte
+  Freigabe für Anbieter-Verknüpfung und Auth-/Sitzungsspeicher.
+- A09 und der Abnahmestatus verweisen auf PR #7, Auto-Merge nach erfolgreichem
+  Pflichtcheck, GitHub Actions Run 38/39 und erfolgreichen GitHub-Pages-Run 7.
+  Branch-Schutz wird als zuletzt früher erfolgreich gelesen gekennzeichnet;
+  der aktuelle GitHub-Connector lieferte dafür 403. Direkte Pushes bleiben als
+  dokumentierte Einschränkung sichtbar.
+- Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test`
+  105/105 bestanden; `npm run check` bestanden (96 Dateien); `git diff --check`
+  bestanden.
