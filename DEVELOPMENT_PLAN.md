@@ -92,8 +92,8 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Free-Quota-Fail-Closed-Tests sind implementiert.
 - Die aktive PWA liegt unter
   `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Main-Commit
-  `a3b397356734a47db506c32ec562d8ad52985dc1` bestand Main-CI-Run 75
-  (`43768090841`) und GitHub-Pages-Run 19 (`43768090642`). PR #19 bestand Run 74
+  `bf5a15c1b8a4fc0f832e55aefcdc84bfa440c5a5` bestand Main-CI-Run 81
+  (`43770701922`) und GitHub-Pages-Run 21 (`43770701589`). PR #21 bestand Run 80
   auf Apple-Silicon- und Intel-macOS sowie mit Pflichtjob `test` und wurde
   automatisch gemergt. GitHub Pages hostet nur die
   statische PWA, keine Control API. Cloudflare ist als Host abgewählt; das
@@ -106,7 +106,7 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
 - CI prüft jetzt vollständig auf Apple-Silicon- und Intel-macOS-Standard-Runnern.
   Der bestehende Pflichtjob `test` blockiert bei fehlgeschlagenem oder
-  übersprungenem macOS-Lauf. PR #18 und Main-Run 72 bestanden diese Lanes. Das
+  übersprungenem macOS-Lauf. PR #21 und Main-Run 81 bestanden diese Lanes. Das
   prüft macOS-Kompatibilität, ersetzt aber keinen Nachweis eines lokalen
   MacBook-Runners.
 
@@ -137,9 +137,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   lud UI, Styles, Manifest und App-Icon. Die Control API bleibt auf dem
   statischen Host unerreichbar. Der pausierte frühere Cloudflare-Deploy bleibt
   erreichbar, wird aber nicht automatisch aktualisiert. Ein Browser-Smoke im
-  Viewport 390×844 zeigte die korrekte API-Ausfallmeldung, aber ohne API keine
-  Projektansicht. Die echte iPhone-Installation und Live-Offline-/Updateprüfung
-  sind noch offen.
+  Viewport 390×844 zeigt nun eine Erklärung der fehlenden Control API. Die
+  Aktualisieren-Aktion wiederholt den Bootstrap und behauptet bei weiterem
+  API-Ausfall keinen Erfolg. Ohne API bleiben Projektansicht, Anmeldung und
+  Aufträge verborgen. Die echte iPhone-Installation und Live-Offline-/Update-
+  prüfung sind noch offen.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet

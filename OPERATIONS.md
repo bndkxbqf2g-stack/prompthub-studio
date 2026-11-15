@@ -70,12 +70,12 @@ Manifest, App-Icon, Service Worker, App-Skript und Stylesheet live mit HTTP 200
 und passenden Inhaltstypen; die PWA meldet weiterhin, dass die Control API nicht
 erreichbar ist.
 
-Main-Commit `a3b397356734a47db506c32ec562d8ad52985dc1` bestand Main-CI-Run 75
-(`43768090841`) und GitHub-Pages-Run 19 (`43768090642`). PR #19 bestand PR-CI-
-Run 74 (`43767985410`) auf beiden macOS-Architekturen und für `test`; GitHub
-führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte Titel,
-Aktualisieren-Schalter und den API-Ausfallstatus. Eine echte iPhone-Prüfung ist
-das nicht.
+Main-Commit `bf5a15c1b8a4fc0f832e55aefcdc84bfa440c5a5` bestand Main-CI-Run 81
+(`43770701922`) und GitHub-Pages-Run 21 (`43770701589`). PR #21 bestand PR-CI-
+Run 80 (`43770627889`) auf beiden macOS-Architekturen und für `test`; GitHub
+führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte die
+Erklärung zur fehlenden Control API; ein Klick auf Aktualisieren erhielt den
+Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
