@@ -939,3 +939,28 @@
 - Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 108/108;
   `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
   `git diff --check` ohne Befund.
+
+## CP-038 – Serverless-Kandidaten anhand offizieller Tarife verglichen
+
+- Datum: 2026-11-16.
+- Vercel Hobby ist laut offiziellen Unterlagen kostenlos, auf persönliche und
+  nicht-kommerzielle Nutzung beschränkt und hat harte Nutzungsgrenzen. Vercel
+  dokumentiert `vercel billing usage --json`; ein Konten-Readback wurde nicht
+  ausgeführt.
+- Vercel Blob dokumentiert private Speicherung, Hobby-Kontingente und bedingte
+  `ifMatch`-Schreibvorgänge. Damit ist ein CAS-geschützter OAuth-State-Consume
+  technisch plausibel, aber weder im Adapter implementiert noch mit Konkurrenz-
+  oder Quotenfehlern getestet. `@vercel/blob` wäre eine neue Runtime-
+  Abhängigkeit und verlangt die dokumentierte Ausnahme.
+- Render Free wurde wegen Schlafverhalten, flüchtigem Dateisystem und 30-Tage-
+  Ablauf des kostenlosen Postgres verworfen. Deno Deploy wurde wegen des
+  angekündigten Endes im April 2027 verworfen.
+- Es wurde kein Anbieter verbunden oder deployed. GitHub Pages bleibt der
+  statische Einstieg; die Control API ist weiterhin nicht live. Vercel Hobby
+  braucht ausdrückliche Freigabe und ist nur bei persönlicher, nicht-
+  kommerzieller Nutzung zulässig. A16 bleibt `No-Go` bis Providerfreigabe,
+  unabhängiger Sicherheitsprüfung, vollständigem Kontingent-Readback und
+  HTTPS-Live-Smoke.
+- Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 108/108;
+  `npm run check` bestand für 97 Dateien und bestätigte die Prompt-Library;
+  `git diff --check` ohne Befund.
