@@ -444,3 +444,29 @@
   eine PWA-Verwaltung der Strategiebewertungen sind noch nicht live abgenommen.
 - Der A14-Fix wurde lokal ausgeführt und geprüft. Es erfolgten kein Push,
   Deployment oder Änderung der GitHub-Repository-Einstellungen.
+
+## CP-017 – A14-PWA-Verwaltung und Projektansichten
+
+- Datum: 2026-11-15, 17:43 UTC.
+- Die iPhone-PWA kann Strategiebewertungen projektbezogen erfassen und anzeigen.
+  Freigaben kritischer Strategien werden nur bei passender GitHub-Sitzung und
+  vollständigen Review-/CI-Nachweisen angeboten; der Server prüft Nachweise
+  erneut. Gemessene CI-Ergebnisse werden nicht als kausale Wirksamkeit ausgegeben.
+- Job- und Fehlerhistorie-Ansichten laden nur Daten des ausgewählten Projekts.
+  Antworten aus inzwischen verlassenen Projekten werden ignoriert. Ladefehler
+  und erfolgreich leere Zustände werden getrennt dargestellt. Felder für
+  Fehlerursachenbestätigungen haben zugeordnete barrierefreie Beschriftungen.
+- Die erste unabhängige UI-Prüfung fand einen mittleren Befund zu verspäteten
+  Antworten bei Projektwechseln sowie einen niedrigen Befund zu unbeschrifteten
+  Job-ID-Feldern. Beide wurden behoben. Eine erneute unabhängige Prüfung meldete
+  keine konkreten Befunde und bestätigte den Projektfilter, die Antwort-Guards,
+  die Zustandsanzeigen, die Beschriftungen und das Strategie-Freigabe-Gate.
+- Regressionen: `test/pwa-strategy.test.mjs` prüft die PWA-Freigabe und
+  Projektwechsel-Guards; `test/api-projects.test.mjs` prüft den API-Projektfilter.
+  Die unabhängige Prüfung meldete 24/24 gezielte Tests bestanden.
+- Nachweis: `npm test` 103/103 bestanden; `npm run check` erfolgreich für
+  94 Dateien und synchronisierte Prompt-Bibliothek; `git diff --check` bestanden.
+  Paket-Commit: `46711f0` (lokal, nicht gepusht).
+- A14 bleibt teilweise abgenommen, da reale GitHub-PR-/Review-/Actions-Belege
+  und produktive Control-API-Konfiguration noch fehlen. Es erfolgten kein Push,
+  Deployment oder Änderungen an externen GitHub-/Cloudflare-Einstellungen.
