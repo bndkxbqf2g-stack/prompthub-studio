@@ -102,7 +102,7 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Für die frühere Cloudflare-Control-API fehlten OAuth-App, Runtime-Secrets und
   KV-Binding; ihr dokumentierter Status war HTTP 503. Ein produktiver
   Cloud-Control-Plane-Betrieb ist nicht nachgewiesen.
-- Der aktuelle Dokumentationsstand wurde in PR #22 als Commit
+- Ein früherer Dokumentationsstand wurde in PR #22 als Commit
   `9c5e4b40adaaccfb6065e177cdad01ab7fd3d816` integriert. Main-CI-Run 84
   (`43771264550`) bestand `macos-latest`, `macos-15-intel` und `test`; Pages-Run
   22 (`43771264030`) bestand Build, Deployment und Statusreport. Der PWA-Code
