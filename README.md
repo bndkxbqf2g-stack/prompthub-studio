@@ -9,12 +9,13 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
 am 2026-11-15 veröffentlichte GitHub-Quell-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. `main` steht auf
-`b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f`; Main-CI-Run 66
-(`43764164796`) und GitHub-Pages-Run 16 (`43764164154`) waren erfolgreich.
-PR #16 wurde nach bestandenem `test`-Check automatisch gemergt. GitHub meldet
-`allow_auto_merge=true`; der Nutzer hat automatische Merges nach bestandenen
-Pflichtchecks ausdrücklich autorisiert. Der letzte erfolgreiche
+ist die dauerhafte Quelle für den Quellcode. Der zuletzt verifizierte Main-Stand
+vor dem aktuellen CI-Änderungszweig ist
+`cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`; Main-CI-Run 69
+(`43765995946`) und GitHub-Pages-Run 17 (`43765995208`) waren erfolgreich.
+PR #17 bestand PR-CI-Run 68 (`43765871861`, Pflichtjob `test`) und wurde danach
+gemergt. GitHub meldet `allow_auto_merge=true`; der Nutzer hat automatische
+Merges nach bestandenen Pflichtchecks ausdrücklich autorisiert. Der letzte erfolgreiche
 Branch-API-Readback bestätigte den erforderlichen Check `test`, `strict=true`
 und Admin-Enforcement. Ein aktueller Readback der Branch-Regel ist über die
 verbundene GitHub-Schnittstelle nicht verfügbar; laut letztem Readback verlangt

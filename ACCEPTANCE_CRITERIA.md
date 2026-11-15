@@ -10,10 +10,10 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A03 | Keine Geheimnisse im Browser/GitHub/Log | `scripts/check.mjs`, OAuth-/Payload-Assertions | Pflicht | lokal bestanden |
 | A04 | Zuverlässige Auftragsverarbeitung | `test/runner.test.mjs`, `npm run demo` | Pflicht | lokal bestanden: Demo-Auftrag `job_4883cfd5-d035-47ef-b9de-d0bcce8095f7` erreichte `succeeded` nach Pflichtcheck und sieben Ereignissen; Executor war ausdrücklich geskriptet |
 | A05 | Global maximal zwei aktive Jobs | `test/lease-store.test.mjs`, Control-Plane-Cap-Test | Pflicht | lokal bestanden |
-| A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal verifiziert: gestarteter lokaler Server meldete `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen; echter Mac-Runner weiterhin offen |
+| A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false`, echte macOS-CI und lokaler Mac-Runner | Pflicht | Windows-Live-Smoke bestätigte `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen. Dieser Arbeitszweig ergänzt vollständige Test-/Static-Check-Läufe auf `macos-latest` (Apple Silicon) und `macos-15-intel`; deren GitHub-CI-Nachweis steht noch aus. Ein echter lokaler MacBook-Runner ist weiterhin nicht nachgewiesen. |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | Main-Commit `b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f`: Main-CI-Run 66 (`43764164796`) und Pages-Run 16 (`43764164154`) erfolgreich. PR #16 bestand PR-CI-Run 65 (`43764130343`) und wurde danach automatisch gemergt. GitHub bestätigt `allow_auto_merge=true`; der Nutzer hat automatische Merges nach bestandenen Pflichtchecks ausdrücklich autorisiert. Der letzte erfolgreiche Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die verbundene GitHub-Schnittstelle nicht verfügbar. Laut diesem Readback verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-033 |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | Verifizierter Main-Commit `cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`: Main-CI-Run 69 (`43765995946`) und Pages-Run 17 (`43765995208`) erfolgreich. PR #17 bestand PR-CI-Run 68 (`43765871861`, Job `test`) und wurde als Commit `cd3264d` gemergt. GitHub meldet `allow_auto_merge=true`; der Nutzer hat automatische Merges nach bestandenen Pflichtchecks ausdrücklich autorisiert. Für PR #17 lehnte GitHub das Aktivieren der PR-Auto-Merge-Flag bei bereits sauberem Merge-Status ab; der Merge erfolgte erst nach verifiziertem Pflichtcheck. Der letzte erfolgreiche Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die verbundene GitHub-Schnittstelle nicht verfügbar. Laut diesem Readback verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Der aktuelle Branch ergänzt macOS-Gates; deren Live-Nachweis steht aus. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-033 |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,11 +46,11 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. `main` steht auf
-`b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f`; Main-CI-Run 66
-(`43764164796`) bestand mit `test`, GitHub-Pages-Run 16 (`43764164154`) war
-erfolgreich. PR #16 bestand PR-CI-Run 65 (`43764130343`) und wurde automatisch
-gemergt; er änderte nur Dokumentation.
+A27/A28 sind durch reproduzierbare Tests belegt. Der zuletzt vollständig
+verifizierte Main-Commit ist `cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`;
+Main-CI-Run 69 (`43765995946`) und GitHub-Pages-Run 17 (`43765995208`) waren
+erfolgreich. PR #17 bestand PR-CI-Run 68 (`43765871861`, Job `test`) und wurde
+danach gemergt. Der aktuelle CI-Änderungszweig ist noch nicht live abgenommen.
 Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich; kein
 kostenpflichtiger Plan wurde aktiviert. Cloudflare bleibt pausiert; die
 Projektlöschung wartet auf die gesonderte Bestätigung des Nutzers.

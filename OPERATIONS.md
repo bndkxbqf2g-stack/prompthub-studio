@@ -69,9 +69,10 @@ mit dem Unterpfad-Fix gemergt. Eine Live-Browserprüfung bestätigte das gerende
 PWA-UI und geladene Styles sowie relative Icon-/Manifest-Pfade; die Oberfläche
 meldet weiterhin, dass die Control API nicht erreichbar ist.
 
-Main-Commit `b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f` bestand Main-CI-Run 66
-(`43764164796`) und GitHub-Pages-Run 16 (`43764164154`). PR #16 wurde nach
-bestandenem `test`-Check automatisch gemergt.
+Der zuletzt vollständig verifizierte Main-Stand vor dem aktuellen
+CI-Änderungszweig ist `cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`; Main-CI-Run 69
+(`43765995946`) und GitHub-Pages-Run 17 (`43765995208`) waren erfolgreich. PR
+#17 bestand PR-CI-Run 68 (`43765871861`, `test`) und wurde danach gemergt.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte

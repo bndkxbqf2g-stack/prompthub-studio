@@ -8,10 +8,43 @@ permissions:
   contents: read
 
 jobs:
+  macos:
+    name: macOS checks (${{ matrix.runner }})
+    if: github.event.repository.private == false
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [macos-latest, macos-15-intel]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - name: Install dependency-free package
+        run: npm install --ignore-scripts --no-audit --no-fund
+      - name: Run tests
+        run: npm test
+      - name: Run static checks
+        run: npm run check
+
   test:
+    if: always()
+    needs: macos
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
+      - name: Require successful macOS verification
+        if: needs.macos.result != 'success'
+        run: |
+          echo "macOS verification did not succeed; blocking the required test check." >&2
+          exit 1
       - name: Check out repository
         uses: actions/checkout@v4
         with:
