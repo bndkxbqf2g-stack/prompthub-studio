@@ -26,26 +26,33 @@
 - Für eine PWA direkt nutzbare, nachweislich kostenlose Codex-LLM-API ist kein
   verfügbarer Zugang nachgewiesen. Prompt-Designer verwendet deshalb bis zu
   einer belegten Integration einen klar markierten strukturierten Fallback.
-- GitHub Actions, Cloudflare Workers oder Pages werden erst nach Prüfung der
-  konkreten Kontingente, Kostenstopps und Kontoeinstellungen aktiviert.
+- GitHub Actions ist für CI aktiviert; Cloudflare Pages Free stellt die
+  statische PWA bereit. Vor weiterer Runtime-Aktivierung müssen Free-Kontingente
+  und Kostenstopps geprüft sein.
 - GitHub zeigt den Plan `GitHub Free`, Actions-Billable-Usage von $0 nach
   Included-Usage-Rabatten und ein Actions-Monatsbudget von $0.00 mit Status
   „Usage blocked“. Included-Usage-Alerts sind eingeschaltet. Bei erreichtem
   kostenfreien Kontingent blockiert GitHub Actions statt Mehrverbrauch zu
   berechnen; ein CI-Lauf bleibt deshalb von der verbleibenden Free-Usage abhängig.
-- Cloudflare ist im Browser erreichbar. Workers & Pages zeigt keine Projekte
-  und 0/100.000 Requests für den heutigen Tag; das stimmt mit dem Free-Kontingent
-  überein. Die Billing-Seite lud nicht, daher sind Abrechnung und mögliche
-  Zahlungsmittel nicht bestätigt. Es wurden keine Cloudflare-Ressourcen oder
-  Bezahloptionen angelegt.
-- Cloudflare Pages ist vorbereitet, aber nicht deployed. Die Cloudflare-GitHub-
-  OAuth-Verbindung wurde autorisiert; die GitHub-App-Installation wurde nicht
-  bestätigt, weil sie selbst für ein einzelnes Repository Schreibzugriff auf
-  Administration, Checks, Code, Deployments und Pull Requests verlangt. Kein
-  Pages-Projekt, KV-Namespace oder Runtime-Secret ist eingerichtet. Der Pages-
-  Handler liefert ohne diese Bindings `503`; `/api/me` öffnet dann keinen
-  Adminbereich. Der frühere Workers-Static-Assets-Modus ist in
-  `wrangler.worker.toml` erhalten.
+- Cloudflare Pages Free ist als `prompthub-studio` mit dem privaten Repository
+  verbunden; `https://prompthub-studio.pages.dev` liefert die PWA-Assets über
+  HTTPS. Das erfolgreiche Produktionsdeployment ist `10eb0d77-7b19-4edc-9adc-548518e098f7`
+  für Commit `504477dc35dab908c8b3755550866bca071c72db`. `Fail closed` wurde im
+  Dashboard gespeichert und erneut verifiziert. Die GitHub-Integration für
+  Pages ist aktiv.
+- Die Control-Plane-Runtime ist nicht eingerichtet: kein `SESSIONS`-KV-Binding,
+  keine PromptHub-GitHub-OAuth-App und keine Runtime-Secrets. Deshalb geben
+  `/api/me` und `/healthz` HTTP 503; es gibt keine funktionsfähige Anmeldung,
+  Auftragsverwaltung oder Cloud-Ausführung. Das Repo blieb privat.
+- Cloudflare Pages wurde mit Preview-Branches auf „None“ gestellt; nach dem
+  Speichern konnte die Persistenz wegen eines Browser-Transportabbruchs nicht
+  erneut ausgelesen werden. Preview-Adressen sind standardmäßig öffentlich;
+  Cloudflare Access ist nicht eingerichtet und Preview-Secrets wurden nicht
+  gesetzt.
+- Die Cloudflare-Billing-Seite lud nicht; der Kontotarif und Zahlungsmittel
+  sind daher nicht unabhängig verifiziert. In diesem Arbeitsgang wurde kein
+  kostenpflichtiger Tarif, keine kostenpflichtige Ressource und keine
+  Abrechnungsfunktion aktiviert. Das 0-€-Budget bleibt verbindlich.
 - Wrangler Direct Upload wäre eine Alternative ohne GitHub-App, erfordert aber
   `Cloudflare Pages Edit` auf Kontoebene, womit sämtliche Pages-Projekte des
   Kontos erstellt, geändert oder gelöscht werden können. Ein Direct-Upload-
@@ -65,6 +72,13 @@
   Tarifwechsel und keinen Cloud-Codex-Executor. Ist kein Runner vorhanden, zeigt
   `/healthz` `runner_status: not_configured`. Die Cloud-PWA-Ausführung ist daher
   vorbereitet, aber erst nach Einrichtung und externem Funktionstest abnehmbar.
+- Der Nutzer hat den erforderlichen GitHub-Check `test` ausdrücklich
+  freigegeben. GitHub Branch-Protection meldet, dass Regeln für dieses private
+  Repository einen bezahlten Team- oder Enterprise-Organisationsplan benötigen.
+  Wegen 0-€-Budget und
+  privatem Repository wurde kein Upgrade und keine Sichtbarkeitsänderung
+  vorgenommen. Der Check läuft in CI, ist aber kein erzwungenes Merge-Gate.
+  Aktuelle Verfügbarkeit steht in der [GitHub-Dokumentation zu Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
 
 ## Laufzeitregeln
 
@@ -78,8 +92,9 @@
   Schwellenwert und Verhalten bei Überschreitung zu dokumentieren.
 - Cloudflare Pages führt Functions nur für `/api/*`, `/auth/*` und `/healthz`
   aus; `src/pwa/_routes.json` hält PWA-Dateien auf dem unbegrenzten Static-Asset-
-  Pfad. Bei erschöpftem Pages-Functions-Kontingent muss Fail-Closed aktiviert
-  sein. Der erhaltene Workers-Modus darf `run_worker_first` nicht global
+  Pfad. `Fail closed` ist im Pages-Runtime-Dashboard gespeichert und verifiziert;
+  diese Einstellung muss bei erschöpftem Pages-Functions-Kontingent erhalten
+  bleiben. Der getrennte Workers-Modus darf `run_worker_first` nicht global
   aktivieren.
 - Jede Kosten-/Kontingententscheidung erhält Datum, Quelle und tatsächlichen
   Nachweis. Annahmen werden nicht als verifizierte Tarife ausgegeben.

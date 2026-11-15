@@ -244,3 +244,34 @@
   keine HTTPS-Veröffentlichung.
 - Kosten: in diesem Durchlauf wurden keine Cloud-Ressourcen, kostenpflichtigen
   Tarife oder neuen Dienste aktiviert.
+
+## CP-009 – Pages-PWA veröffentlicht und live geprüft
+
+- Datum: 2026-11-15, 14:50 UTC
+- Cloudflare Pages `prompthub-studio` ist mit dem privaten GitHub-Repository
+  verbunden. Production `https://prompthub-studio.pages.dev` steht auf Branch
+  `main`; Deployment `10eb0d77-7b19-4edc-9adc-548518e098f7` für Commit
+  `504477dc35dab908c8b3755550866bca071c72db` meldet `success`.
+- GitHub Actions Run 6 (`43724681369`), Job `test`, bestand. Der Build-Fix
+  erzeugt das Prompt-Library-ES-Modul aus der versionierten JSON-Quelle.
+- HTTPS-Prüfung: `/`, `/manifest.webmanifest`, `/app-icon-source.png`,
+  `/sw.js`, `/app.js` und `/styles.css` antworteten mit HTTP 200. `/api/me`
+  und `/healthz` antworteten mit HTTP 503 und
+  `cloud_control_plane_not_configured`; OAuth, Runtime-Secrets und KV-Binding
+  sind nicht eingerichtet. Damit ist die PWA-Hülle veröffentlicht, nicht die
+  funktionsfähige Control API.
+- Cloudflare Runtime `Fail closed` wurde gespeichert und erneut ausgelesen.
+  Preview-Branches wurden auf `None` gestellt und gespeichert; nachfolgende
+  erneute Kontrolle war wegen geschlossenem Cloud-Browser-Transport nicht
+  möglich. Preview-Access wurde nicht eingerichtet; Preview-Secrets sind nicht
+  gesetzt.
+- GitHub bleibt privat. Der Nutzer hat den erforderlichen CI-Check `test`
+  freigegeben; GitHub Branch-Protection meldete im Dashboard, dass private
+  Repositories dafür einen bezahlten Team- oder Enterprise-Organisationsplan
+  benötigen. Kein Upgrade
+  und keine Sichtbarkeitsänderung vorgenommen; Merge-Gate fehlt.
+- Cloudflare-Billing-Seite konnte nicht verifiziert werden. In diesem
+  Arbeitsgang wurde kein kostenpflichtiger Tarif oder Dienst aktiviert.
+- Echtes iPhone-Installations-/E2E-Testing und unabhängiger Quoten-/Ausfalltest
+  stehen aus. Vollständige Abnahme bleibt offen; Details in
+  `ACCEPTANCE_CRITERIA.md` und `CLOUDFLARE_OPERATIONS.md`.
