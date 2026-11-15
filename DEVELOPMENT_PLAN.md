@@ -150,11 +150,14 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet
-  Netlify Free als noch nicht aktivierte Option. Auth-/Session-Adapter,
-  Runtime-Abhängigkeit und Netlify-Kontoverknüpfung warten auf ausdrückliche
-  Freigaben. Die unabhängige, rein lesende Sicherheitsprüfung vom 2026-11-15
-  empfiehlt bis zu Tests, Live-Nachweisen und einer verlässlichen teamweiten
-  Quotenmessung No-Go für die produktive Aktivierung.
+  Vercel Hobby als stärksten, nicht aktivierten Kandidaten, sofern die Nutzung
+  persönlich und nicht-kommerziell bleibt. Netlify Free ist eine Alternative;
+  Render Free und Deno Deploy wurden wegen Betriebs-/Speichergrenzen verworfen.
+  Provider-/Deployment-Freigabe, Vercel-Kontoplan und Usage-Readback sind offen.
+  Private Blob-Sessionstore und Function-Adapter verändern Auth und Runnerpfad;
+  dafür sind ausdrückliche Freigabe, unabhängige Sicherheitsprüfung und
+  Regressionstests nötig. Keine Vercel-Verknüpfung oder Deployment wurde
+  ausgeführt. Ohne frischen Quoten-Readback bleiben Cloud-Jobs gesperrt.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.
 
 ### Phase 4 – technische Abnahme

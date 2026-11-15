@@ -30,6 +30,15 @@
 - Für eine PWA direkt nutzbare, nachweislich kostenlose Codex-LLM-API ist kein
   verfügbarer Zugang nachgewiesen. Prompt-Designer verwendet deshalb bis zu
   einer belegten Integration einen klar markierten strukturierten Fallback.
+- Vercel Hobby ist nach aktueller offizieller Dokumentation ein möglicher
+  0-€-Serverless-Kandidat für persönliche, nicht-kommerzielle Nutzung. Der Tarif
+  hat harte Nutzungslimits; bei Überschreitung werden Funktionen gesperrt und
+  Hobby kann keine Zusatznutzung kaufen. Die dokumentierte
+  `vercel billing usage --json`-Abfrage könnte Kontingente maschinenlesbar
+  überwachen. Vercel Blob bietet private Speicherung und CAS-Schreibvorgänge.
+  Das Nutzerkonto, der Tarif, die Nutzungsabfrage und die Nicht-Kommerz-Bedingung
+  sind nicht verifiziert. Vercel ist weder autorisiert noch verbunden oder
+  deployed; bis zum Readback bleiben Cloud-Jobs gesperrt.
 - GitHub Actions ist für CI aktiviert. GitHub Pages ist für das öffentliche
   Repository aktiv und stellt statische Dateien bereit; die PWA liegt unter
   `/src/pwa/`. GitHub Pages hostet keine serverseitige Control API.
@@ -140,4 +149,11 @@
   (abgerufen am 2026-11-15; Standard-GitHub-Runner sind für öffentliche Repositories kostenlos und unbegrenzt).
 - [GitHub Free Plan enthaltene Nutzung](https://docs.github.com/en/billing/reference/product-usage-included)
   (abgerufen am 2026-11-15).
+- [Vercel Hobby Plan, Limits und Überschreitungsverhalten](https://vercel.com/docs/plans/hobby)
+  (abgerufen am 2026-11-16; konkretes Konto nicht geprüft).
+- [Vercel Usage CLI, JSON und Projektgruppierung](https://vercel.com/docs/cli/usage)
+  (abgerufen am 2026-11-16; tatsächlicher Account-Readback nicht durchgeführt).
+- [Vercel Blob Hobby-Kontingente](https://vercel.com/docs/vercel-blob/usage-and-pricing)
+  und [private Blob-Speicherung](https://vercel.com/docs/vercel-blob/private-storage)
+  (abgerufen am 2026-11-16).
 

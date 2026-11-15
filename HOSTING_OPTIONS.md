@@ -17,8 +17,10 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
 | Möglichkeit | Nachweister Umfang | Kosten-/Ausfallverhalten | Eignung |
 |---|---|---|---|
 | GitHub Pages allein | Statisches HTML/CSS/JS; keine serverseitige OAuth-Callback- oder API-Ausführung | GitHub-Free-Seite ist für das öffentliche Repo verfügbar | Für PWA-Shell und Dokumente geeignet; kein funktionsfähiger API-/Auth-Host |
-| Netlify Free | Git-Deployments, Node-Functions, Netlify Blobs; öffentliches oder privates persönliches GitHub-Repository wird unterstützt | 0 USD/Monat, 300 Credits/Monat mit Hard Limit und ohne Auto-Recharge. Bei aufgebrauchtem Team-Kontingent pausiert Netlify alle Sites bis zum nächsten Abrechnungszyklus; keine automatische kostenpflichtige Überschreitung im Free-Tarif | Beste geprüfte Cloudflare-Alternative für den API-Vertikalschnitt, vorbehaltlich der Freigaben unten |
-| Vercel Hobby | Serverless Functions; dokumentierte kostenlose Monatskontingente | Bei Überschreitung werden Funktionen üblicherweise bis zur Rücksetzung pausiert; der Tarif ist laut Vercel nur für persönliche, nicht-kommerzielle Nutzung | Technisch möglich, aber weniger passend als Netlify Free für eine verlässliche harte Team-Ausgabengrenze |
+| Vercel Hobby | GitHub-Deployments, serverlose Functions, private Vercel Blob-Speicherung; Blob unterstützt bedingte `ifMatch`-Schreibvorgänge. Die CLI dokumentiert maschinenlesbare Nutzungsdaten via `vercel billing usage --json`. | 0 USD für Hobby; keine zusätzlichen Nutzungskäufe im Hobby-Tarif. Bei ausgeschöpften Kontingenten kann die betroffene Funktion bis zur Quotenrücksetzung nicht genutzt werden. Private Blob-Nutzung ist innerhalb der Hobby-Limits kostenlos und danach gesperrt. Nutzung laut Vercel nur persönlich und nicht-kommerziell. | Derzeit stärkster technische Kandidat, falls der Einsatz nachweislich persönlich und nicht-kommerziell bleibt. Kontoplan, Nutzungsreadback und End-to-End-Betrieb sind ungeprüft; keine Aktivierung erfolgt. |
+| Netlify Free | Git-Deployments, Node-Functions, Netlify Blobs; öffentliches oder privates persönliches GitHub-Repository wird unterstützt | 0 USD/Monat, 300 Credits/Monat mit Hard Limit und ohne Auto-Recharge. Bei aufgebrauchtem Team-Kontingent pausiert Netlify alle Sites bis zum nächsten Abrechnungszyklus; keine automatische kostenpflichtige Überschreitung im Free-Tarif | Weiterer Kandidat. Teamweite Hinweise sind dokumentiert, aber ein nutzbarer maschinenlesbarer Usage-Readback ist nicht nachgewiesen. |
+| Render Free | Serverlose Alternative steht hier nicht bereit; Free-Webservice mit dynamischem API-Server und kostenlosem Datenspeicher | Free-Webservices schlafen nach 15 Minuten Inaktivität ein; lokales Dateisystem ist flüchtig, Free-Postgres läuft nach 30 Tagen ab, und Bandbreite/Builds können bei vorhandenem Zahlungsmittel kostenpflichtig werden | Für die dauerhafte Control API und geschützte Sitzungsdaten ungeeignet. |
+| Deno Deploy Free | Edge-Anwendungen mit monatlichen Free-Kontingenten | Free-Anwendungen pausieren bei Quotenüberschreitung; Deno Deploy soll im April 2027 eingestellt werden | Wegen angekündigtem Produktende keine tragfähige Plattformgrundlage. |
 
 ## Netlify-Kandidat: Kosten- und Betriebsgrenzen
 
@@ -59,55 +61,107 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
   die erforderliche automatische 75-%-Jobpause nicht nachweisen und muss neue
   Cloud-Jobs bei unbekanntem Verbrauch geschlossen halten.
 
-## Ergebnis der unabhängigen Sicherheitsprüfung
+## Ergebnis der Hosting-Sicherheitsprüfung
 
-Eine unabhängige, rein lesende Prüfung vom 2026-11-15 empfiehlt **No-Go für
-produktive Aktivierung**. Der Netlify-Free-Tarif bleibt ein technisch plausibler
-Kandidat für statische PWA und API-Funktionen, aber OAuth-/Session-Adapter,
-Production-/Preview-Isolation, Storage-Fail-Closed-Tests, Kontoverknüpfung,
-Kosten-Readback und Live-Smoke sind nicht vorhanden. Die Prüfung fand außerdem
-keinen nachgewiesenen Weg, den teamweiten Verbrauch automatisch in PromptHub
-auszulesen. Daher ist der vollständige autonome Cloud-Betrieb noch nicht
-abnahmefähig.
+Der dokumentierte Betriebsstatus ist **No-Go für produktive Aktivierung**.
+Vercel Hobby ist der stärkste Kandidat für eine persönliche, nicht-kommerzielle
+Nutzung: die offiziellen Unterlagen dokumentieren harte Hobby-Limits, JSON-Ausgabe
+der aktuellen Nutzung sowie private Blob-Speicher mit bedingten
+Compare-and-Swap-Schreibvorgängen. Diese Produktfunktionen wurden weder im
+Nutzerkonto noch in PromptHub erprobt. Die Hobby-Nutzungsbedingungen, das
+Hobby-Kontingent, der Usage-Readback im konkreten Konto, die neue
+Blob-SDK-Abhängigkeit, OAuth-/Session-Adapter, Production-/Preview-Isolation und
+Live-Smoke brauchen noch Prüfung und ausdrückliche Provider-/Deployment-Freigabe.
+Netlify bleibt eine Alternative zur weiteren Prüfung; seine Bedingungen für
+kommerzielle Nutzung und eine maschinenlesbare Team-Usage-Abfrage müssen vor
+einer Auswahl separat bestätigt werden. Daher ist der vollständige autonome
+Cloud-Betrieb noch nicht abnahmefähig.
+
+## Vercel-Hobby-Kandidat: sichere Einsatzgrenzen
+
+- Das Quell-Repository ist öffentlich und gehört einem persönlichen GitHub-
+  Account. Vercel dokumentiert GitHub-Deployments; bei einem Hobby-Team müssen
+  Deployments jedoch dem Inhaber zugeordnet sein. Die konkrete Integration ist
+  nicht eingerichtet.
+- Vercel Hobby ist nur für persönliche, nicht-kommerzielle Nutzung. Falls
+  PromptHub oder das damit entwickelte Angebotsküche-Projekt kommerziell
+  eingesetzt wird, ist Hobby nicht zulässig und dieser Kandidat scheidet aus.
+- Hobby-Nutzung ist kostenlos, kann keine zusätzlichen Usage-Käufe aktivieren und
+  sperrt Funktionen nach überschrittenen Free-Limits bis zur Rücksetzung. Keine
+  Pro-Testphase starten, keinen kostenpflichtigen Tarif wählen und keine
+  Zusatzcredits kaufen.
+- Vercel Blob bietet für Hobby dokumentierte Freikontingente von 1 GB Speicher,
+  10.000 einfachen Operationen, 2.000 erweiterten Operationen und 10 GB
+  Blob-Transfer pro Monat. Bei Überschreitung wird Blob-Zugriff gesperrt, statt
+  im Hobby-Tarif kostenpflichtig erweitert. Ein privater Blob-Store kann
+  serverseitige OAuth-Sitzungen und einmalige OAuth-State-Daten speichern;
+  `ifMatch` unterstützt bedingte Schreibvorgänge, die einen CAS-geschützten
+  einmaligen State-Consume ermöglichen können. Diese Semantik muss im Adapter
+  mit gezielten Konkurrenztests verifiziert werden.
+- Die Vercel CLI dokumentiert `vercel billing usage --json`, einschließlich
+  Serviceverbrauch, Kosten und optionalem Credit-Stand. Die Abfrage kann nach
+  Projekt gruppiert werden. Sie liefert keinen bestätigten Nutzungswert des
+  PromptHub-Kontos, bis Plan, Berechtigung, Aktualität und JSON-Antwort dort
+  unabhängig geprüft wurden. Ohne aktuellen, vollständigen Readback bleiben
+  Cloud-Jobs gesperrt.
+- Für private Blob-Speicherung dokumentiert Vercel die neue Abhängigkeit
+  `@vercel/blob` ab Version 2.3.0. Das widerspricht der Built-in-only-MVP-Regel
+  und verlangt vor Installation eine ausdrücklich begründete Ausnahme. Tokens
+  und Runtime-Secrets bleiben ausschließlich im Production-Environment;
+  Preview-Deployments erhalten keinerlei Zugangsdaten.
+- PWA und API müssten im Vercel-Projekt auf demselben `*.vercel.app`-Origin
+  laufen, damit die vorhandenen `HttpOnly`-/`SameSite=Lax`-Cookies first-party
+  bleiben. GitHub Pages könnte eine statische Spiegelung behalten, wäre aber
+  nicht die angemeldete Laufzeit. Diese Änderung der aktiven PWA-Adresse braucht
+  eine ausdrückliche Deployment-Freigabe.
 
 ## Vor Implementierung erforderliche Freigaben
 
-1. **Hosting-Anbieter:** Netlify würde PromptHub-Quellcode, Funktionsausführung
-   und Auth-/Sitzungsmetadaten verarbeiten. Der Nutzer muss die GitHub-App für
-   genau dieses Repository verbinden und den Free-Tarif im Dashboard bestätigen.
-2. **Auth-/Sitzungsänderung:** Die Netlify-Function braucht persistente
+1. **Hosting-Anbieter und Nutzungszweck:** Vercel würde PromptHub-Quellcode,
+   Funktionsausführung und private Auth-/Sitzungsmetadaten verarbeiten. Der
+   Nutzer muss die Vercel-Hobby-Verknüpfung für genau dieses öffentliche
+   Repository sowie die persönliche, nicht-kommerzielle Nutzung ausdrücklich
+   freigeben und den Hobby-Tarif ohne Pro-Testphase bestätigen. Netlify bleibt
+   die Alternative, falls Vercels Nutzungsbedingung nicht passt.
+2. **Auth-/Sitzungsänderung:** Die gewählte Function braucht persistente
    serverseitige OAuth-Sitzungen und einmalige OAuth-State-Daten. Eine
-   Netlify-Blobs-SessionStore-Implementierung verändert den vorhandenen
-   Authentifizierungspfad und ist nach `AGENTS.md`/`SECURITY_RULES.md` eine
-   kritische Änderung: zuerst ausdrückliche Freigabe, anschließend unabhängige
-   Sicherheitsprüfung und Regressionstests. Die bestehenden Berechtigungs- und
-   Session-Invarianten bleiben unverändert.
-3. **Abhängigkeit:** Netlify dokumentiert `@netlify/blobs` als SDK. Das wäre eine
+   Vercel-Blob- oder Netlify-Blobs-SessionStore-Implementierung verändert den
+   vorhandenen Authentifizierungspfad und ist nach `AGENTS.md`/`SECURITY_RULES.md`
+   eine kritische Änderung: zuerst ausdrückliche Freigabe, anschließend
+   unabhängige Sicherheitsprüfung und Regressionstests. Bestehende
+   Berechtigungs- und Session-Invarianten bleiben unverändert.
+3. **Abhängigkeit:** Vercel dokumentiert `@vercel/blob` als SDK. Das wäre eine
    neue Runtime-Abhängigkeit und weicht von der Built-in-only-MVP-Konvention ab.
    Vor Installation ist eine ausdrückliche, begründete Ausnahme erforderlich;
    das Paket wird auf eine geprüfte Version gepinnt und nicht in den Browserbund
-   aufgenommen.
+   aufgenommen. Für eine Netlify-Implementierung gilt dieselbe Ausnahmeprüfung
+   für `@netlify/blobs`.
 4. **Fail-closed-Konfiguration:** Nur Production bekommt OAuth-/Control-Secrets.
-   Deploy Previews bleiben deaktiviert oder isoliert; `SESSIONS` nutzt starke
-   Konsistenz. Ablaufzeiten werden serverseitig geprüft, abgelaufene Einträge
-   werden entfernt, Storage-/Quota-Fehler beenden Auth-/Job-Schreibvorgänge mit
-   `503`.
-5. **Kosten-Gate:** Nur Free mit 300-Credit-Hard-Limit. Kein Upgrade, keine
-   Credit-Packs, keine Auto-Recharge und kein Custom-Domain-Kauf. Die spätere
-   Implementierung muss betroffene Jobs spätestens bei 75 % des gemessenen
-   teamweiten Kontingents pausieren; fehlt ein verlässlicher Nutzungsstand,
-   werden keine neuen Jobs gestartet. Diese Kontrolle ist noch nicht
-   implementiert oder live nachgewiesen.
-6. **Verbrauchsmessung:** Vor Jobfreigabe einen unterstützten, teamweiten
-   maschinenlesbaren Credit-Readback nachweisen. Netlify-Dashboard-Warnungen
-   allein belegen keine automatische Jobpause in PromptHub. Ohne aktuelle
-   verifizierte Messung bleibt die Cloud-Ausführung gesperrt.
+   Deploy Previews bleiben deaktiviert oder isoliert. Vercel Blob verwendet
+   Private Access und geprüfte `ifMatch`-Schreibvorgänge; Netlify Blobs verwendet
+   nur den getesteten starken Konsistenzmodus. Ablaufzeiten werden serverseitig
+   geprüft, abgelaufene Einträge werden entfernt, Storage-/Quota-Fehler beenden
+   Auth-/Job-Schreibvorgänge mit `503`.
+5. **Kosten-Gate:** Nur Vercel Hobby mit den dokumentierten harten
+   Free-Kontingenten; keine Pro-Testphase, kein Upgrade, kein Credit-Kauf und
+   keine kostenpflichtige Domain. Die Implementierung muss betroffene Jobs
+   spätestens bei 75 % des frisch gemessenen Projekt-/Teamkontingents pausieren;
+   fehlt ein verlässlicher Nutzungsstand, werden keine neuen Jobs gestartet.
+   Für Netlify gilt alternativ das 300-Credit-Hard-Limit ohne Auto-Recharge.
+   Diese Kontrolle ist noch nicht implementiert oder live nachgewiesen.
+6. **Verbrauchsmessung:** Vor Jobfreigabe `vercel billing usage --json` im
+   autorisierten Hobby-Konto ausführen und Schema, Vollständigkeit, Projekt-
+   Gruppierung und Aktualität prüfen. Eine dokumentierte CLI-Funktion ist noch
+   kein erfolgreicher Readback. Ohne aktuelle verifizierte Messung bleibt die
+   Cloud-Ausführung gesperrt. Netlify-Dashboard-Warnungen allein belegen keine
+   automatische Jobpause in PromptHub.
 
-Bis diese Freigaben und die Netlify-Kontoverknüpfung vorliegen, bleibt GitHub
-Pages der statische PWA-Einstieg. Es wird keine produktive Control API auf
-GitHub Pages behauptet und Cloudflare bleibt unverändert pausiert.
+Bis Provider-/Deployment-Freigabe und die nötige Konto-/GitHub-Verknüpfung für
+eine der Optionen vorliegen, bleibt GitHub Pages der statische PWA-Einstieg. Es
+wird keine produktive Control API auf GitHub Pages behauptet und Cloudflare
+bleibt unverändert pausiert.
 
-## Quellen (abgerufen 2026-11-15)
+## Quellen (Netlify-Angaben abgerufen 2026-11-15; Vercel-, Render- und Deno-Angaben abgerufen 2026-11-16)
 
 - [GitHub Pages unterstützt keine serverseitigen Sprachen](https://docs.github.com/en/pages/getting-started-with-github-pages/creating-a-github-pages-site?apiVersion=2022-11-28)
 - [Netlify Free und Credit-Hard-Limit](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/)
@@ -117,5 +171,14 @@ GitHub Pages behauptet und Cloudflare bleibt unverändert pausiert.
 - [Netlify: teamweite Credit-Nutzung und 50/75/100-%-Benachrichtigungen](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/monitor-usage-for-credit-based-plans/)
 - [Netlify öffentliche API-Referenz](https://open-api.netlify.com/)
 - [Netlify-GitHub-Repository-Unterstützung](https://docs.netlify.com/build/git-workflows/overview/)
-- [Vercel Hobby-Kontingente und Pause bei Überschreitung](https://vercel.com/docs/plans/hobby)
 - [Vercel-Hobby-Nutzung nur persönlich/nicht-kommerziell und Git-Provider-Limits](https://vercel.com/docs/limits)
+- [Vercel Hobby: Free-Kontingente und Nutzungspause](https://vercel.com/docs/plans/hobby)
+- [Vercel Usage CLI mit JSON-Ausgabe und Projektgruppierung](https://vercel.com/docs/cli/usage)
+- [Vercel Billing Usage JSON-Schema](https://vercel.com/docs/cli/usage#json)
+- [Vercel Blob Hobby-Kontingente und Fail-Closed bei Limitüberschreitung](https://vercel.com/docs/vercel-blob/usage-and-pricing)
+- [Vercel Private Blob und serverseitige Zugriffskontrolle](https://vercel.com/docs/vercel-blob/private-storage)
+- [Vercel Blob bedingte Schreibvorgänge via `ifMatch`](https://vercel.com/docs/vercel-blob)
+- [Vercel-Hobby-Repositories und Deployment-Eigentümer](https://vercel.com/docs/git/vercel-for-github)
+- [Vercel Hobby ist persönlich und nicht-kommerziell](https://vercel.com/legal/terms)
+- [Deno Deploy wird im April 2027 eingestellt](https://docs.deno.com/deploy/usage/)
+- [Render Free-Webservice-Limits und Kosten-/Speicherverhalten](https://render.com/docs/free)
