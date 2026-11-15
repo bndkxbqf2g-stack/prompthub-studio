@@ -91,10 +91,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
 - Die aktive PWA liegt unter
-  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Der zuletzt
-  vollständig verifizierte Main-Commit `cd3264da58cbffd3d040e3cfe0a0b71e3ab48949`
-  bestand Main-CI-Run 69 (`43765995946`) und GitHub-Pages-Run 17
-  (`43765995208`); PR #17 bestand Run 68 und wurde danach gemergt. GitHub Pages hostet nur die
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Main-Commit
+  `50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72
+  (`43767244221`) und GitHub-Pages-Run 18 (`43767243571`). PR #18 bestand Run 71
+  auf Apple-Silicon- und Intel-macOS sowie mit Pflichtjob `test` und wurde
+  automatisch gemergt. GitHub Pages hostet nur die
   statische PWA, keine Control API. Cloudflare ist als Host abgewählt; das
   Projekt ist pausiert, nicht gelöscht, und die alte Veröffentlichung bleibt
   erreichbar. Die endgültige Löschung wartet auf die gesonderte Bestätigung.
@@ -103,11 +104,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Cloud-Control-Plane-Betrieb ist nicht nachgewiesen.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
-- Der aktuelle CI-Änderungszweig ergänzt vollständige Tests und statische
-  Prüfungen auf Apple-Silicon- und Intel-macOS-Standard-Runnern. Der bestehende
-  Pflichtjob `test` blockiert bei fehlgeschlagenem oder übersprungenem macOS-Lauf.
-  Das prüft macOS-Kompatibilität, ersetzt aber keinen Nachweis eines lokalen
-  MacBook-Runners; der PR-CI-Nachweis steht noch aus.
+- CI prüft jetzt vollständig auf Apple-Silicon- und Intel-macOS-Standard-Runnern.
+  Der bestehende Pflichtjob `test` blockiert bei fehlgeschlagenem oder
+  übersprungenem macOS-Lauf. PR #18 und Main-Run 72 bestanden diese Lanes. Das
+  prüft macOS-Kompatibilität, ersetzt aber keinen Nachweis eines lokalen
+  MacBook-Runners.
 
 ### Phase 2 – GitHub-Betriebsintegration
 
