@@ -21,6 +21,15 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   wurde die lokale Commit-Abstammung nicht übernommen.
 - `.github/workflows/ci.yml` ist enthalten. Die Commit-Statusabfrage lieferte
   `statuses: []`; ein erfolgreicher GitHub-Actions-Lauf bleibt unbelegt.
+- Cloudflare-Pages-Profil und Function-Routen sind lokal vorbereitet. Im
+  erreichbaren Cloud-Browser wurde kein vorhandenes Pages-Projekt gefunden;
+  Workers & Pages zeigt 0/100.000 Requests heute. Die Billing-Seite lädt nicht.
+  GitHub Free zeigt $0 Actions-Billable-Usage und ein $0.00 Actions-Budget mit
+  Ausgabenblockierung.
+  Die Cloudflare-GitHub-App verlangt selbst bei Auswahl eines einzelnen
+  Repositories weitreichende Repository-Schreibrechte. Installation, Pages-
+  Projekt und Deployment wurden deshalb bis zur separaten Berechtigungsfreigabe
+  nicht gestartet.
 - Angebotsküche ist laut Nutzer das bestehende GitHub-Repository `Einkaufen`.
   Der Inhalt bleibt bis zur bestandenen PromptHub-Abnahme und der einmaligen
   MVP-Umfangsbestätigung unangetastet.
@@ -63,8 +72,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
-- Cloudflare-Plan, echtes KV-Binding, OAuth-App und privates GitHub-Control-Repo
-  sind nicht eingerichtet; keine Aktivierung oder Veröffentlichung erfolgt.
+- Cloudflare-Pages-Account, echtes KV-Binding, OAuth-App und privates
+  GitHub-Control-Repo sind nicht eingerichtet; keine Aktivierung oder
+  Veröffentlichung erfolgt.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
 
@@ -102,3 +112,4 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 Nach jedem Paket: `npm test`, `npm run check`, `git diff --check`, Ergebnis in
 `CHECKPOINTS.md`, Status der Abnahmematrix aktualisieren. Ein Fehlschlag stoppt
 die nächste Phase nicht automatisch, aber es darf kein Erfolg behauptet werden.
+

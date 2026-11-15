@@ -20,6 +20,15 @@ ist daher noch nicht belegt. Der GitHub-Betrieb der Anwendung benötigt weiterhi
 ein separat konfiguriertes privates Control-Repository, Token und OAuth-
 Zugangsdaten. Ein Deployment wurde nicht erstellt.
 
+Ein Cloudflare-Pages-Profil liegt in `wrangler.toml`; die API-Routen nutzen den
+vorhandenen Worker-Handler und schlagen ohne sichere Production-Bindings mit
+`503` fehl. Im Cloud-Dashboard wurden keine vorhandenen Projekte gefunden und
+0/100.000 Requests für den Tag angezeigt. Ein Pages-Projekt wurde noch nicht
+angelegt oder veröffentlicht: Die Cloudflare-GitHub-App verlangt weitreichende
+Schreibrechte auf das verbundene Repository. Abrechnung blieb ungeprüft, da die
+Billing-Seite nicht lud. Details und der Wrangler-Alternativweg stehen in
+`CLOUDFLARE_OPERATIONS.md`.
+
 ## Schnellstart
 
 ```powershell
@@ -64,3 +73,4 @@ Token-, Kontext- und Cache-Regeln stehen in `RESOURCE_EFFICIENCY.md`.
 Vor Änderungen `AGENTS.md`, `SECURITY_RULES.md` und
 `ACCEPTANCE_CRITERIA.md` lesen. Ergebnisse und Einschränkungen werden in
 `CHECKPOINTS.md` dokumentiert.
+

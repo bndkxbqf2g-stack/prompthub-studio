@@ -45,6 +45,11 @@ nur an `127.0.0.1`.
 - `src/cloudflare/worker.mjs`: GitHub-Control-Plane, OAuth und API-Routen als
   Serverless-Worker. `src/cloudflare/kv-session-store.mjs` speichert kurzlebige
   Sessions und OAuth-State in einem begrenzten Workers-KV-Binding.
+- `functions/[[path]].js`: Cloudflare-Pages-Adapter für den bestehenden Worker-
+  Handler. `src/pwa/_routes.json` lässt nur API-, Auth- und Health-Routen durch
+  Functions laufen; statische PWA-Anfragen bleiben auf dem kostenlosen Asset-Pfad.
+- `wrangler.toml`: Pages-Build-Ausgabe `src/pwa`; das vorherige Workers-Static-
+  Assets-Profil bleibt in `wrangler.worker.toml` verfügbar.
 - `src/runner/runner.mjs`: Polling, Claim, Lease, Heartbeats, Checkpoints,
   Resume, sauberes Stoppen und nicht-blockierende Erfassung verifizierter
   Abschlussbelege.
@@ -138,3 +143,4 @@ Der MVP verwendet Node-Built-ins. GitHub ist ein erforderlicher externer Dienst
 für den Produktions-Control-Plane-Modus. Eine konkrete Codex-CLI, ein HTTPS-Host
 und GitHub-OAuth-Credentials sind Betriebs-Konfiguration, keine hart codierten
 Abhängigkeiten. Fehlen sie, meldet das System `not_configured` statt Erfolg.
+

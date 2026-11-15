@@ -182,3 +182,31 @@
 - Abnahmestatus bleibt `conditional_local_pass`; A09 und externe Betriebsnachweise
   sind offen. Angebotsküche (`Einkaufen`) bleibt bis zum Abnahmegatter gesperrt.
 - Es wurden keine kostenpflichtigen Dienste oder Tarife aktiviert.
+
+## CP-007 – Cloudflare-Pages-Bereitstellung vorbereitet
+
+- Datum: 2026-11-15
+- Cloudflare Pages ist in `wrangler.toml` konfiguriert. Das vorherige Workers-
+  Static-Assets-Profil bleibt in `wrangler.worker.toml`. `functions/[[path]].js`
+  verwendet den vorhandenen gehärteten Handler; `_routes.json` begrenzt Functions
+  auf API-, Auth- und Health-Routen. Ohne Production-Secrets oder KV-Binding
+  bleibt `/api/me` bei 503 und der PWA-Adminbereich verborgen.
+- Lokale Nachweise: `npm test` 75/75; `npm run check` 86 Dateien;
+  `git diff --check` Exit 0; `npm run demo` meldet einen `succeeded`-Job und
+  sieben Ereignisse.
+- Cloudflare-Dashboard: keine vorhandenen Workers-/Pages-Projekte; 0/100.000
+  Requests am heutigen UTC-Tag. Billing-Seite blieb beim Laden, daher ist der
+  konkrete Abrechnungsstatus nicht bestätigt.
+- GitHub-Billing: Plan Free, Actions-Billable-Usage $0 nach Rabatten,
+  Actions-Budget $0.00 mit „Usage blocked“ und Included-Usage-Alerts aktiviert.
+- Die Cloudflare-GitHub-OAuth-Verbindung wurde autorisiert. Die GitHub-App-
+  Installation wurde nicht bestätigt: sie fordert Schreibzugriff auf
+  Administration, Checks, Code, Deployments und Pull Requests. Kein Pages-
+  Projekt, KV-Namespace oder Runtime-Secret wurde angelegt; kein Deployment
+  wurde gestartet. Das Repository blieb privat.
+- Abnahme A16 bleibt offen: Berechtigungsfreigabe, Cloudflare-Abrechnung,
+  Runtime-Bindings, produktiver HTTPS-Deploy sowie Live- und Quotenprüfungen.
+  Die Dashboard- und Berechtigungsnachweise stehen in
+  `CLOUDFLARE_OPERATIONS.md` und `CLOUD_COST_RULES.md`.
+- Es wurden keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
+

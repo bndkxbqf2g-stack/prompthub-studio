@@ -1,5 +1,5 @@
 const CACHE = "prompthub-static-v3";
-const STATIC_ASSETS = ["/", "/styles.css", "/app.js", "/manifest.webmanifest", "/app-icon-source.png"];
+const STATIC_ASSETS = ["/", "/styles.css", "/app.js", "/regression-test-request.js", "/manifest.webmanifest", "/app-icon-source.png"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(STATIC_ASSETS)));
@@ -14,3 +14,4 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin || url.pathname.startsWith("/api/")) return;
   event.respondWith(fetch(event.request).catch(() => caches.match(event.request)));
 });
+

@@ -1,0 +1,23 @@
+# Legacy Workers Static Assets profile; deploy with --config wrangler.worker.toml.
+name = "prompthub-studio"
+main = "src/cloudflare/worker.mjs"
+compatibility_date = "2026-11-15"
+workers_dev = true
+
+[assets]
+directory = "./src/pwa"
+binding = "ASSETS"
+run_worker_first = ["/api/*", "/auth/*", "/healthz"]
+
+[limits]
+cpu_ms = 10
+
+[vars]
+GITHUB_BRANCH = "main"
+GITHUB_OAUTH_SCOPES = "read:user"
+
+# Before deployment, create a free Workers KV namespace and add its binding:
+# [[kv_namespaces]]
+# binding = "SESSIONS"
+# id = "<the namespace ID from the account>"
+

@@ -20,8 +20,8 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A13 | Kosten-/Ressourcenbegrenzung | keine Runtime-Dependencies, harte Cap-/Retry-/Polling-Limits | Pflicht | lokal bestanden |
 | A14 | Kontrollierte Eigenupdates | Evidenz-Gate für Strategien; kritische Adoption verlangt Approval | Pflicht | lokal bestanden; unabhängige Prüfung offen |
 | A15 | sichere Wiederherstellung | Backup-Manifest, SHA-256, Approval- und Tamper-Test | Pflicht | lokal bestanden |
-| A16 | Cloud-first Control Plane ohne kostenpflichtigen Dauer-Server | `test/cloudflare-worker.test.mjs`, `src/cloudflare/worker.mjs`, `wrangler.toml`; Free-Quota-Limits und Fail-Closed in `CLOUDFLARE_OPERATIONS.md` | Pflicht | lokal implementiert/getestet; Konto, KV-Binding, Live-Ausfall- und Quotenprüfung offen |
-| A17 | PWA-Installationssymbol | `test/api.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort und MIME | Pflicht | lokal bestanden |
+| A16 | Cloud-first Control Plane auf Cloudflare Pages ohne kostenpflichtigen Dauer-Server | `test/cloudflare-worker.test.mjs`, `test/cloudflare-pages.test.mjs`, `src/cloudflare/worker.mjs`, `functions/[[path]].js`, `src/pwa/_routes.json`, `wrangler.toml`; Free-Quota-Limits und Fail-Closed in `CLOUDFLARE_OPERATIONS.md` | Pflicht | lokal vorbereitet/getestet; Dashboard zeigt 0/100.000 Requests und keine Projekte; Billing-Seite lädt nicht; GitHub-App-Freigabe, KV-Binding, OAuth-Secrets, HTTPS-Deployment, Live-Ausfall- und Quotenprüfung offen |
+| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Cache und MIME | Pflicht | lokal bestanden; HTTPS-Installation auf iPhone offen |
 | A18 | Multi-Projekt-Analyse | `test/projects.test.mjs`: Regeln, README, Skripte, Issues, CI, nur lesende API und Snapshot-Version | Pflicht | lokal bestanden |
 | A19 | Entfernen/Wiederverbinden/Datenlöschung | `test/projects.test.mjs`, `test/api-projects.test.mjs`: Bestätigung, Pause, laufende/stale Sperre, Wiederverbinden, getrennte Datenlöschung; kein Repo-Delete | Pflicht | lokal bestanden |
 | A20 | Prompt-Designer | `test/prompt-designer.test.mjs`, `test/api-projects.test.mjs`: Analyse, Einzelfrage, vier Optionen, Skip/Ende, Anforderungen/Annahmen, Version, QA und ausdrückliche Freigabe | Pflicht | lokal bestanden |
@@ -47,6 +47,7 @@ ausgewiesen und nicht als bestanden markiert.
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung und A27/
 A28 sind durch reproduzierbare Tests belegt. Die Erstabnahme ist noch nicht
-vollständig bestanden, weil ein echter GitHub-Workflow-Run, ein echter
-Mac-Runner und ein vom Nutzer freigegebener HTTPS-/OAuth-Betrieb nicht aus
-dieser leeren lokalen Mappe heraus nachgewiesen werden dürfen.
+vollständig bestanden, weil ein erfolgreicher GitHub-Workflow-Run, ein
+verifiziertes Cloudflare-Free-Konto, ein echtes Pages-HTTPS-/OAuth-Deployment
+und ein echter Mac-/Cloud-Runner nicht nachgewiesen sind.
+

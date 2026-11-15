@@ -23,11 +23,12 @@ Memory-Control-Plane-Adapter.
 
 ## Serverlose PWA
 
-Cloudflare Worker/Static Assets sind im `wrangler.toml` vorbereitet. Der aktuelle
-Betriebsstatus, notwendige KV-/OAuth-/GitHub-Bindings, Fehlerverhalten und
-kontobezogene Grenzen stehen in `CLOUDFLARE_OPERATIONS.md`. Es wurde kein Konto
-konfiguriert und kein Deployment ausgeführt. Ein Cloud-Codex-Runner ist nicht
-vorhanden; `not_configured` bleibt der echte Zustand.
+Cloudflare Pages ist mit `wrangler.toml`, begrenzten Function-Routen und dem
+vorhandenen Worker-Handler vorbereitet. Das frühere Workers-Static-Assets-Profil
+liegt in `wrangler.worker.toml`. Cloudflare-Konto, Pages-Projekt, KV-/OAuth-
+Bindings und GitHub-Integration sind nicht konfiguriert; ein Deployment wurde
+nicht ausgeführt. Einzelheiten stehen in `CLOUDFLARE_OPERATIONS.md`. Ein
+Cloud-Codex-Runner ist nicht vorhanden; `not_configured` bleibt der echte Zustand.
 
 ## Konfiguration
 
@@ -84,3 +85,4 @@ Prozesscache enthält höchstens 32 Einträge für fünf Minuten. Ein Cache-Tref
 überspringt weder Nutzerfreigaben noch Prompt-Versionierung oder Pflichtchecks.
 Cache-Hit-Zähler sind lokal zum laufenden Prozess und keine dauerhaften
 Einsparungs- oder Tokenangaben.
+

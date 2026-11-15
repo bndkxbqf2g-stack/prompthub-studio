@@ -1,6 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { Script } from "node:vm";
+import { spawnSync } from "node:child_process";
 
 const forbidden = [
   /console\.log\([^\n]*(?:token|secret|password|cookie)/i,
@@ -26,11 +26,10 @@ for (const file of files) {
   for (const pattern of forbidden) {
     if (pattern.test(content)) violations.push(`${file}: ${pattern}`);
   }
-  if (file.endsWith(".js")) {
-    try {
-      new Script(content, { filename: file });
-    } catch (error) {
-      violations.push(`${file}: JavaScript syntax error: ${error.message}`);
+  if (file.endsWith(".js") || file.endsWith(".mjs")) {
+    const checked = spawnSync(process.execPath, ["--check", file], { cwd: process.cwd(), encoding: "utf8" });
+    if (checked.status !== 0) {
+      violations.push(`${file}: JavaScript syntax error: ${(checked.stderr || checked.stdout || checked.error?.message || "unknown syntax error").trim()}`);
     }
   }
 }
@@ -41,3 +40,4 @@ if (violations.length > 0) {
 } else {
   console.log(`Static check passed for ${files.length} files`);
 }
+
