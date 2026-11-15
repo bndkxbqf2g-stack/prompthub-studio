@@ -470,3 +470,26 @@
 - A14 bleibt teilweise abgenommen, da reale GitHub-PR-/Review-/Actions-Belege
   und produktive Control-API-Konfiguration noch fehlen. Es erfolgten kein Push,
   Deployment oder Änderungen an externen GitHub-/Cloudflare-Einstellungen.
+
+## CP-018 – lokale HTTP- und Runner-Demonstration
+
+- Datum: 2026-11-15, 17:48 UTC.
+- `npm run demo` erzeugte im isolierten Memory-Modus den Auftrag
+  `job_4883cfd5-d035-47ef-b9de-d0bcce8095f7`. Der geskriptete Executor bestand
+  den Demo-Pflichtcheck; der Job endete mit `succeeded` und sieben Ereignissen.
+  Dies belegt die lokale Control-Plane-/Runner-Demo, nicht die Codex-CLI oder
+  einen echten Mac-/Cloud-Runner.
+- `src/server.mjs` wurde auf `127.0.0.1:18787` gestartet. `/`,
+  `/manifest.webmanifest`, `/app-icon-source.png`, `/healthz` und `/api/me`
+  lieferten HTTP 200. Security-Header einschließlich CSP waren gesetzt; die
+  lokale Sitzung gab keinen Token zurück. `/healthz` meldete
+  `runner_inbound_port:false`, `runner_status:not_observed` und
+  `runner_configured:false`.
+- Der Server wurde beendet und danach bestätigt, dass auf Port 18787 kein
+  Listener verblieb.
+- Nachweis: `npm test` 103/103 bestanden; `npm run check` erfolgreich für
+  94 Dateien und synchronisierte Prompt-Bibliothek; `git diff --check` bestanden.
+- Die GitHub-Repository-Metadaten wurden schreibgeschützt erneut abgerufen und
+  melden weiterhin `visibility: private`. Der Cloud Browser bleibt nicht
+  verbunden; die bereits genehmigte Sichtbarkeitsänderung und Branch-Regel
+  wurden nicht ausgeführt. Kein Push, Deployment oder Kostenwechsel.
