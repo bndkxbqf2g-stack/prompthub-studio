@@ -52,6 +52,21 @@ Schreibzugriff, HTTPS-Prüfungen, kostenfreien Kontingenten und offenen
 Abnahmepunkten stehen in `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner
 bleibt mangels verifizierter Laufzeitschnittstelle `not_configured`.
 
+## Pull Requests und Auto-Merge
+
+Der Nutzer hat am 2026-11-15 Auto-Merge für zukünftige Pull Requests
+ausdrücklich autorisiert; GitHub weist `allow_auto_merge=true` aus. PromptHub
+kann Auto-Merge für einen PR aktivieren, sobald er eröffnet ist. GitHub darf
+ihn erst integrieren, wenn `test` und alle weiteren geltenden Schutzregeln
+bestanden sind. Keine Prüfung und keine erforderliche unabhängige Prüfung wird
+dadurch übersprungen. Änderungen an Authentifizierung, Berechtigungen, Runnern,
+Freigaben oder produktiven Daten benötigen weiterhin die jeweils erforderliche
+menschliche Freigabe und unabhängige Prüfung.
+
+Die aktuelle `main`-Regel verlangt keinen PR und beschränkt direkte Pushes
+nicht. Auto-Merge schützt daher nur PRs und wird nicht als vollständige Sperre
+für Änderungen an `main` dargestellt.
+
 ## Konfiguration
 
 Alle Variablen sind in `.env.example` dokumentiert. Secrets werden nur über die
