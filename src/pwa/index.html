@@ -24,6 +24,13 @@
       <section id="notice" class="notice" role="status" aria-live="polite"></section>
       <button id="update-app" class="button secondary update-button" type="button" hidden>Neue Version laden</button>
 
+      <section id="unavailable-panel" class="card unavailable-card" role="region" aria-labelledby="unavailable-title" hidden>
+        <p class="eyebrow">VERBINDUNG</p>
+        <h2 id="unavailable-title">Control API nicht verfügbar</h2>
+        <p>Die PWA-Oberfläche ist erreichbar. Anmeldung, Projekte, Aufträge und Freigaben benötigen jedoch eine separate serverseitige Control API.</p>
+        <p class="muted">Solange der Server nicht antwortet, bleiben diese Bereiche verborgen. Tippe oben auf „Ansicht aktualisieren“, sobald die API verfügbar ist.</p>
+      </section>
+
       <section id="auth-panel" class="card auth-card" hidden>
         <p class="eyebrow">ZUGANG</p>
         <h2>GitHub-Sitzung erforderlich</h2>
