@@ -15,9 +15,10 @@
 
 ## Verifizierter Stand
 
-- GitHub MCP ist mit dem Nutzerkonto verbunden. Das private Quell-Repository
-  `bndkxbqf2g-stack/prompthub-studio` ist erstellt; ein separates privates
-  Control-Repository und dessen Runtime-Token sind nicht eingerichtet.
+- GitHub MCP ist mit dem Nutzerkonto verbunden. Das Quell-Repository
+  `bndkxbqf2g-stack/prompthub-studio` wurde am 2026-11-15 auf ausdrückliche
+  Nutzeranweisung öffentlich gestellt. Ein separates privates Control-Repository
+  und dessen Runtime-Token sind nicht eingerichtet.
 - Die Codex-App meldet eine lauffähige Standard-Cloud-Umgebung, aber ohne
   hinterlegte Repositories. Daraus folgt keine nachgewiesene autonome Ausführung
   für dieses Projekt.
@@ -34,7 +35,7 @@
   „Usage blocked“. Included-Usage-Alerts sind eingeschaltet. Bei erreichtem
   kostenfreien Kontingent blockiert GitHub Actions statt Mehrverbrauch zu
   berechnen; ein CI-Lauf bleibt deshalb von der verbleibenden Free-Usage abhängig.
-- Cloudflare Pages Free ist als `prompthub-studio` mit dem privaten Repository
+- Cloudflare Pages Free ist als `prompthub-studio` mit dem öffentlichen Quell-Repository
   verbunden; `https://prompthub-studio.pages.dev` liefert die PWA-Assets über
   HTTPS. Das erfolgreiche Produktionsdeployment ist `10eb0d77-7b19-4edc-9adc-548518e098f7`
   für Commit `504477dc35dab908c8b3755550866bca071c72db`. `Fail closed` wurde im
@@ -43,7 +44,8 @@
 - Die Control-Plane-Runtime ist nicht eingerichtet: kein `SESSIONS`-KV-Binding,
   keine PromptHub-GitHub-OAuth-App und keine Runtime-Secrets. Deshalb geben
   `/api/me` und `/healthz` HTTP 503; es gibt keine funktionsfähige Anmeldung,
-  Auftragsverwaltung oder Cloud-Ausführung. Das Repo blieb privat.
+  Auftragsverwaltung oder Cloud-Ausführung. Das Quell-Repository ist öffentlich;
+  das separate private Control-Repository existiert noch nicht.
 - Cloudflare Pages wurde mit Preview-Branches auf „None“ gestellt; nach dem
   Speichern konnte die Persistenz wegen eines Browser-Transportabbruchs nicht
   erneut ausgelesen werden. Preview-Adressen sind standardmäßig öffentlich;
@@ -54,12 +56,13 @@
   kostenpflichtiger Tarif, keine kostenpflichtige Ressource und keine
   Abrechnungsfunktion aktiviert. Das 0-€-Budget bleibt verbindlich.
 - Wrangler Direct Upload wäre eine Alternative ohne GitHub-App, erfordert aber
-  `Cloudflare Pages Edit` auf Kontoebene, womit sämtliche Pages-Projekte des
-  Kontos erstellt, geändert oder gelöscht werden können. Ein Direct-Upload-
-  Projekt kann später nicht auf Git-Integration umgestellt werden. Ein
-  Deployment-Workflow über GitHub Actions ist nicht eingerichtet; der
-  verifizierte $0-Actions-Budgetstopp blockiert kostenpflichtigen Mehrverbrauch,
-  sobald die enthaltene Free-Usage erschöpft ist.
+  `Pages Write` auf Kontoebene. Dieses Recht kann Pages-Projekte des Kontos
+  erstellen, ändern und löschen. Das bereits verknüpfte Git-Integrationsprojekt
+  wird nicht auf Direct Upload umgestellt. Für diese Sitzung fehlen Wrangler,
+  Cloudflare-Token und Cloud-Browser; es fand keine Cloudflare-Schreiboperation
+  statt. Ein GitHub-Actions-Deployment-Workflow ist nicht eingerichtet; der
+  verifizierte $0-Actions-Budgetstopp blockiert Mehrverbrauch nach erschöpfter
+  inkludierter Free-Usage.
 - Der Cloudflare-Tarifstand wurde am 2026-11-15 ausschließlich anhand der
   offiziellen Dokumentation recherchiert: Free Workers bis 100.000 Worker-
   Requests/Tag und 10 ms CPU je Aufruf; statische Assets sind kostenfrei und
@@ -73,19 +76,15 @@
   `/healthz` `runner_status: not_configured`. Die Cloud-PWA-Ausführung ist daher
   vorbereitet, aber erst nach Einrichtung und externem Funktionstest abnehmbar.
 - Der Nutzer hat `test` als erforderlichen GitHub-Check ausdrücklich
-  freigegeben. Die Rulesets-API antwortet für dieses private Repository mit
-  HTTP 403: „Upgrade to GitHub Pro or make this repository public to enable this
-  feature.“ Das Repository gehört einem persönlichen GitHub-Konto; die
-  kostenpflichtige private Option wäre GitHub Pro. Wegen 0-€-Budget und
-  Privatheit wurde weder ein Upgrade noch eine Sichtbarkeitsänderung vorgenommen.
-  CI läuft, aber erzwingt keinen Merge-Gate. Der Cloudflare-Pages-Build führt
-  `npm test` und `npm run check` vor Veröffentlichung aus und hält fehlerhafte
-  Builds von Production fern; ein Merge verhindert das nicht. Bis eine
-  technische Branch-Regel erlaubt ist, Änderungen nur über PRs mergen und erst,
-  wenn `test` für den unveränderten PR-Head erfolgreich ist; direkte Pushes auf
-  `main` sind im Arbeitsablauf tabu. Das bleibt eine manuelle Regel, keine
-  serverseitige Sperre. Siehe [GitHub
-  branch protection](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches) und [Rulesets availability](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
+  freigegeben und anschließend ausdrücklich die Veröffentlichung des
+  Quell-Repositories angeordnet. GitHub Free erlaubt Branch Protection für
+  öffentliche Repositories. Die Branch-Protection-API bestätigt für `main`
+  den erforderlichen Check `test`, `strict=true` und Admin-Enforcement.
+  GitHub Actions Run 13 (`43744475969`) bestand für Commit
+  `0a9e105641a17db91988c6848778b62cafbbcd40`; `main` verlangt damit `test` für
+  PR-Merges. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht.
+  Es wurde kein kostenpflichtiger Plan aktiviert. Quellen:
+  [GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches), [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).
 
 ## Laufzeitregeln
 

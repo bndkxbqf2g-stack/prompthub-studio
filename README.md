@@ -6,13 +6,17 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 
 ## Status
 
-Die technische Erstabnahme ist noch offen. Das private GitHub-Repository
+Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
+am 2026-11-15 veröffentlichte GitHub-Quell-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. GitHub Actions Run 9 für Commit
-`8f0fdc25e90f0ba32d0ed79c724ff136aed14881` bestand mit Job `test` erfolgreich.
+ist die dauerhafte Quelle für den Quellcode. `main` verlangt für Merges den
+erfolgreichen Check `test`; die Branch-API bestätigte `strict=true` und
+Admin-Enforcement. GitHub Actions Run 13 für Commit
+`0a9e105641a17db91988c6848778b62cafbbcd40` bestand. Der zugehörige PR #2 ist
+offen und nicht gemergt.
 
 Die PWA-Hülle ist unter [prompthub-studio.pages.dev](https://prompthub-studio.pages.dev)
-veröffentlicht. Cloudflare Pages ist mit dem privaten Repository verbunden;
+veröffentlicht. Cloudflare Pages ist mit dem öffentlichen Quell-Repository verbunden;
 Commits auf `main` lösen Production-Builds aus. Startseite, Manifest, Icon,
 JavaScript und Service Worker wurden über HTTPS mit HTTP 200 geprüft. Die
 Control API ist noch nicht eingerichtet: `/api/me` und `/healthz` antworten
@@ -20,10 +24,11 @@ deshalb mit HTTP 503 (`cloud_control_plane_not_configured`). OAuth, KV-Binding
 und Runtime-Secrets fehlen; die PWA ist derzeit keine betriebsbereite
 Auftragssteuerung.
 
-GitHub Free erzwingt in diesem privaten Repository den freigegebenen Check
-`test` nicht. Es wurde weder ein kostenpflichtiger Plan aktiviert noch die
-Repository-Sichtbarkeit geändert. Der Cloudflare-Billing-Status konnte wegen
-der nicht ladenden Abrechnungsseite nicht unabhängig verifiziert werden. Die
+GitHub Free konnte den freigegebenen Check `test` nach der vom Nutzer
+angeordneten Veröffentlichung des Quell-Repositories als Branch-Regel auf
+`main` setzen. Es wurde kein kostenpflichtiger Plan aktiviert. Der
+Cloudflare-Billing-Status konnte wegen der nicht ladenden Abrechnungsseite
+nicht unabhängig verifiziert werden. Die
 Abnahmematrix, Kostenregeln und aktuellen Betriebseinschränkungen stehen in
 `ACCEPTANCE_CRITERIA.md`, `CLOUD_COST_RULES.md` und
 `CLOUDFLARE_OPERATIONS.md`.

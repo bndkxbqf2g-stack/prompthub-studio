@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal verifiziert: gestarteter lokaler Server meldete `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen; echter Mac-Runner weiterhin offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | teilweise: Run 9 (`43727273718`, Commit `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`) Job `test` erfolgreich; Regeln-API antwortet 403 „Upgrade to GitHub Pro or make this repository public“; `main` bleibt ungeschützt. Pages baut `npm test` und `npm run check` vor Veröffentlichung, blockiert damit fehlerhafte Deployments, aber nicht Merges |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher GitHub-Actions-Lauf; GitHub-Branch-API muss `main` als geschützt mit erforderlichem Check `test` ausweisen | Pflicht | bestanden für PR-Merges: Branch-API bestätigt `main`, erforderlichen Check `test`, `strict=true` und Admin-Enforcement; Actions Run 13 (`43744475969`) für Commit `0a9e105641a17db91988c6848778b62cafbbcd40` bestand. Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,13 +46,13 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. GitHub Actions Run 9 und der
-Pages-Produktionsbuild für `504477dc35dab908c8b3755550866bca071c72db` sind
-erfolgreich; die PWA-Assets sind über HTTPS erreichbar. `main` erzwingt den
-freigegebenen Check `test` nicht: die Rulesets-API antwortet mit HTTP 403 und
-verlangt GitHub Pro für private Repositories oder eine öffentliche Sichtbarkeit.
-Der Pages-Build führt die Pflichtprüfungen unabhängig vor jeder Veröffentlichung
-aus, verhindert aber keinen Merge. Die Control API ist
-noch nicht konfiguriert (503); OAuth/KV, ein echter Mac-/Cloud-Runner,
-iPhone-Installation und Kontobilling sind nicht nachgewiesen. Die vollständige
-technische Erstabnahme ist daher nicht bestanden.
+A27/A28 sind durch reproduzierbare Tests belegt. GitHub Actions Run 13 und der
+Branch-API-Readback belegen den erfolgreichen Check und die Schutzregel auf
+`main`. Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich;
+kein kostenpflichtiger Plan wurde aktiviert. Der letzte dokumentierte
+Production-Build für `504477dc35dab908c8b3755550866bca071c72db` ist erfolgreich,
+aber noch nicht mit dem aktuellen PR-Stand aktualisiert. Die Regel blockiert
+PR-Merges bei fehlendem oder fehlgeschlagenem `test`; direkte Pushes sind nicht
+beschränkt. Die Control API ist noch nicht konfiguriert (503); OAuth/KV, ein
+echter Mac-/Cloud-Runner, iPhone-Installation und Kontobilling sind nicht
+nachgewiesen. Die vollständige technische Erstabnahme ist daher nicht bestanden.

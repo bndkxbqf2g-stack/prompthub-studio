@@ -4,7 +4,7 @@
 
 Die Pakete sind klein, testbar und einzeln rücksetzbar. Parallelisierung wird nur
 eingesetzt, wenn getrennte Worktrees und eine zuverlässige Schnittstelle
-vorhanden sind. Das private Quell-Repository existiert; zwei verifizierte Worker
+vorhanden sind. Das Quell-Repository existiert; zwei verifizierte Worker
 und getrennte, verlässliche Arbeitsbereiche sind nicht nachgewiesen. Bis dahin
 wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
@@ -15,7 +15,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Arbeitsmappe, Regeln, lokale Tools und GitHub-Berechtigung geprüft.
 - Kein passendes vorhandenes PromptHub-Repository gefunden; der Nutzer hat
   anschließend das private Repository `bndkxbqf2g-stack/prompthub-studio`
-  erstellt. Es wurde geprüft: `private`, Standardbranch `main`, Schreibzugriff.
+  erstellt. Es wurde zunächst als `private`, Standardbranch `main` mit
+  Schreibzugriff geprüft. Am 2026-11-15 wurde es auf ausdrückliche
+  Nutzeranweisung öffentlich gestellt.
 - Der lokale Stand `ec8dc42` wurde am 2026-11-15 als Snapshot über die GitHub-API
   nach `main` übertragen (Commit `ca6210a`). Da kein Git-Transportzugang vorlag,
   wurde die lokale Commit-Abstammung nicht übernommen.
@@ -43,8 +45,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Codex-Cloud-Umgebungsabfrage meldet `asenvcfg_base` als bereit/lauffähig, aber
   ohne verknüpfte Repositories. Es wurde kein Cloud-Task gestartet. Somit ist
   weder ein authentifizierter lokaler Executor noch autonome Cloud-Ausführung
-  für das private PromptHub-Repository nachgewiesen. `gh` und `wrangler` sind
-  nicht verfügbar; ein echter Mac-Runner wurde nicht getestet.
+  für PromptHub nachgewiesen. `gh` und `wrangler` sind nicht verfügbar; ein
+  echter Mac-Runner wurde nicht getestet. GitHub-Schreibzugriff wurde später
+  über den vorhandenen Git Credential Manager nachgewiesen (`admin=true`,
+  `push=true`); Sandbox-Datei-/Netzwerkgrenzen wurden für die erforderlichen
+  Git-Metadaten- und Push-Befehle gezielt überwunden.
 - Verbindliche Dokumentation und Abnahmematrix angelegt.
 
 ### Phase 1 – vertikaler und projektbezogener Schnitt (aktuell)
@@ -83,12 +88,14 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
-- Cloudflare Pages ist mit dem privaten Quell-Repository verbunden und die
-  PWA-Hülle unter `https://prompthub-studio.pages.dev` live. Der Pages-Build
-  und GitHub-Actions-Run 9 für `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`
-  sind erfolgreich; das Control-API-KV-Binding, die OAuth-App und Runtime-
-  Secrets sind weiterhin nicht eingerichtet. Die API liefert deshalb sicher
-  HTTP 503; Cloudflare Fail closed ist verifiziert.
+- Cloudflare Pages ist mit dem öffentlichen Quell-Repository verbunden und die
+  PWA-Hülle unter `https://prompthub-studio.pages.dev` live. Production bleibt
+  auf dem zuletzt nachgewiesenen erfolgreichen Deployment für Commit
+  `504477dc35dab908c8b3755550866bca071c72db`. GitHub Actions Run 13
+  (`43744475969`) für den offenen PR-Head `0a9e105641a17db91988c6848778b62cafbbcd40`
+  ist erfolgreich. Das Control-API-KV-Binding, die OAuth-App und Runtime-Secrets
+  sind weiterhin nicht eingerichtet; die API liefert deshalb HTTP 503.
+  Cloudflare Fail closed ist verifiziert.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
 
@@ -96,16 +103,15 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Erledigt: GitHub-Actions-Run 9 (`43727273718`) war für Commit
-  `8f0fdc25e90f0ba32d0ed79c724ff136aed14881` erfolgreich; der Job `test`
-  einschließlich Tests, statischer Analyse und Whitespace-Prüfung bestand.
-- Merge-Gate: der Nutzer hat `test` ausdrücklich als Pflichtcheck freigegeben.
-  Die Rulesets-API meldet HTTP 403: „Upgrade to GitHub Pro or make this
-  repository public to enable this feature.“ Weil das private persönliche Repo
-  und 0 € geschützt sind, wurde keine dieser kostenpflichtigen oder
-  sichtbarkeitsändernden Optionen gewählt. CI läuft und Cloudflare Pages
-  wiederholt Tests vor dem Deploy; Merges werden serverseitig dennoch nicht
-  blockiert. Remote-Control- und Runner-Integrationschecks bleiben offen.
+- Erledigt: GitHub Actions Run 13 (`43744475969`) war für den offenen PR-Head
+  `0a9e105641a17db91988c6848778b62cafbbcd40` erfolgreich; Pflichtjob `test`
+  und die Schritte `npm test`, `npm run check`, `git diff --check` bestanden.
+- Merge-Gate: Nach der ausdrücklichen Freigabe von `test` und der autorisierten
+  Veröffentlichung des Quell-Repositories wurde `main` mit erforderlichem
+  Check `test`, `strict=true` und Admin-Enforcement geschützt. API-Readback
+  bestätigt die Werte. Die Regel verlangt keinen PR und beschränkt direkte
+  Pushes nicht. Es wurde kein kostenpflichtiger Plan aktiviert. PR #2 ist offen
+  und nicht gemergt; Remote-Control- und Runner-Integrationschecks bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.

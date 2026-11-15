@@ -493,3 +493,41 @@
   melden weiterhin `visibility: private`. Der Cloud Browser bleibt nicht
   verbunden; die bereits genehmigte Sichtbarkeitsänderung und Branch-Regel
   wurden nicht ausgeführt. Kein Push, Deployment oder Kostenwechsel.
+
+## CP-019 – GitHub-Schreibzugriff und Pflichtcheck wiederhergestellt
+
+- Datum: 2026-11-15, 18:18 UTC.
+- Diagnose: lokale Git-Metadaten waren durch die Sandbox blockiert; der erste
+  Git-Netzwerkversuch scheiterte ebenfalls in der eingeschränkten Umgebung.
+  Mit gezielter Rechteausweitung für die nötigen Git-Befehle, per-Befehl
+  `safe.directory` und dem bereits angemeldeten Git Credential Manager gelang
+  der Dry-Run und anschließend der normale Push. Die globale Git-Konfiguration
+  blieb unverändert. Credential-Ausgaben und Token wurden nicht offengelegt.
+- GitHub bestätigte für den vorhandenen Credential-Manager-Zugang
+  `admin=true` und `push=true`. Das Quell-Repository
+  `bndkxbqf2g-stack/prompthub-studio` wurde auf ausdrückliche Nutzeranweisung
+  öffentlich gestellt; die Repository-API bestätigte HTTP 200 und anschließend
+  `visibility=public`. Kein bezahlter Plan und kein kostenpflichtiger Dienst
+  wurde aktiviert.
+- Die zuvor freigegebene Branch-Regel wurde für `main` gesetzt und erneut
+  ausgelesen: erforderlicher Check `test`, `strict=true`, Admin-Enforcement.
+  GitHub Free konnte die Regel nach der Sichtbarkeitsänderung bereitstellen.
+  Die Regel verlangt keinen PR und beschränkt direkte Pushes nicht; weitere
+  Branch-Schutzoptionen wurden nicht verändert.
+- Feature-Branch `codex/oauth-returnto-hardening` wurde auf Commit
+  `0a9e105641a17db91988c6848778b62cafbbcd40` gepusht. PR #2 bleibt offen und
+  ungemergt. GitHub Actions Run 13 (`43744475969`) bestand vollständig,
+  einschließlich Job `test`, `npm test`, `npm run check` und
+  `git diff --check`.
+- Cloudflare-Schreibzugriff bleibt nicht verfügbar: `gh` und `wrangler` sind
+  nicht installiert, Cloudflare-Token-Umgebungsvariablen fehlen und der
+  Cloud-Browser ist nicht verbunden. Es wurde keine Cloudflare-Änderung,
+  kein Deployment und keine Ressource angelegt. Minimale sichere Optionen,
+  Rechteumfang und Wiederherstellungsweg sind in `CLOUDFLARE_OPERATIONS.md`
+  dokumentiert. Kontobilling bleibt ungeprüft; es wurde kein Tarif aktiviert.
+- Dokumentation aktualisiert: `README.md`, `ACCEPTANCE_CRITERIA.md`,
+  `CLOUD_COST_RULES.md`, `CLOUDFLARE_OPERATIONS.md`, `DEVELOPMENT_PLAN.md` und
+  `OPERATIONS.md`.
+- Pflichtnachweis vor dem Checkpoint: `npm test` 103/103 bestanden;
+  `npm run check` bestanden (94 Dateien, Prompt-Library synchron);
+  `git diff --check` bestanden.

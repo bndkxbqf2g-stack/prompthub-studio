@@ -23,7 +23,7 @@ Memory-Control-Plane-Adapter.
 
 ## Serverlose PWA
 
-Cloudflare Pages `prompthub-studio` ist mit dem privaten GitHub-Repository
+Cloudflare Pages `prompthub-studio` ist mit dem öffentlichen GitHub-Quell-Repository
 verbunden und unter https://prompthub-studio.pages.dev veröffentlicht. Commits
 auf `main` lösen Production-Builds aus. `wrangler.toml` enthält die Pages-
 Konfiguration; das frühere Workers-Static-Assets-Profil bleibt in
@@ -38,10 +38,12 @@ Persistenz ließ sich nach einem Browser-Transportabbruch nicht erneut prüfen.
 Preview-Adressen sind öffentlich, sofern sie aktiviert werden; daher keine
 Preview-Secrets setzen und vor Aktivierung Cloudflare Access konfigurieren.
 
-Die GitHub-Pages-Integration ist nicht die GitHub-OAuth-Anmeldung innerhalb der
-PWA. Details zu Build, Bindings, HTTPS-Prüfungen, kostenfreien Kontingenten und
-offenen Abnahmepunkten stehen in `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-
-Runner bleibt mangels verifizierter Laufzeitschnittstelle `not_configured`.
+Die Cloudflare-GitHub-Integration ist nicht die GitHub-OAuth-Anmeldung innerhalb
+der PWA. `main` verlangt für PR-Merges den Statuscheck `test`; die Regel verlangt
+keinen PR und beschränkt direkte Pushes nicht. Details zu Build, Bindings,
+Schreibzugriff, HTTPS-Prüfungen, kostenfreien Kontingenten und offenen
+Abnahmepunkten stehen in `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner
+bleibt mangels verifizierter Laufzeitschnittstelle `not_configured`.
 
 ## Konfiguration
 

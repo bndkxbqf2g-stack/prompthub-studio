@@ -2,16 +2,20 @@
 
 ## Verifizierter Stand
 
-- Cloudflare-Pages-Projekt `prompthub-studio` ist mit dem privaten GitHub-
+- Cloudflare-Pages-Projekt `prompthub-studio` ist mit dem öffentlichen GitHub-
   Repository `bndkxbqf2g-stack/prompthub-studio` verbunden. Account-ID:
   `19a163849475274c22cb8a8a130d352b`.
 - Die Produktion unter https://prompthub-studio.pages.dev wurde erfolgreich
   veröffentlicht: Deployment `10eb0d77-7b19-4edc-9adc-548518e098f7`, Commit
   `504477dc35dab908c8b3755550866bca071c72db`, Cloudflare-Status `success`.
   Git-Integration deployt Commits auf `main` automatisch.
-- GitHub bestätigt das Repository weiterhin als `private`, Default-Branch
-  `main`, HEAD `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`. Actions-Run 9
-  (`43727273718`) einschließlich Job `test` war erfolgreich.
+- Das Quell-Repository wurde am 2026-11-15 auf ausdrückliche Nutzeranweisung
+  öffentlich gestellt. Auf `main` ist der Check `test` als Branch-Schutz
+  erforderlich (`strict=true`, Admin-Enforcement); Actions Run 13
+  (`43744475969`) für Feature-Branch-Commit
+  `0a9e105641a17db91988c6848778b62cafbbcd40` war erfolgreich. PR #2 ist offen,
+  nicht gemergt. Der letzte Production-Deploy bleibt der oben genannte ältere
+  Commit auf `main`.
 - `wrangler.toml` beschreibt Pages; der bisherige Workers Static Assets-Modus
   bleibt in `wrangler.worker.toml` erhalten.
 - functions/[[path]].js leitet ausschließlich über _routes.json ausgewählte
@@ -31,10 +35,9 @@
   `504477dc35dab908c8b3755550866bca071c72db` verwendet den Service-Worker-Cache
   `prompthub-static-v3` und enthält noch keinen Update-Button. Lokal liegen die
   Commits `a1649e6` und `bc84f65` mit dem getesteten Updateablauf und Cache v4.
-  Der Branch `codex/oauth-returnto-hardening` enthält ungepushte lokale
-  Änderungen; der Updateablauf ist deshalb nicht Bestandteil des
-  dokumentierten Production-Deployments. Eine neue Live-HTTP-Prüfung war in der
-  aktuellen Shell wegen fehlendem Netzwerkzugriff nicht möglich.
+  Der Updateablauf liegt auf `codex/oauth-returnto-hardening` in PR #2 und ist
+  deshalb noch nicht Bestandteil des dokumentierten Production-Deployments.
+  Eine erneute Live-HTTP-Prüfung wurde für diesen Feature-Branch nicht ausgeführt.
 - Pages Runtime ist auf `Fail closed` gestellt; der Zustand wurde im Dashboard
   nach dem Speichern erneut geprüft. Für Branch Control wurde die automatische
   Bereitstellung von Preview-Branches auf „None“ gesetzt und gespeichert. Die
@@ -42,7 +45,7 @@
   ausgelesen werden. Preview-Deployments sind standardmäßig öffentlich; Cloudflare
   Access wurde dafür nicht eingerichtet und Preview-Secrets sind nicht gesetzt.
 - Die Cloudflare-GitHub-Integration ist im Projekt aktiv und mit dem
-  ausgewählten privaten Repository verbunden. Sie ist von der GitHub-OAuth-App
+  ausgewählten öffentlichen Quell-Repository verbunden. Sie ist von der GitHub-OAuth-App
   für die Anmeldung von PromptHub-Nutzern zu unterscheiden; diese OAuth-App,
   Runtime-Secrets und das KV-Binding sind nicht eingerichtet.
 - Der Cloud-Browser bestätigte Projekt und Deployment. Die Billing-Seite blieb
@@ -62,7 +65,7 @@
 | Projektname | prompthub-studio |
 | Produktionsadresse | https://prompthub-studio.pages.dev |
 | Letzte Deployment-ID | 10eb0d77-7b19-4edc-9adc-548518e098f7 |
-| GitHub-Repository | bndkxbqf2g-stack/prompthub-studio (privat) |
+| GitHub-Repository | bndkxbqf2g-stack/prompthub-studio (öffentlich, Nutzerentscheidung vom 2026-11-15) |
 | Produktionsbranch | main |
 | Root-Verzeichnis | Repository-Root |
 | Build-Befehl | npm ci --ignore-scripts --no-audit --no-fund && npm test && npm run check |
@@ -113,34 +116,45 @@ erneut ausgelesen werden. Behandle die Persistenz daher als unbestätigt. Falls
 Preview-Builds aktiv sind oder später aktiviert werden, ist Cloudflare Access
 erforderlich, weil Preview-Adressen sonst öffentlich sind.
 
-GitHub branch protection: der Nutzer hat den erforderlichen Check `test`
-ausdrücklich freigegeben. Der Repository-Eigentümer ist ein persönliches Konto;
-die Rulesets-API antwortet aktuell mit HTTP 403:
-`Upgrade to GitHub Pro or make this repository public to enable this feature.`
-GitHub Free ermöglicht keine erzwungenen Branch-Regeln für private Repositories.
-GitHub dokumentiert Pro für private persönliche Repositories sowie Team/Enterprise
-für private Organisations-Repositories. Wegen des verbindlichen 0-€-Budgets und
-der privaten Sichtbarkeit wurde weder ein Upgrade noch eine Veröffentlichung
-vorgenommen. `test` läuft in CI, ist aber kein serverseitiges Merge-Gate.
-Der Cloudflare-Pages-Build führt Tests und statische Prüfung vor dem Deploy aus;
-ein fehlgeschlagener Pflichtcheck blockiert dadurch die Veröffentlichung, nicht
-den Merge. Bis ein zulässiger Plan aktiviert wird, gilt daher als manueller
-Arbeitsablauf: Änderungen nur per PR, `test` für genau den PR-Head erfolgreich
-abwarten und vor dem Merge erneut prüfen; kein direkter Push auf `main`. Das ist
-eine Prozessregel und keine technische Sperre gegen einen Maintainer. Quellen:
-[GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches) und [Verfügbarkeit von Rulesets](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/available-rules-for-rulesets).
+GitHub-Branch-Schutz: Der Nutzer hat den erforderlichen Check `test`
+ausdrücklich freigegeben. GitHub Free erlaubt Branch Protection für öffentliche
+Repositories. Nach der ausdrücklich autorisierten Veröffentlichung des
+Quell-Repositories wurde `main` per GitHub-API mit `test`, `strict=true` und
+Admin-Enforcement geschützt; der GET-Readback bestätigte diese Werte.
+GitHub Actions Run 13 (`43744475969`) für den aktuellen PR-Head
+`0a9e105641a17db91988c6848778b62cafbbcd40` bestand. Die Regel blockiert PR-Merges,
+wenn `test` fehlt oder fehlschlägt. Sie verlangt keinen PR und beschränkt direkte
+Pushes nicht; solche zusätzlichen Branch-Regeln wurden nicht freigegeben oder
+gesetzt. Es wurde kein bezahlter Plan aktiviert. Quellen:
+[GitHub-Verfügbarkeit geschützter Branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches) und [Branch-Protection-API](https://docs.github.com/en/rest/branches/branch-protection).
 
-Alternative Wrangler Direct Upload: Sie vermeidet eine Cloudflare-App mit
-Schreibzugriff auf GitHub, erfordert aber einen Cloudflare-API-Token mit
-`Cloudflare Pages Edit`. Diese Account-Berechtigung kann Pages-Projekte im
-gesamten Cloudflare-Konto erstellen, ändern und löschen. Außerdem lässt sich
-ein Direct-Upload-Projekt später nicht auf Git-Integration umstellen. Deshalb
-wurde auch dieser Weg nicht begonnen. Ein GitHub-Actions-Workflow würde den
-Token als Repository-Secret benötigen. Der GitHub-Free-Account hat ein
-Actions-Budget von $0 mit Ausgabenblockierung; nach Erschöpfung der enthaltenen
-Usage werden Läufe blockiert. Der Actions-Deployment-Workflow ist nicht
-eingerichtet. Der bestehende GitHub-verbundene Pages-Weg wurde vom Nutzer
-bestätigt; Wrangler Direct Upload wird nicht zusätzlich eingerichtet.
+Die Pages-Git-Integration ist der gewählte Deployment-Weg. Für reine
+Quellcode-Commits auf `main` ist kein eigener Cloudflare-Token nötig; Cloudflare
+erstellt nach dem GitHub-Check automatisch das Production-Deployment. Ein
+zusätzlicher GitHub-Actions-Deploy würde ein Repository-Secret mit Cloudflare-
+Schreibzugriff benötigen und ist nicht eingerichtet.
+
+## Schreibzugriff und Wiederherstellungswege
+
+Fehler beim Schreiben werden nach Ursache getrennt, weil Sandbox-, Netzwerk-,
+Anmelde- und Tarifgrenzen verschiedene Lösungen benötigen:
+
+| Fehlerbild | Sichere Lösung |
+|---|---|
+| Lokale Dateien beschreibbar, `.git` aber schreibgeschützt | Git-Metadatenoperationen gezielt mit dem autorisierten Schreibmodus ausführen. `safe.directory` und Autoridentität nur pro Git-Befehl setzen; keine globale Sicherheitskonfiguration ändern. |
+| `git push` scheitert mit Netzwerkfehler | Den Push zuerst als Dry-Run prüfen und bei isoliertem Netzwerkzugriff für genau diesen Befehl erweiterten Netzwerkzugriff verwenden. Zugangsdaten im Credential Manager belassen, nie in Remote-URL, Kommandozeile oder Logs schreiben. Das wurde für den Feature-Branch erfolgreich angewendet. |
+| GitHub antwortet mit 401/403 | Authentifizierungsfehler von fehlender Repository-Rolle, Token-Scope und Tarifbeschränkung unterscheiden. Für Branch-Schutz braucht ein Fine-Grained Token `Administration: write` nur auf dieses Repository und der Nutzer muss Admin/Owner sein. Ein 403 wegen GitHub-Free-Sichtbarkeit wird durch mehr Tokenrechte nicht behoben. |
+| GitHub Free blockiert Branch-Schutz im privaten Repo | Kostenfreier Weg: öffentliches Quell-Repository, sofern der Nutzer das ausdrücklich entscheidet. Alternativ wäre ein passender bezahlter GitHub-Plan erforderlich; dieser bleibt wegen des 0-€-Budgets deaktiviert. Die Sichtbarkeitsänderung und `test`-Regel sind inzwischen umgesetzt. |
+| Cloudflare-Schreibzugriff fehlt | Bevorzugt die angemeldete Cloudflare-Dashboard-Sitzung nutzen. Alternativ wäre ein API-Token mit `Pages Write` nötig; dies ist kontoweit und kann Pages-Projekte erstellen, ändern und löschen. Für KV-Anlage wäre zusätzlich `Workers KV Storage Write` nötig. Vor jeder API-Mutation Zielprojekt auslesen und ausschließlich gezielte Update-/Create-Methoden verwenden. Keine Ressource löschen. |
+| Wrangler OAuth scheint einfacher | `wrangler login` hat keine granularen Rechteauswahl. Für automatisierte Nutzung nur ein eng begrenztes API-Token verwenden; Token nie im Chat übermitteln. Wrangler Direct Upload ist für das bereits mit GitHub verbundene Pages-Projekt kein geeigneter Weg. |
+
+Für diese Sitzung gibt es kein `gh` und kein `wrangler`, keine Cloudflare-Token-
+Umgebungsvariable und keinen geöffneten Cloud-Browser. Daher sind derzeit nur
+Git/GitHub-Schreibzugriffe nachgewiesen. Die Cloudflare-Berechtigung muss über
+eine wieder verfügbare, angemeldete Dashboard-Sitzung oder einen sicher
+bereitgestellten API-Token hergestellt werden. GitHub- und Cloudflare-Token
+werden niemals im Chat angefordert oder ausgegeben. Cloudflare-Permissions:
+[Pages API](https://developers.cloudflare.com/api/resources/pages/subresources/projects/methods/create/), [Tokenrechte](https://developers.cloudflare.com/workers/authorization/workers/) und [Wrangler-Rechte](https://developers.cloudflare.com/workers/authorization/).
 
 Die vollständige Control-Plane setzt OAuth, privates Control-Repository,
 begrenzten GitHub-Token, Production-KV-Binding und vollständige Secrets voraus.
