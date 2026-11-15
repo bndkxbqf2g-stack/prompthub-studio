@@ -360,7 +360,7 @@
   Dateien; `git diff --check` erfolgreich; `npm run demo` endete mit
   `succeeded` und sieben Ereignissen.
 - A17 bleibt teilweise offen, bis Installation und Aktualisierung auf einem
-  echten iPhone geprüft wurden. Diese Änderung wurde noch nicht committed,
-  gepusht oder nach Cloudflare Pages deployed; sie ist lokal auf dem Branch
-  `codex/oauth-returnto-hardening` dokumentiert. GitHub-PR #2 und
+  echten iPhone geprüft wurden. Das Paket ist lokal als Commit `a1649e6` auf dem
+  Branch `codex/oauth-returnto-hardening` gesichert, aber nicht gepusht oder
+  nach Cloudflare Pages deployed. GitHub-PR #2 und
   Repository-Einstellungen wurden nicht verändert.
