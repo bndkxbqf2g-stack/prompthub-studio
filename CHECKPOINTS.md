@@ -881,3 +881,26 @@
   bestand für 96 Dateien; `git diff --check` ohne Befund.
 - A06 ist teilweise belegt: macOS-Kompatibilität ist CI-getestet. Ein echter
   lokaler MacBook-Runner mit Codex-Ausführung bleibt offen.
+
+## CP-035 – Auto-Merge und mobile Live-PWA erneut geprüft
+
+- Datum: 2026-11-15.
+- GitHub meldet `allow_auto_merge=true`, öffentliches Repository, Default-Branch
+  `main` und keine offenen PRs. Main-Commit
+  `a3b397356734a47db506c32ec562d8ad52985dc1` bestand CI-Run 75
+  (`43768090841`); Pages-Run 19 (`43768090642`) war erfolgreich. PR #19 bestand
+  Run 74 (`43767985410`) mit Apple-Silicon-, Intel-macOS- und `test`-Jobs und
+  wurde automatisch gemergt.
+- Die Branch-Schutzseite in GitHub Settings bestätigte `test`, Strict-Mode und
+  Admin-Enforcement. „Require a pull request before merging“ ist aus; direkte
+  Commits auf `main` bleiben möglich. Force-Push und Branch-Löschen waren aus.
+  Eine automatische PR-Pflicht wurde noch nicht gespeichert; die Entscheidung
+  des Nutzers ist angefragt. Der GitHub-API-Readback ist für diese Einstellung
+  mit HTTP 403 nicht verfügbar.
+- Live-PWA-Smoke im Browser bei 390×844 zeigte Titel, Aktualisieren-Schalter
+  und `Die Control API ist derzeit nicht erreichbar.` Der Inhaltsbereich bleibt
+  ohne Control API leer. Das belegt weder iPhone-Installation noch echtes
+  Offline-/Updateverhalten.
+- Lokale Pflichtprüfungen nach der Dokumentationsänderung: `npm test` 106/106;
+  `npm run check` bestand für 96 Dateien und bestätigte die Prompt-Library;
+  `git diff --check` ohne Befund.

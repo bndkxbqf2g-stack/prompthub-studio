@@ -21,7 +21,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A14 | Kontrollierte Eigenupdates | `test/strategy-learning.test.mjs`, `test/pwa-strategy.test.mjs`, `test/api-projects.test.mjs`, `test/auth.test.mjs`; GitHub-PR-/Actions-Evidenz, unabhängiger Review und authentifizierte Freigabe | Pflicht | teilweise: lokale API-/PWA-Gates, projektbezogene Erfassung/Anzeige und Projektwechsel-Regressionen bestanden; echte GitHub-Review-/Actions-Nachweise und produktive Control-API-Verbindung sind wegen fehlender Laufzeitkonfiguration noch nicht live abgenommen |
 | A15 | sichere Wiederherstellung | Backup-Manifest, SHA-256, Approval- und Tamper-Test | Pflicht | lokal bestanden |
 | A16 | Kostenfreies serverloses Control Plane, unabhängig vom statischen PWA-Host | `HOSTING_OPTIONS.md`; Integrationstests für den ausdrücklich ausgewählten Anbieter, OAuth/Sitzungen, Speicherisolation, Quoten-Fail-Closed und HTTPS-Live-Smoke; Kosten-/Kontingent-Readback | Pflicht | teilweise, produktiv No-Go: das separate private GitHub-Control-Repository und die leere Lease-Datei sind eingerichtet und verifiziert. GitHub Pages hostet nur die PWA-Hülle. Cloudflare bleibt pausiert und wird nicht reaktiviert. Netlify Free ist nur ein Kandidat; unabhängige Prüfung fand fehlende Function-/Session-Implementierung, Production-/Preview-Isolation, Kosten-Readback und Live-Nachweise. Die dokumentierten Team-Warnungen reichen nicht als automatische PromptHub-Jobpause; eine unterstützte API für aktuellen Team-Credit-Verbrauch ist nicht nachgewiesen. OAuth-App, Runtime-Secrets, Anbieter-Verknüpfung, Auth-/Sitzungsadapter und Runtime-Abhängigkeit fehlen. Bei unbekannter Quote müssen Cloud-Jobs gesperrt bleiben. |
-| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`, `test/pwa-updates.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Offline-Fallback, Cache-Isolation, freigegebener Update-Flow und MIME | Pflicht | teilweise: Nach Pages-Run 18 (`43767243571`) antworteten `/src/pwa/`, `manifest.webmanifest`, `app-icon-source.png`, `sw.js`, `app.js` und `styles.css` live über HTTPS mit HTTP 200 und den erwarteten Inhaltstypen. Die UI zeigt korrekt, dass GitHub Pages keine Control API bereitstellt. Das Manifest enthält relative `start_url`, `scope`, Standalone-Modus und Icon. Offline-/Update-Flow ist lokal regressionstested. Echte iPhone-Installation, Offline-Verhalten und Update nach Live-Deployment bleiben offen |
+| A17 | PWA-Installationssymbol und iPhone-Installation | `test/api.test.mjs`, `test/cloudflare-pages.test.mjs`, `test/pwa-updates.test.mjs`: Manifest, Apple-Touch-Icon, PNG-Antwort, Offline-Fallback, Cache-Isolation, freigegebener Update-Flow und MIME | Pflicht | teilweise: Pages-Run 19 (`43768090642`) bestand. HTTPS-Smoke nach Pages-Run 18 bestätigte `/src/pwa/`, `manifest.webmanifest`, `app-icon-source.png`, `sw.js`, `app.js` und `styles.css` mit HTTP 200 und erwarteten Inhaltstypen. Browserprüfung im Viewport 390×844 zeigte Titel, Aktualisieren-Schalter und die korrekte Meldung, dass die Control API nicht erreichbar ist; ohne API bleibt die Projektansicht leer. Das Manifest enthält relative `start_url`, `scope`, Standalone-Modus und Icon. Offline-/Update-Flow ist lokal regressionstested. Echte iPhone-Installation, Offline-Verhalten und Update nach Live-Deployment bleiben offen |
 | A18 | Multi-Projekt-Analyse | `test/projects.test.mjs`: Regeln, README, Skripte, Issues, CI, nur lesende API und Snapshot-Version | Pflicht | lokal bestanden |
 | A19 | Entfernen/Wiederverbinden/Datenlöschung | `test/projects.test.mjs`, `test/api-projects.test.mjs`: Bestätigung, Pause, laufende/stale Sperre, Wiederverbinden, getrennte Datenlöschung; kein Repo-Delete | Pflicht | lokal bestanden |
 | A20 | Prompt-Designer | `test/prompt-designer.test.mjs`, `test/api-projects.test.mjs`: Analyse, Einzelfrage, vier Optionen, Skip/Ende, Anforderungen/Annahmen, Version, QA und ausdrückliche Freigabe | Pflicht | lokal bestanden |
@@ -47,18 +47,19 @@ ausgewiesen und nicht als bestanden markiert.
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
 A27/A28 sind durch reproduzierbare Tests belegt. Der verifizierte Main-Commit
-`50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72
-(`43767244221`) und Pages-Run 18 (`43767243571`). PR #18 bestand Run 71
-(`43767158231`) mit beiden macOS-Lanes und Pflichtjob `test` und wurde durch
+`a3b397356734a47db506c32ec562d8ad52985dc1` bestand Main-CI-Run 75
+(`43768090841`) und Pages-Run 19 (`43768090642`). PR #19 bestand Run 74
+(`43767985410`) mit beiden macOS-Lanes und Pflichtjob `test` und wurde durch
 GitHub Auto-Merge integriert.
 Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich; kein
 kostenpflichtiger Plan wurde aktiviert. Cloudflare bleibt pausiert; die
 Projektlöschung wartet auf die gesonderte Bestätigung des Nutzers.
 GitHub Pages stellt keine Control API
 bereit, und es ist noch kein alternativer API-Host freigegeben oder konfiguriert.
-Der letzte erfolgreiche Branch-API-Readback bestätigte den erforderlichen Check
-`test`, `strict=true` und Admin-Enforcement; direkte Pushes sind weiterhin nicht
-eingeschränkt und die aktuelle GitHub-Integration kann den Branch-Schutz nicht
-erneut auslesen. OAuth-/Sitzungsbetrieb, echter Mac-/Cloud-Runner,
+Die GitHub-Branch-Einstellungsseite wurde am 2026-11-15 erneut geprüft: `test`,
+`strict=true` und Admin-Enforcement sind aktiv; die Regel verlangt keinen PR,
+direkte Commits auf `main` sind somit weiterhin möglich. `allow_auto_merge=true`
+ist aktiv. Die verbundene GitHub-API verweigert den Branch-Schutz-Readback mit
+HTTP 403. OAuth-/Sitzungsbetrieb, echter Mac-/Cloud-Runner,
 iPhone-Installation, Kontobilling und externe Lernexperimente sind nicht
 nachgewiesen. Die vollständige technische Erstabnahme ist daher nicht bestanden.

@@ -70,10 +70,12 @@ Manifest, App-Icon, Service Worker, App-Skript und Stylesheet live mit HTTP 200
 und passenden Inhaltstypen; die PWA meldet weiterhin, dass die Control API nicht
 erreichbar ist.
 
-Main-Commit `50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72
-(`43767244221`) und GitHub-Pages-Run 18 (`43767243571`). PR #18 bestand PR-CI-
-Run 71 (`43767158231`) auf beiden macOS-Architekturen und für `test`; GitHub
-führte den Merge automatisch aus.
+Main-Commit `a3b397356734a47db506c32ec562d8ad52985dc1` bestand Main-CI-Run 75
+(`43768090841`) und GitHub-Pages-Run 19 (`43768090642`). PR #19 bestand PR-CI-
+Run 74 (`43767985410`) auf beiden macOS-Architekturen und für `test`; GitHub
+führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte Titel,
+Aktualisieren-Schalter und den API-Ausfallstatus. Eine echte iPhone-Prüfung ist
+das nicht.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
@@ -93,10 +95,11 @@ Browserausfall konnte diese Einstellung nicht erneut ausgelesen werden. Bei
 einer späteren Aktivierung wären Preview-Adressen öffentlich; dafür keine
 Preview-Secrets setzen und zuvor Cloudflare Access konfigurieren.
 
-Die letzte erfolgreiche Branch-Regel-Abfrage bestätigte für `main` den Check
-`test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die
-verbundene GitHub-Schnittstelle nicht verfügbar. Laut dem letzten Readback
-verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Historische
+Die GitHub-Branch-Einstellungsseite wurde am 2026-11-15 erneut geprüft: Für
+`main` sind der Pflichtcheck `test`, `strict=true` und Admin-Enforcement aktiv.
+„Require a pull request before merging“ ist ausgeschaltet; direkte Commits auf
+`main` sind somit möglich. `allow_auto_merge=true` ist aktiviert. Die verbundene
+GitHub-API verweigert den Branch-Schutz-Readback mit HTTP 403. Historische
 Cloudflare-Konfiguration und aktuelle Einschränkungen stehen in
 `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner bleibt mangels verifizierter
 Laufzeitschnittstelle `not_configured`.

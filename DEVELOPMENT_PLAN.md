@@ -92,8 +92,8 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Free-Quota-Fail-Closed-Tests sind implementiert.
 - Die aktive PWA liegt unter
   `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Main-Commit
-  `50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72
-  (`43767244221`) und GitHub-Pages-Run 18 (`43767243571`). PR #18 bestand Run 71
+  `a3b397356734a47db506c32ec562d8ad52985dc1` bestand Main-CI-Run 75
+  (`43768090841`) und GitHub-Pages-Run 19 (`43768090642`). PR #19 bestand Run 74
   auf Apple-Silicon- und Intel-macOS sowie mit Pflichtjob `test` und wurde
   automatisch gemergt. GitHub Pages hostet nur die
   statische PWA, keine Control API. Cloudflare ist als Host abgewählt; das
@@ -121,11 +121,12 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Merge-Gate: Nach der ausdrücklichen Freigabe von `test` und der autorisierten
   Veröffentlichung des Quell-Repositories wurde `main` mit erforderlichem
   Check `test`, `strict=true` und Admin-Enforcement geschützt. API-Readback
-  bestätigt die Werte. Die Regel verlangt keinen PR und beschränkt direkte
-  Pushes nicht. Es wurde kein kostenpflichtiger Plan aktiviert. PR #2 wurde
-  nach erfolgreichen Pflichtchecks gemergt; GitHub bestätigt `allow_auto_merge=true`
-  für zukünftige geeignete PRs. Remote-Control- und Runner-Integrationschecks
-  bleiben offen.
+  bestätigt die Werte. Eine erneute Prüfung in GitHub Settings am 2026-11-15
+  zeigte: Die Regel verlangt keinen PR; direkte Commits auf `main` sind weiterhin
+  möglich. `allow_auto_merge=true` ist aktiviert. Der Nutzer hat zukünftige
+  automatische Merges autorisiert. Die ausdrückliche Entscheidung, zusätzlich
+  eine PR-Pflicht zu setzen, steht aus. Es wurde kein kostenpflichtiger Plan
+  aktiviert. Remote-Control- und Runner-Integrationschecks bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.
@@ -135,8 +136,10 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; die Live-Prüfung
   lud UI, Styles, Manifest und App-Icon. Die Control API bleibt auf dem
   statischen Host unerreichbar. Der pausierte frühere Cloudflare-Deploy bleibt
-  erreichbar, wird aber nicht automatisch aktualisiert. Die echte iPhone-
-  Installation und Live-Offline-/Updateprüfung sind noch offen.
+  erreichbar, wird aber nicht automatisch aktualisiert. Ein Browser-Smoke im
+  Viewport 390×844 zeigte die korrekte API-Ausfallmeldung, aber ohne API keine
+  Projektansicht. Die echte iPhone-Installation und Live-Offline-/Updateprüfung
+  sind noch offen.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet
