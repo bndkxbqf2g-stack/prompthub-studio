@@ -27,6 +27,14 @@
   `cloud_control_plane_not_configured`, weil OAuth-/Runtime-Konfiguration und
   KV-Binding nicht vorhanden sind. Die PWA-Hülle ist live; die Control API ist
   bewusst nicht betriebsbereit.
+- Der Quellstand des zuletzt dokumentierten Produktionsdeployments
+  `504477dc35dab908c8b3755550866bca071c72db` verwendet den Service-Worker-Cache
+  `prompthub-static-v3` und enthält noch keinen Update-Button. Lokal liegen die
+  Commits `a1649e6` und `bc84f65` mit dem getesteten Updateablauf und Cache v4.
+  Der Branch `codex/oauth-returnto-hardening` enthält ungepushte lokale
+  Änderungen; der Updateablauf ist deshalb nicht Bestandteil des
+  dokumentierten Production-Deployments. Eine neue Live-HTTP-Prüfung war in der
+  aktuellen Shell wegen fehlendem Netzwerkzugriff nicht möglich.
 - Pages Runtime ist auf `Fail closed` gestellt; der Zustand wurde im Dashboard
   nach dem Speichern erneut geprüft. Für Branch Control wurde die automatische
   Bereitstellung von Preview-Branches auf „None“ gesetzt und gespeichert. Die

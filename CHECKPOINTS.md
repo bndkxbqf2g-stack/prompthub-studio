@@ -364,3 +364,21 @@
   Branch `codex/oauth-returnto-hardening` gesichert, aber nicht gepusht oder
   nach Cloudflare Pages deployed. GitHub-PR #2 und
   Repository-Einstellungen wurden nicht verändert.
+
+## CP-014 – Production- und Arbeitsstand getrennt dokumentiert
+
+- Datum: 2026-11-15, 16:21 UTC.
+- GitHub-Leseabfrage bestätigt weiterhin privates Repository, PR #2 offen auf
+  Head `6123cf79120f97f73dd11fb56ecf64def385b2ab` und CI Run 11 erfolgreich
+  ausschließlich für diesen Head. Die lokalen Commits `a1649e6` und `bc84f65`
+  sind nicht auf GitHub.
+- Der letzte dokumentierte Production-Commit `504477dc35dab908c8b3755550866bca071c72db`
+  wurde direkt aus dem lokalen Git-Objekt geprüft: `src/pwa/sw.js` enthält
+  Cache v3 und `index.html` kein Update-Steuerelement. Die PWA-Änderung aus CP-013
+  ist nur lokal vorhanden.
+- Eine erneute HTTP-Prüfung von `prompthub-studio.pages.dev` war in dieser
+  Shell wegen eines Netzwerkfehlers nicht möglich. Der aktuelle Live-Zustand
+  wird daher nicht neu behauptet. Sichtbarkeit, Deployment und Branch-Regeln
+  wurden nicht verändert.
+- Nachweis für den aktuellen Workspace: `npm test` 82/82 bestanden;
+  `npm run check` erfolgreich für 90 Dateien; `git diff --check` erfolgreich.
