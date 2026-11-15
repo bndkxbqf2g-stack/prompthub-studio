@@ -19,8 +19,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Der lokale Stand `ec8dc42` wurde am 2026-11-15 als Snapshot über die GitHub-API
   nach `main` übertragen (Commit `ca6210a`). Da kein Git-Transportzugang vorlag,
   wurde die lokale Commit-Abstammung nicht übernommen.
-- `.github/workflows/ci.yml` ist enthalten. Die Commit-Statusabfrage lieferte
-  `statuses: []`; ein erfolgreicher GitHub-Actions-Lauf bleibt unbelegt.
+- `.github/workflows/ci.yml` ist enthalten. Der importierte Snapshot hatte
+  `statuses: []`; der Pages-Vorbereitungscommit
+  `3e92f9c2919fe7026eb3eddd4421d46a7358d903` wurde anschließend im GitHub-Actions-
+  Lauf 43720677933 erfolgreich getestet (75 Node-Tests, statische Prüfung und
+  Patch-Whitespace-Prüfung).
 - Cloudflare-Pages-Profil und Function-Routen sind lokal vorbereitet. Im
   erreichbaren Cloud-Browser wurde kein vorhandenes Pages-Projekt gefunden;
   Workers & Pages zeigt 0/100.000 Requests heute. Die Billing-Seite lädt nicht.
@@ -82,8 +85,9 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 - GitHub Issues/Labels/Kommentare und Contents-CAS gegen ein ausdrücklich
   konfiguriertes Repository testen.
-- Einen tatsächlichen GitHub-Actions-Lauf des `push`-Commits erfassen und
-  Pflichtchecks mit erfolgreichem Ergebnis dokumentieren.
+- Erledigt: tatsächlicher GitHub-Actions-`push`-Lauf 43720677933 auf `main`
+  war für Commit `3e92f9c2919fe7026eb3eddd4421d46a7358d903` erfolgreich. Weitere
+  Remote-Control- und Runner-Integrationschecks sind noch offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
   PromptHub-Arbeitsverzeichnis.

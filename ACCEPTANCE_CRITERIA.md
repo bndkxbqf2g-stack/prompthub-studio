@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal bestanden; Mac offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI und Pflichtchecks | `.github/workflows/ci.yml`, lokale `npm ci/test/check` | Pflicht | teilweise; GitHub-Run offen |
+| A09 | CI und Pflichtchecks | `.github/workflows/ci.yml`; GitHub Actions Run 3 für Commit `3e92f9c2919fe7026eb3eddd4421d46a7358d903` | Pflicht | bestanden: Run 43720677933 erfolgreich; Tests, statische Prüfung und Whitespace-Check erfolgreich |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |

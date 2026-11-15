@@ -1,3 +1,6 @@
+Warning: truncated output (original token count: 3434)
+Total output lines: 218
+
 # Checkpoints
 
 ## CP-000 – Inventar und Schutzrahmen
@@ -96,35 +99,7 @@
   Regressionen, CI-Signale und Belegstatus.
 - Wissen bleibt im ausgewählten Projekt. Prompts trennen bestätigte
   Anforderungen, Diagnosehinweise und Hypothesen. Gealterte Belege zählen nicht
-  als aktuell verifizierte Regression. Aufbewahrung ist auf 200 Ergebnisse,
-  500 Vorfälle je Projekt, 20 Hypothesen je Vorfall und 40 Historieneinträge je
-  Vorfall begrenzt.
-- Tests: `npm test` erfolgreich, 68/68; umfasst Runner-Ingestion,
-  Wiederholungsgruppierung, datensparsame Fehlerklassifikation,
-  exakte Bestätigung mit verknüpften Belegen, Projekttrennung, Manipulations-
-  und Schemafehler, CI-Schrittbegrenzung, Promptkontext und Dashboard.
-- Statische Analyse: `npm run check` erfolgreich, 81 Dateien;
-  `node --check src/pwa/app.js` erfolgreich; `npm run demo` erfolgreich mit
-  `queued → running → succeeded` und sieben Ereignissen.
-- `git diff --check` erfolgreich; Git meldet lediglich die konfigurierte
-  LF/CRLF-Konvertierung für Arbeitsdateien.
-- Abnahmereferenz: A27 und A28 lokal bestanden. A23 bleibt für kontrollierte
-  gepaarte Commit-/CI-Experimente teilweise offen. Echte GitHub-CI-Läufe,
-  private Remote-Control-Repository-Konfiguration, HTTPS/OAuth, Cloud-Binding
-  und Mac-/Cloud-Runner wurden nicht ausgeführt oder vorgetäuscht.
-- Implementierungscommit: `2e747ad` (`Implement error prevention learning engine`).
-- Kosten: keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
-
-## CP-005 – GitHub-Zuordnung und Laufzeitinventar
-
-- Datum: 2026-11-15
-- Nutzerentscheidung: Das bestehende Angebotsküche-Projekt heißt auf GitHub
-  `Einkaufen`. Sein Inhalt bleibt bis zur bestandenen technischen PromptHub-
-  Abnahme und anschließenden einmaligen MVP-Umfangsbestätigung unangetastet.
-- PromptHub-Remote: Der Nutzer hat `prompthub-studio` ausdrücklich zur Anlage
-  auf GitHub freigegeben. GitHub-Connector und lokaler Credential-Manager stellen
-  derzeit keinen Repository-Erstellungszugang bereit; die GitHub-Weboberfläche
-  konnte mit der verfügbaren UI-Automation nicht sicher bedient werden. Das
+  als aktuell verifizierte Regression. Aufbewa…434 tokens truncated… konnte mit der verfügbaren UI-Automation nicht sicher bedient werden. Das
   Formular blieb ungesendet und mit Standard-Sichtbarkeit Public geöffnet.
   Repository-Erstellung, Push und GitHub-CI sind daher noch nicht erfolgt. Der
   Nutzer richtet einen Erstellungszugang ein.
@@ -194,6 +169,11 @@
 - Lokale Nachweise: `npm test` 75/75; `npm run check` 86 Dateien;
   `git diff --check` Exit 0; `npm run demo` meldet einen `succeeded`-Job und
   sieben Ereignisse.
+- Der Pages-Vorbereitungscommit `3e92f9c2919fe7026eb3eddd4421d46a7358d903`
+  wurde auf `main` synchronisiert. GitHub Actions Run
+  [43720677933](https://github.com/bndkxbqf2g-stack/prompthub-studio/actions/runs/43720677933)
+  endete mit `success`; Test-, statische Analyse- und Whitespace-Schritte waren
+  erfolgreich. Die GitHub-API bestätigte anschließend weiter `visibility=private`.
 - Cloudflare-Dashboard: keine vorhandenen Workers-/Pages-Projekte; 0/100.000
   Requests am heutigen UTC-Tag. Billing-Seite blieb beim Laden, daher ist der
   konkrete Abrechnungsstatus nicht bestätigt.
@@ -204,7 +184,8 @@
   Administration, Checks, Code, Deployments und Pull Requests. Kein Pages-
   Projekt, KV-Namespace oder Runtime-Secret wurde angelegt; kein Deployment
   wurde gestartet. Das Repository blieb privat.
-- Abnahme A16 bleibt offen: Berechtigungsfreigabe, Cloudflare-Abrechnung,
+- Abnahme A09 ist für diesen Commit bestanden. A16 bleibt offen:
+  Berechtigungsfreigabe, Cloudflare-Abrechnung,
   Runtime-Bindings, produktiver HTTPS-Deploy sowie Live- und Quotenprüfungen.
   Die Dashboard- und Berechtigungsnachweise stehen in
   `CLOUDFLARE_OPERATIONS.md` und `CLOUD_COST_RULES.md`.

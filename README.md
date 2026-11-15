@@ -14,11 +14,12 @@ enthält den lokalen Quellstand `ec8dc42` auf `main` (Remote-Snapshot-Commit
 für Git-Transport hier keine Anmeldung eingerichtet ist; die ursprüngliche
 lokale Commit-Abstammung wurde dabei nicht übernommen.
 
-Die GitHub-CI-Konfiguration ist enthalten. Für den Snapshot lieferte die
-Commit-Statusabfrage keine Status-Einträge; ein erfolgreicher GitHub-Actions-Lauf
-ist daher noch nicht belegt. Der GitHub-Betrieb der Anwendung benötigt weiterhin
-ein separat konfiguriertes privates Control-Repository, Token und OAuth-
-Zugangsdaten. Ein Deployment wurde nicht erstellt.
+Die GitHub-CI-Konfiguration ist enthalten. GitHub Actions Run 3 für den privaten
+main-Commit `3e92f9c2919fe7026eb3eddd4421d46a7358d903` war erfolgreich:
+75 Tests, statische Prüfung und Whitespace-Prüfung bestanden. Der GitHub-Betrieb
+der Anwendung benötigt weiterhin ein separat konfiguriertes privates
+Control-Repository, Token und OAuth-Zugangsdaten. Ein Deployment wurde nicht
+erstellt.
 
 Ein Cloudflare-Pages-Profil liegt in `wrangler.toml`; die API-Routen nutzen den
 vorhandenen Worker-Handler und schlagen ohne sichere Production-Bindings mit
