@@ -7,6 +7,8 @@ import { onRequest } from "../functions/[[path]].js";
 const routes = JSON.parse(await readFile(new URL("../src/pwa/_routes.json", import.meta.url), "utf8"));
 const pagesConfig = await readFile(new URL("../wrangler.toml", import.meta.url), "utf8");
 const workerConfig = await readFile(new URL("../wrangler.worker.toml", import.meta.url), "utf8");
+const headersConfig = await readFile(new URL("../src/pwa/_headers", import.meta.url), "utf8");
+const pwaHtml = await readFile(new URL("../src/pwa/index.html", import.meta.url), "utf8");
 
 test("Wrangler configuration targets Pages and preserves the previous Worker profile", () => {
   assert.match(pagesConfig, /^pages_build_output_dir = "\.\/src\/pwa"$/m);
@@ -48,12 +50,15 @@ test("PWA service worker caches the second application script for offline launch
   const worker = await readFile(new URL("../src/pwa/sw.js", import.meta.url), "utf8");
   assert.match(worker, /"\/regression-test-request\.js"/);
   assert.match(worker, /"\/service-worker-client\.mjs"/);
+  assert.match(headersConfig, /^\/service-worker-client\.mjs\r?\n\s+Cache-Control: no-cache$/m);
+  assert.match(pwaHtml, /id="update-app"[^>]*hidden/);
+  assert.match(pwaHtml, /<script type="module" src="\/app\.js"><\/script>/);
 });
 
 test("service worker preserves unrelated caches and waits for a user-requested update", async () => {
   const source = await readFile(new URL("../src/pwa/sw.js", import.meta.url), "utf8");
   const listeners = new Map();
-  const calls = { added: [], deleted: [], claimed: 0, skipped: 0 };
+  const calls = { added: [], deleted: [], claimed: 0, skipped: 0, matched: 0 };
   const caches = {
     async open(name) {
       calls.opened = name;
@@ -61,7 +66,7 @@ test("service worker preserves unrelated caches and waits for a user-requested u
     },
     async keys() { return ["prompthub-static-v3", "other-app-cache", "prompthub-static-v4"]; },
     async delete(name) { calls.deleted.push(name); },
-    async match() { return new Response("cached offline asset"); },
+    async match() { calls.matched += 1; return new Response("cached offline asset"); },
   };
   const self = {
     location: { origin: "https://prompthub.example" },
@@ -91,8 +96,19 @@ test("service worker preserves unrelated caches and waits for a user-requested u
   let responsePromise;
   listeners.get("fetch")({ request: new Request("https://prompthub.example/styles.css"), respondWith(promise) { responsePromise = promise; } });
   assert.equal(await (await responsePromise).text(), "cached offline asset");
-  let interceptedApi = false;
-  listeners.get("fetch")({ request: new Request("https://prompthub.example/api/me"), respondWith() { interceptedApi = true; } });
-  assert.equal(interceptedApi, false);
+  assert.equal(calls.matched, 1);
+  const excludedRequests = [
+    new Request("https://prompthub.example/api/me"),
+    new Request("https://prompthub.example/auth/github/start"),
+    new Request("https://prompthub.example/healthz"),
+    new Request("https://prompthub.example/action", { method: "POST", body: "action" }),
+    new Request("https://other.example/styles.css"),
+  ];
+  for (const request of excludedRequests) {
+    let intercepted = false;
+    listeners.get("fetch")({ request, respondWith() { intercepted = true; } });
+    assert.equal(intercepted, false, `${request.method} ${request.url} must bypass the service worker`);
+  }
+  assert.equal(calls.matched, 1);
 });
 

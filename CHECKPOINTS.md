@@ -355,7 +355,8 @@
   `service-worker-client.mjs` wird für Offline-Start mitgecacht und erhält
   `text/javascript` im lokalen Server.
 - Regressionstests prüfen Update-Race, einmaligen Reload, Erstinstallation,
-  Offline-Fallback, Cache-Isolation und Ausschluss der API-Anfragen.
+  Offline-Fallback, Cache-Isolation, No-Cache-Header sowie den Ausschluss von
+  API-, OAuth-, Health-, Cross-Origin- und Nicht-GET-Anfragen.
 - Nachweis: `npm test` 82/82 bestanden; `npm run check` erfolgreich für 90
   Dateien; `git diff --check` erfolgreich; `npm run demo` endete mit
   `succeeded` und sieben Ereignissen.
