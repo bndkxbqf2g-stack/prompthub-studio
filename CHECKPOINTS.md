@@ -819,3 +819,16 @@
   ausdrücklich offen.
 - Pflichtprüfungen nach den Dokumentationsänderungen: `npm test` 105/105;
   `npm run check` (96 Dateien, Prompt-Library synchron); `git diff --check`.
+
+## CP-032 – PR #15 und nachgelagerte Läufe verifiziert
+
+- Datum: 2026-11-15.
+- PR #15 (`docs: refresh current acceptance evidence`) bestand PR-CI-Run 62
+  (`43763665889`, Job `test`) und wurde mit Commit
+  `473f88b5a7d010f7562dfc587c4e3a2906e6c2c7` automatisch in `main` gemergt.
+- Die GitHub-Actions-Ansicht bestätigte für diesen Main-Commit den erfolgreichen
+  Main-CI-Run 63 (`43763723162`) und GitHub-Pages-Run 15 (`43763722729`). Der
+  lokale `main` wurde anschließend per Fast-Forward auf `473f88b` synchronisiert.
+- `ACCEPTANCE_CRITERIA.md` verweist nun auf diese Nachweise. PR #15 änderte
+  ausschließlich Abnahmematrix und Checkpoint-Dokumentation; Produktcode und
+  Sicherheitsregeln blieben unverändert.

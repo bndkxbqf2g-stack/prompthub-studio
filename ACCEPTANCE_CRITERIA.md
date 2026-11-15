@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false` | Pflicht | lokal verifiziert: gestarteter lokaler Server meldete `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen; echter Mac-Runner weiterhin offen |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | Main-Commit `884fa5740b371a7b8de610e5c031237cce388463`: Main-CI-Run 60 (`43762780380`), Job `test`, erfolgreich. Pages-Run 14 (`43762779516`) bestand mit `build`, `deploy` und `report-build-status`. PR #14 wurde nach bestandenem Pflichtcheck automatisch gemergt. GitHub bestätigt `allow_auto_merge=true`; der Nutzer hat am 2026-11-15 automatische Merges zukünftiger PRs ausdrücklich autorisiert, wenn die erforderlichen Gates bestanden sind. Der letzte erfolgreiche Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die verbundene GitHub-Schnittstelle nicht verfügbar. Laut diesem Readback verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-031 |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | Main-Commit `473f88b5a7d010f7562dfc587c4e3a2906e6c2c7`: Main-CI-Run 63 (`43763723162`), Job `test`, erfolgreich. Pages-Run 15 (`43763722729`) war erfolgreich. PR #15 bestand PR-CI-Run 62 (`43763665889`) und wurde anschließend automatisch gemergt. GitHub bestätigt `allow_auto_merge=true`; der Nutzer hat am 2026-11-15 automatische Merges zukünftiger PRs ausdrücklich autorisiert, wenn die erforderlichen Gates bestanden sind. Der letzte erfolgreiche Branch-API-Readback bestätigte `test`, `strict=true` und Admin-Enforcement; ein aktueller Readback ist über die verbundene GitHub-Schnittstelle nicht verfügbar. Laut diesem Readback verlangt die Regel keinen PR und beschränkt direkte Pushes nicht. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-032 |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,14 +46,13 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Aktueller Status: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. Main-Commit
-`884fa5740b371a7b8de610e5c031237cce388463` bestand in Main-CI-Run 60
-(`43762780380`) mit dem Pflichtjob `test`; Pages-Run 14 (`43762779516`)
-bestand mit Build und Deployment. PR #14 wurde nach bestandenem Pflichtcheck
-automatisch gemergt.
+A27/A28 sind durch reproduzierbare Tests belegt. Die aktuelle Implementierungs-
+Basis `473f88b5a7d010f7562dfc587c4e3a2906e6c2c7` bestand in Main-CI-Run 63
+(`43763723162`) mit dem Pflichtjob `test`; Pages-Run 15 (`43763722729`) war
+erfolgreich. PR #15 bestand den erforderlichen PR-Check und wurde automatisch
+gemergt. Der PR änderte nur Abnahmedokumentation.
 Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich; kein
-kostenpflichtiger Plan wurde aktiviert. Aktueller dokumentierter Main-Commit
-ist `884fa5740b371a7b8de610e5c031237cce388463`. Cloudflare bleibt pausiert.
+kostenpflichtiger Plan wurde aktiviert. Cloudflare bleibt pausiert.
 GitHub Pages stellt keine Control API
 bereit, und es ist noch kein alternativer API-Host freigegeben oder konfiguriert.
 Der letzte erfolgreiche Branch-API-Readback bestätigte den erforderlichen Check
