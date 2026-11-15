@@ -38,6 +38,14 @@
   „Usage blocked“. Included-Usage-Alerts sind eingeschaltet. Bei erreichtem
   kostenfreien Kontingent blockiert GitHub Actions statt Mehrverbrauch zu
   berechnen; ein CI-Lauf bleibt deshalb von der verbleibenden Free-Usage abhängig.
+- Für das öffentliche Quell-Repository verwendet die CI nur Standard-
+  GitHub-Runner, darunter `macos-latest` und `macos-15-intel`. GitHub dokumentiert
+  Standard-Runner in öffentlichen Repositories als kostenlos und unbegrenzt.
+  Der macOS-Job läuft nur bei öffentlich sichtbarem Repository; der erforderliche
+  Check `test` schlägt fehl, wenn der macOS-Job übersprungen wird oder fehlschlägt.
+  So wird bei einem später privaten Repository kein macOS-Free-Runner gestartet
+  und kein Merge ohne diese Prüfung freigegeben. Größere Runner werden nicht
+  verwendet.
 - GitHub Pages ist der aktive statische PWA-Host unter
   `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`; es gibt dort
   keine Control API. Cloudflare ist abgewählt. Das Pages-Projekt
@@ -128,6 +136,8 @@
   (abgerufen am 2026-11-15; Cloudflare Pages Edit erstellt, ändert und löscht Pages-Projekte).
 - [GitHub Actions Billing](https://docs.github.com/en/billing/concepts/product-billing/github-actions)
   (abgerufen am 2026-11-15; private Runner verbrauchen enthaltene Free-Usage und werden ohne Mehrkostenkontingent blockiert).
+- [GitHub: Choose a runner for a job](https://docs.github.com/en/actions/how-tos/write-workflows/choose-where-workflows-run/choose-the-runner-for-a-job)
+  (abgerufen am 2026-11-15; Standard-GitHub-Runner sind für öffentliche Repositories kostenlos und unbegrenzt).
 - [GitHub Free Plan enthaltene Nutzung](https://docs.github.com/en/billing/reference/product-usage-included)
   (abgerufen am 2026-11-15).
 
