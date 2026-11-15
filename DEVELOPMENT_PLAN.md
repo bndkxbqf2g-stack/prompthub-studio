@@ -90,20 +90,17 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
   Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
   Free-Quota-Fail-Closed-Tests sind implementiert.
-- Die letzte Cloudflare-Pages-Veröffentlichung unter
-  `https://prompthub-studio.pages.dev` bleibt erreichbar; automatische
-  Production- und Preview-Deployments sind pausiert. GitHub Pages ist unter
-  `https://bndkxbqf2g-stack.github.io/prompthub-studio/` aktiv; die PWA-Dateien
-  sind unter `/src/pwa/`. GitHub Pages stellt keine Control API bereit. GitHub
-  Pages-Unterpfad-Fix wurde mit PR #2 gemergt. GitHub Actions Run 19
-  (`43749169752`) bestand auf PR-Head
-  `36ba10a4166bb365e6fcc8d06b443a2d77118d35`; Merge-Commit ist
-  `c3d479a7676a143ebf4c6ad8448651e162bb9ea3`. Die Browserprüfung bestätigte
-  geladene Styles und relative Icon-/Manifest-Pfade, aber die Control API ist
-  auf diesem statischen Host nicht erreichbar. Das Control-API-KV-Binding, die
-  OAuth-App und Runtime-Secrets sind weiterhin nicht eingerichtet; die
-  Cloudflare-API liefert deshalb HTTP 503.
-  Cloudflare Fail closed ist verifiziert.
+- Die aktive PWA liegt unter
+  `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Main-Commit
+  `b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f` bestand Main-CI-Run 66
+  (`43764164796`) und GitHub-Pages-Run 16 (`43764164154`); PR #16 wurde nach
+  bestandenem Pflichtcheck automatisch gemergt. GitHub Pages hostet nur die
+  statische PWA, keine Control API. Cloudflare ist als Host abgewählt; das
+  Projekt ist pausiert, nicht gelöscht, und die alte Veröffentlichung bleibt
+  erreichbar. Die endgültige Löschung wartet auf die gesonderte Bestätigung.
+  Für die frühere Cloudflare-Control-API fehlten OAuth-App, Runtime-Secrets und
+  KV-Binding; ihr dokumentierter Status war HTTP 503. Ein produktiver
+  Cloud-Control-Plane-Betrieb ist nicht nachgewiesen.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
   `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
 
@@ -129,11 +126,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
 ### Phase 3 – produktionsnahe Sicherheit
 
-- Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; PR #2 enthält
-  den Unterpfad-Fix und die Live-Seite lädt Styles sowie relative
-  Icon-/Manifest-Pfade. Die Control API bleibt auf dem statischen Host
-  unerreichbar. Der vorhandene Cloudflare-Deploy bleibt erreichbar, wird aber
-  nicht mehr automatisch aktualisiert.
+- Die öffentliche PWA-Ansicht ist über GitHub Pages erreichbar; die Live-Prüfung
+  lud UI, Styles, Manifest und App-Icon. Die Control API bleibt auf dem
+  statischen Host unerreichbar. Der pausierte frühere Cloudflare-Deploy bleibt
+  erreichbar, wird aber nicht automatisch aktualisiert. Die echte iPhone-
+  Installation und Live-Offline-/Updateprüfung sind noch offen.
 - OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
   Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
 - Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet

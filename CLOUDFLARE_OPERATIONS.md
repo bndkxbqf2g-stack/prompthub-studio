@@ -1,80 +1,53 @@
 # PromptHub Studio – Cloudflare Pages Betrieb
 
-## Verifizierter Stand
+## Aktueller Status – zuletzt geprüft am 2026-11-15
 
-- Cloudflare-Pages-Projekt `prompthub-studio` ist mit dem öffentlichen GitHub-
-  Repository `bndkxbqf2g-stack/prompthub-studio` verbunden. Account-ID:
-  `19a163849475274c22cb8a8a130d352b`.
-- Die Produktion unter https://prompthub-studio.pages.dev wurde erfolgreich
-  veröffentlicht: Deployment `10eb0d77-7b19-4edc-9adc-548518e098f7`, Commit
-  `504477dc35dab908c8b3755550866bca071c72db`, Cloudflare-Status `success`.
-  Seit 2026-11-15 sind automatische Production-Deployments deaktiviert;
-  Preview-Deployments stehen auf `None`. Die letzte Veröffentlichung bleibt
-  erreichbar. Projekt und Deployment wurden nicht gelöscht.
-- Das Quell-Repository wurde am 2026-11-15 auf ausdrückliche Nutzeranweisung
-  öffentlich gestellt. Auf `main` ist der Check `test` als Branch-Schutz
-  erforderlich (`strict=true`, Admin-Enforcement); Actions Run 14
-  (`43746180556`) für Feature-Branch-Commit
-  `d45d1514656ce120da54e97de5e02f7ee68db288` war erfolgreich. PR #2 ist offen,
-  nicht gemergt. Der letzte Production-Deploy bleibt der oben genannte ältere
-  Commit auf `main`.
-- `wrangler.toml` beschreibt Pages; der bisherige Workers Static Assets-Modus
-  bleibt in `wrangler.worker.toml` erhalten.
-- functions/[[path]].js leitet ausschließlich über _routes.json ausgewählte
-  API-, Auth- und Health-Anfragen an denselben gehärteten Worker weiter. Statische
-  PWA-Dateien werden direkt ausgeliefert.
-- Fehlende Runtime-Secrets oder das KV-Binding führen auf API-Routen zu 503.
-  Es gibt keine lokale Mock-Authentifizierung im Cloudflare-Modus. Ohne
-  Konfiguration bleibt die PWA-Hülle sichtbar, die Control API aber nicht
-  verfügbar.
-- Echte HTTPS-Prüfung: `/`, `/manifest.webmanifest`, `/app-icon-source.png`,
-  `/sw.js`, `/app.js` und `/styles.css` antworteten mit HTTP 200 und passenden
-  Inhaltstypen. `/api/me` und `/healthz` antworteten mit HTTP 503 und
-  `cloud_control_plane_not_configured`, weil OAuth-/Runtime-Konfiguration und
-  KV-Binding nicht vorhanden sind. Die PWA-Hülle ist live; die Control API ist
-  bewusst nicht betriebsbereit.
-- GitHub Pages ist für das Repository auf `main`/`/(root)` aktiviert. Die
-  Projektseite ist unter
-  https://bndkxbqf2g-stack.github.io/prompthub-studio/ erreichbar; die PWA liegt
-  unter `/src/pwa/`. GitHub Pages ist ein statischer Host und stellt weder die
-  Control API noch serverseitige OAuth-Verarbeitung bereit. Die aktuell
-  veröffentlichte PWA lädt wegen Root-relativer Asset-Pfade unvollständig; der
-  relative Pfadfix und Regressionstest sind lokal vorbereitet, aber noch nicht
-  in PR #2 übertragen oder live.
-- Der Quellstand des zuletzt dokumentierten Produktionsdeployments
-  `504477dc35dab908c8b3755550866bca071c72db` verwendet den Service-Worker-Cache
-  `prompthub-static-v3` und enthält noch keinen Update-Button. Lokal liegen die
-  Commits `a1649e6` und `bc84f65` mit dem getesteten Updateablauf und Cache v4.
-  Der Updateablauf liegt auf `codex/oauth-returnto-hardening` in PR #2 und ist
-  deshalb noch nicht Bestandteil des dokumentierten Production-Deployments.
-  Eine erneute Live-HTTP-Prüfung wurde für diesen Feature-Branch nicht ausgeführt.
-- Pages Runtime ist auf `Fail closed` gestellt; der Zustand wurde im Dashboard
-  nach dem Speichern erneut geprüft. Für Branch Control wurde die automatische
-  Bereitstellung von Preview-Branches auf „None“ gesetzt und gespeichert. Die
-  Einstellung konnte nach dem späteren Browser-Transportabbruch nicht erneut
-  ausgelesen werden. Preview-Deployments sind standardmäßig öffentlich; Cloudflare
-  Access wurde dafür nicht eingerichtet und Preview-Secrets sind nicht gesetzt.
-- Die Cloudflare-GitHub-Integration ist im Projekt aktiv und mit dem
-  ausgewählten öffentlichen Quell-Repository verbunden. Sie ist von der GitHub-OAuth-App
-  für die Anmeldung von PromptHub-Nutzern zu unterscheiden; diese OAuth-App,
-  Runtime-Secrets und das KV-Binding sind nicht eingerichtet.
-- Der Cloud-Browser bestätigte Projekt und Deployment. Die Billing-Seite blieb
-  im Ladezustand; daher sind Konto-Abrechnung und Zahlungsmittel nicht
-  unabhängig verifiziert. In diesem Arbeitsgang wurde kein kostenpflichtiger
-  Tarif, keine kostenpflichtige Ressource und keine Abrechnungsfunktion aktiviert.
-- GitHub steht auf Free; der Actions-Budgetwert beträgt $0.00 und zeigt
-  „Usage blocked“. Actions-Billable-Usage nach Rabatten ist $0; die enthaltene
-  Free-Nutzung bleibt begrenzt und ein Lauf kann nach Erschöpfung blockieren.
-- Es wurde kein kostenpflichtiger Tarif und keine kostenpflichtige Ressource
-  aktiviert; der genaue Account-Billing-Status bleibt ungeprüft.
+- Cloudflare ist als Hosting-Ziel abgewählt. Das Pages-Projekt `prompthub-studio`
+  ist pausiert, bleibt mit `bndkxbqf2g-stack/prompthub-studio` verbunden und
+  wurde nicht gelöscht. Die letzte im Dashboard beobachtete erfolgreiche
+  Veröffentlichung hatte die Deployment-ID
+  `7f73f6ff-0294-4c4e-800c-d9509b48709c` und den Commit
+  `8f0fdc25e90f0ba32d0ed79c724ff136aed14881`; sie bleibt unter
+  https://prompthub-studio.pages.dev erreichbar.
+- Automatische Production-Deployments sind pausiert. Preview-Deployments wurden
+  auf `None` gesetzt; diese Einstellung konnte nach dem Browserausfall nicht
+  erneut ausgelesen werden. Es wurden bei der letzten Prüfung keine
+  Cloudflare-Einstellungen verändert.
+- Die Nutzeranweisung lautet, Cloudflare nicht weiter zu verwenden. Eine
+  endgültige Projektlöschung wurde separat zur Bestätigung vorgelegt und ist
+  noch nicht bestätigt. Das Projekt bleibt daher pausiert und erhalten.
+- Die aktive statische PWA liegt auf GitHub Pages unter
+  https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/. Main-Commit
+  `b36d40b7cd4a7c1cad27311af6d6f3364ce1b77f` bestand Main-CI-Run 66 und Pages-
+  Run 16. GitHub Pages hostet keine Control API; der Browser zeigt dafür einen
+  klaren Verfügbarkeitsfehler.
+- Die frühere Cloudflare-API war nicht konfiguriert: OAuth-App, Runtime-Secrets
+  und KV-Binding fehlten. Ihr letzter dokumentierter Status für `/api/me` und
+  `/healthz` war HTTP 503 (`cloud_control_plane_not_configured`). Kein
+  produktiver Cloud-Control-Plane-Betrieb ist nachgewiesen.
+- Eine schreibgeschützte Dashboard-Prüfung zeigte `Workers Free`. Die
+  Abrechnungsansicht lieferte keinen vollständigen accountweiten Kosten- oder
+  Verbrauchsnachweis; daher wird keine vollständige 0-€-Abrechnung behauptet.
+  Ein kostenpflichtiger Tarif wurde in der letzten Prüfung nicht aktiviert.
+- Auto-Merge zukünftiger PRs nach bestandenen Pflichtchecks ist vom Nutzer
+  autorisiert. Der letzte erfolgreiche Branch-Regel-Readback bestätigte für
+  `main` den Check `test`, `strict=true` und Admin-Enforcement; eine aktuelle
+  erneute Abfrage liegt nicht vor.
 
-## Pages-Konfiguration
+## Historische Cloudflare-Konfiguration
+
+Die folgenden Abschnitte dokumentieren die frühere Pages-Einrichtung und
+Wiederherstellungsoptionen. Sie beschreiben keinen aktiven Host und erteilen
+keine Freigabe, Cloudflare fortzusetzen, neue Ressourcen anzulegen oder die
+Projektlöschung auszuführen.
+
+## Historische Pages-Konfiguration
 
 | Einstellung | Wert |
 |---|---|
 | Projektname | prompthub-studio |
 | Produktionsadresse | https://prompthub-studio.pages.dev |
-| Letzte Deployment-ID | 10eb0d77-7b19-4edc-9adc-548518e098f7 |
+| Zuletzt im Dashboard beobachtete Deployment-ID | 7f73f6ff-0294-4c4e-800c-d9509b48709c |
 | GitHub-Repository | bndkxbqf2g-stack/prompthub-studio (öffentlich, Nutzerentscheidung vom 2026-11-15) |
 | Produktionsbranch | main |
 | Root-Verzeichnis | Repository-Root |
