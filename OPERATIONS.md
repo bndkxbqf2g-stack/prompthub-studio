@@ -1,0 +1,86 @@
+# PromptHub Studio – Betrieb
+
+## Lokaler Start
+
+```powershell
+Copy-Item .env.example .env
+npm test
+npm run check
+npm start
+```
+
+Die lokale API bindet standardmäßig an `127.0.0.1:8787`. Der Runner läuft in
+einem separaten Prozess:
+
+```powershell
+npm run runner
+```
+
+Er benötigt für echte Arbeit ein konfiguriertes Control-Repository, Token,
+Projekt-Allowlist und `CODEX_EXECUTABLE`. Ohne diese Werte bleibt er in einem
+expliziten `not_configured`-Zustand. Der Testmodus verwendet nur den
+Memory-Control-Plane-Adapter.
+
+## Serverlose PWA
+
+Cloudflare Worker/Static Assets sind im `wrangler.toml` vorbereitet. Der aktuelle
+Betriebsstatus, notwendige KV-/OAuth-/GitHub-Bindings, Fehlerverhalten und
+kontobezogene Grenzen stehen in `CLOUDFLARE_OPERATIONS.md`. Es wurde kein Konto
+konfiguriert und kein Deployment ausgeführt. Ein Cloud-Codex-Runner ist nicht
+vorhanden; `not_configured` bleibt der echte Zustand.
+
+## Konfiguration
+
+Alle Variablen sind in `.env.example` dokumentiert. Secrets werden nur über die
+Umgebung eingespeist. Wichtige Variablen: `GITHUB_TOKEN`, `GITHUB_REPOSITORY`,
+`GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`, `SESSION_SECRET`,
+`PROMPTHUB_PROJECT_ROOT`, `CODEX_EXECUTABLE`, `PROMPTHUB_PUBLIC_ORIGIN` und
+`PROMPTHUB_MODE`.
+
+## Monitoring
+
+Überwacht werden letzter Heartbeat, Lease-Alter, GitHub-Sync, Prozess-Exit-Code,
+Checkpoint-Phase und Pflichtcheck-Ergebnis. Es werden keine Token- oder Prompt-
+Inhalte gesammelt. Ein fehlender Heartbeat ist ein Zustand, kein Fortschritt.
+
+## Update und Rollback
+
+Updates laufen über einen eigenen Branch/Worktree und die Pflichtprüfungen. Vor
+dem Aktivieren wird ein Commit-/Manifest-Checkpoint angelegt. Rollback erfolgt
+auf einen bekannten Commit in einem neuen Restore-Schritt. Kritische Runner-,
+Auth- und Freigabecodeänderungen benötigen eine unabhängige Prüfung.
+
+## Ressourcen und Kosten
+
+Keine Produktions-Dependencies und keine automatisch aktivierten kostenpflichtigen
+oder KI-Dienste. Das Budget zusätzlicher laufender Dienste beträgt 0 €. Polling,
+Retry-Anzahl, Payload-Größen und Jobzahl sind konfiguriert und
+begrenzt. Rate-Limit- oder Kostenwarnungen führen zu `paused`, nicht zu einer
+stillen Erhöhung von Limits.
+
+## Projektverbindungen und Prompt-Freigabe
+
+Verbinden analysiert das ausgewählte GitHub-Repository nur lesend. Vor dem
+Erstellen eines Jobs muss eine konkrete Prompt-Version ausdrücklich freigegeben
+werden. **Aus PromptHub entfernen** pausiert wartende Jobs und trennt nur den
+Katalogeintrag; laufende oder unklare Jobs blockieren die Trennung. Wiederverbinden
+nutzt dieselbe Repository-Identität. Projektbezogene Datenlöschung ist eine
+separate Aktion mit eigener Bestätigung. Das endgültige Löschen des GitHub-Repo-
+sitorys wird nicht unterstützt.
+
+## KI-Nutzung und Messwerte
+
+Der Prompt-Designer verwendet nur einen belegten kostenfreien KI-Zugang. Solange
+kein solcher Aufrufweg zur PWA verfügbar ist, weist er den strukturierten
+Fallback aus. Das Dashboard zeigt Tokenwerte nur bei Messdaten vom Provider;
+ansonsten werden tatsächliche Provider-Anfragen, Executor-Starts, Laufzeit,
+Wiederholungen und echte Check-Ergebnisse getrennt benannt. Unvollständige
+Tokentelemetrie wird als teilweise gemessen gekennzeichnet; fehlende Daten sind
+nicht null.
+
+Gleichlautende Analysen werden nur für einen identischen Projekt-Snapshot,
+Wunsch, Anhang, Lieferform und Wissenshinweis dedupliziert. Der flüchtige
+Prozesscache enthält höchstens 32 Einträge für fünf Minuten. Ein Cache-Treffer
+überspringt weder Nutzerfreigaben noch Prompt-Versionierung oder Pflichtchecks.
+Cache-Hit-Zähler sind lokal zum laufenden Prozess und keine dauerhaften
+Einsparungs- oder Tokenangaben.

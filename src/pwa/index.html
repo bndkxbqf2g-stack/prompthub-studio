@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#0b1324">
+    <meta name="description" content="PromptHub Studio – sichere Verwaltung von Entwicklungsprojekten und Codex-Aufträgen">
+    <link rel="icon" type="image/png" sizes="1254x1254" href="/app-icon-source.png">
+    <link rel="apple-touch-icon" href="/app-icon-source.png">
+    <link rel="manifest" href="/manifest.webmanifest">
+    <link rel="stylesheet" href="/styles.css">
+    <title>PromptHub Studio</title>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <p class="eyebrow">PROMPTHUB STUDIO</p>
+          <h1>Projektsteuerung</h1>
+        </div>
+        <button id="refresh" class="icon-button" type="button" aria-label="Ansicht aktualisieren">↻</button>
+      </header>
+
+      <section id="notice" class="notice" role="status" aria-live="polite"></section>
+
+      <section id="auth-panel" class="card auth-card" hidden>
+        <p class="eyebrow">ZUGANG</p>
+        <h2>GitHub-Sitzung erforderlich</h2>
+        <p>GitHub-Zugangsdaten bleiben serverseitig. Melde dich über die konfigurierte OAuth-Anmeldung an.</p>
+        <a class="button primary" href="/auth/github/start">Mit GitHub anmelden</a>
+      </section>
+
+      <section id="app-panel" hidden>
+        <div class="user-row">
+          <span id="user-label"></span>
+          <button id="logout" class="text-button" type="button">Abmelden</button>
+        </div>
+
+        <section class="card metrics-card" aria-labelledby="metrics-title">
+          <div class="section-heading">
+            <div><p class="eyebrow">NACHWEISBARE NUTZUNG</p><h2 id="metrics-title">Ressourcenübersicht</h2></div>
+            <span id="job-cap" class="chip">0 / 2 aktive Jobs</span>
+          </div>
+          <div id="metrics" class="metrics-grid"><p class="muted">Messwerte werden geladen …</p></div>
+        </section>
+
+        <section class="card project-section">
+          <div class="section-heading">
+            <div><p class="eyebrow">MEHRPROJEKTVERWALTUNG</p><h2>GitHub-Projekte</h2></div>
+          </div>
+          <p class="muted">Verbinden liest Repository-Regeln, Übersicht, Aufgaben und CI. Das Repository wird dabei nicht verändert.</p>
+          <form id="project-form" class="inline-form">
+            <label for="repository">Repository</label>
+            <input id="repository" name="repository" maxlength="200" placeholder="owner/repository" autocomplete="off" required>
+            <button class="button primary" type="submit">Verbinden</button>
+          </form>
+          <div id="projects" class="project-list" aria-live="polite"></div>
+          <section id="project-detail" class="project-detail" hidden></section>
+          <section id="incident-panel" class="incident-panel" hidden aria-labelledby="incident-title">
+            <div class="section-heading">
+              <div><p class="eyebrow">FEHLERPRÄVENTION</p><h3 id="incident-title">Fehlerverlauf &amp; Verbesserungsnachweise</h3></div>
+            </div>
+            <p class="muted">Runnerfehler werden aus tatsächlichen Abschlussereignissen übernommen. Nutzerberichte und Ursachenhypothesen bleiben ausdrücklich unbestätigt.</p>
+            <form id="incident-report-form" class="incident-report-form">
+              <label for="incident-summary">Fehler oder Laufzeitproblem melden</label>
+              <textarea id="incident-summary" rows="3" maxlength="1500" required placeholder="Beobachtetes Symptom, ohne Zugangsdaten …"></textarea>
+              <label for="incident-components">Betroffene Pfade (optional, kommasepariert)</label>
+              <input id="incident-components" maxlength="800" placeholder="src/module/file.mjs">
+              <button class="button secondary" type="submit">Fehlerbericht speichern</button>
+            </form>
+            <div id="incidents" class="incident-list" aria-live="polite"></div>
+          </section>
+        </section>
+
+        <section id="designer-section" class="card designer-card">
+          <div class="section-heading">
+            <div><p class="eyebrow">PROMPT-DESIGNER</p><h2>Auftrag gemeinsam präzisieren</h2></div>
+          </div>
+          <p class="muted">Der kostenfreie strukturierte Assistenzmodus ist aktiv. Er trennt bestätigte Anforderungen, offene Fragen und Vorschläge.</p>
+          <form id="designer-form">
+            <label for="intent">Dein Wunsch</label>
+            <textarea id="intent" name="intent" rows="4" maxlength="12000" placeholder="Beschreibe frei, was du erreichen möchtest …" required></textarea>
+            <div class="toolbar-row">
+              <button id="voice-input" class="button secondary" type="button">Spracheingabe</button>
+              <label class="file-button" for="attachments">Textanhänge</label>
+              <input id="attachments" type="file" accept=".txt,.md,.json,.yaml,.yml,.csv,text/plain,text/markdown,application/json" multiple hidden>
+              <span id="attachment-label" class="muted">Keine Anhänge</span>
+            </div>
+            <label for="deliverable">Ausgabe</label>
+            <select id="deliverable" name="deliverable">
+              <option value="single">Einzelauftrag</option>
+              <option value="package">Entwicklungspaket mit Markdown-Dateien</option>
+            </select>
+            <button class="button primary full" type="submit">Wunsch analysieren</button>
+          </form>
+          <section id="draft-view" class="draft-view" hidden aria-live="polite"></section>
+        </section>
+
+        <section class="card library-card">
+          <div class="section-heading">
+            <div><p class="eyebrow">QUELLENBELEGTE MUSTER</p><h2>Prompt-Bibliothek</h2></div>
+          </div>
+          <label for="library-search">Suchen</label>
+          <input id="library-search" type="search" placeholder="Codex, Tests, Sicherheit …">
+          <label for="library-category">Kategorie</label>
+          <select id="library-category"><option value="">Alle Kategorien</option></select>
+          <div id="library-results" class="library-list"></div>
+        </section>
+
+        <section class="section-heading list-heading">
+          <div><p class="eyebrow">GITHUB CONTROL PLANE</p><h2>Aufträge</h2></div>
+          <span id="job-count" class="muted"></span>
+        </section>
+        <section id="jobs" class="job-list" aria-live="polite"></section>
+      </section>
+    </main>
+
+    <dialog id="confirmation-dialog" class="confirm-dialog">
+      <form method="dialog" id="confirmation-form">
+        <p class="eyebrow">BESTÄTIGUNG</p>
+        <h2 id="confirmation-title"></h2>
+        <div id="confirmation-description" class="confirm-description"></div>
+        <label id="confirmation-label" for="confirmation-value"></label>
+        <input id="confirmation-value" autocomplete="off" spellcheck="false">
+        <p id="confirmation-error" class="error-text" aria-live="polite"></p>
+        <div class="dialog-actions">
+          <button id="confirmation-cancel" class="button secondary" value="cancel">Abbrechen</button>
+          <button id="confirmation-submit" class="button danger" type="button">Bestätigen</button>
+        </div>
+      </form>
+    </dialog>
+
+    <script src="/regression-test-request.js" defer></script>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

@@ -1,0 +1,164 @@
+# Checkpoints
+
+## CP-000 – Inventar und Schutzrahmen
+
+- Datum: 2026-11-15
+- Status: abgeschlossen
+- Nachweis: Arbeitsmappe war leer; kein lokales Repository, keine `AGENTS.md`,
+  keine PromptHub-Artefakte vorhanden.
+- Fähigkeiten: Git, Node.js/npm, pnpm und Docker lokal vorhanden; `gh` nicht
+  vorhanden; GitHub-MCP authentifiziert als `bndkxbqf2g-stack` mit Schreibrechten
+  in den eigenen Repositories.
+- Entscheidungen: kein Remote-Repository erstellt; lokale Git-Historie begonnen;
+  dependency-freier Node-MVP; GitHub als durable Control Plane.
+- Restriktionen: echter Mac, OAuth-App, HTTPS-Hosting und Codex-Binary sind in
+  dieser Windows-Umgebung nicht als Betriebsnachweis verifiziert.
+- Prüfung: `git diff --check` erfolgreich.
+
+## CP-001 – Core-Verträge
+
+- Datum: 2026-11-15
+- Status: abgeschlossen
+- Implementiert: dependency-freier Node-Kern, Memory- und GitHub-Control-Plane,
+  GitHub OAuth, mobile PWA, CAS-Leases, Job-Cap 2, Recovery/Resume-Gate,
+  Heartbeats, Checkpoints, Pflichtchecks, isolierte Branches/Worktrees,
+  outbound-only Runner, versioniertes Wissen mit Evidenz-Gates und
+  checksum-verifizierte Backups mit expliziter Restore-Freigabe sowie
+  Dependency-/Risiko-Gates für die Jobpriorisierung. Produktionshärtung erzwingt
+  HTTPS, private Control-Repositories und eine GitHub-Login-Allowlist.
+- Tests: `npm test` erfolgreich, 19/19; `npm ci --ignore-scripts --no-audit --no-fund`
+  erfolgreich; `npm run check` erfolgreich; Syntaxprüfung für 30 `.mjs`-Dateien
+  erfolgreich; `git diff --check` erfolgreich.
+- Vertikalschnitt: `npm run demo` erfolgreich; Job `queued → running →
+  succeeded`, sieben Ereignisse und keine aktive Lease nach Abschluss.
+- Laufzeitprüfung: lokale API auf `127.0.0.1:8787` gestartet; `/healthz` meldete
+  `runner_inbound_port=false`; PWA-HTML lieferte CSP und HTTP 200. Nachweis-
+  listener wurde beendet; kein Listener blieb auf Port 8787.
+- Abnahmebezug: A01, A02, A03, A04, A05, A06, A07, A08, A10, A11, A12, A13
+  und A15 sind lokal durch Tests/Checks belegt. A09 ist als Workflow versioniert,
+  aber noch nicht in GitHub ausgeführt. A14 ist dokumentiert und durch die
+  kritische Strategie-Freigabe markiert, aber noch nicht vollständig als
+  Betriebsnachweis abgenommen.
+- Offene externe Nachweise: echter Mac-Runner, GitHub-Workflow-Run, private
+  GitHub-Control-Repository-Sichtbarkeit, OAuth-App und freigegebener HTTPS-Host.
+- Versionierung: Git-Repository wurde initialisiert und `git status` ist lesbar;
+  ein lokaler Commit konnte wegen der vom Ausführungsrahmen schreibgeschützten
+  `.git`-Indexdatei nicht angelegt werden (`index.lock: Permission denied`).
+
+## CP-002 – Multi-Projekt, Prompt-Intelligence und Effizienz
+
+- Datum: 2026-11-15
+- Status: lokal implementiert und geprüft; externe Abnahme bleibt offen.
+- Implementiert: serverlose Cloudflare-Worker-Adapterstruktur mit KV-Session-
+  Store und fail-closed Quotenfehlern; Multi-Projekt-Verwaltung mit getrennter
+  Projektdatenhaltung, sicherem Entfernen/Wiederverbinden und gesonderter
+  Datenlöschung; Prompt-Designer mit Interview, Risiko-/Qualitätsprüfung,
+  ausdrücklicher Freigabe und deterministischem Fallback; quellenbelegte
+  Prompt-Bibliothek mit Suche, Reviews und Sicherheits-/Aktualitäts-Audit;
+  taskbezogene Kontextwahl, versionierte Snapshots, Cache-Deduplizierung und
+  Dashboard für gemessene Tokens, Anbieter-/Executor-Aufrufe, Laufzeit,
+  Wiederholungen, Pflichtchecks und Datenerfassungsgrenzen.
+- Prüfungen: `npm test` 52/52; `npm run check` 76 Dateien; `npm run demo`
+  erfolgreich mit sieben Statusereignissen; `git diff --check` ohne
+  Whitespace-Fehler (Git meldet nur LF/CRLF-Konvertierungshinweise).
+- Effizienznachweis: Tokenwerte erscheinen nur aus Anbietertelemetrie;
+  unbekannte und teilweise Messungen bleiben unterscheidbar. Das Dashboard
+  markiert die GitHub-Abfragegrenze von 100 Issues sowie höchstens 50
+  aufbewahrte Prompt-Entwürfe je Projekt. `/healthz` behauptet keinen laufenden
+  Runner, sondern meldet `not_observed` und eine etwaige Konfiguration separat.
+- Offene externe Abnahme: kein Remote-Control-Repository, kein verifiziertes
+  Cloudflare-Konto/KV-Binding/Live-Deployment, kein echter GitHub-CI-Lauf,
+  keine OAuth-App/HTTPS-Freigabe und kein verfügbarer Mac- oder Cloud-Codex-
+  Executor. Keine kostenpflichtige Funktion wurde aktiviert.
+- Angebotsküche: noch nicht analysiert; bleibt bis zur vollständigen
+  PromptHub-Abnahme und der verlangten MVP-Umfangsbestätigung gesperrt.
+
+## CP-003 – Fehlerprävention und verifiziertes Ergebnislernen
+
+- Datum: 2026-11-15
+- Status: lokal implementiert und geprüft; technische Gesamt-Abnahme bleibt
+  wegen externer Betriebsnachweise offen.
+- Implementiert: `ErrorLearningEngine` für projektbezogene Runnerfehler,
+  Wiederholungsmuster, Nutzerberichte, Ursachenhypothesen und explizit
+  menschlich bestätigte Ursachen; Digest-, Schema- und vorhandene
+  Control-Plane-Belege werden geprüft. Menschliche Ursachenbestätigung verlangt
+  eine exakte Incident-Phrase, fehlgeschlagenen plus später bestandenen
+  gleichnamigen Pflichtcheck und die Bestätigung, dass der Erfolgsjob dieselbe
+  Korrektur prüft.
+- Runner-/Check-Ausgaben werden nur in-memory mit einer festen Liste
+  deterministischer Fehlerklassen analysiert. Rohe Logs gelangen nicht in
+  Projektdaten, Jobereignisse, Prompts oder Dashboard. GitHub-CI-Analyse ist auf
+  fünf jüngste Runs, zwei Fehlerdetails und je 100 Jobs begrenzt; keine
+  vollständigen Actions-Logs werden gespeichert.
+- PWA/API: projektbezogene Fehlerliste und -meldung, Hypothesenformular,
+  menschlicher Bestätigungsdialog, Fehlerquote aus der geladenen Jobstichprobe,
+  7-Tage-Fehlerbeobachtungstrend, wiederkehrende Muster, verfügbare bestätigte
+  Regressionen, CI-Signale und Belegstatus.
+- Wissen bleibt im ausgewählten Projekt. Prompts trennen bestätigte
+  Anforderungen, Diagnosehinweise und Hypothesen. Gealterte Belege zählen nicht
+  als aktuell verifizierte Regression. Aufbewahrung ist auf 200 Ergebnisse,
+  500 Vorfälle je Projekt, 20 Hypothesen je Vorfall und 40 Historieneinträge je
+  Vorfall begrenzt.
+- Tests: `npm test` erfolgreich, 68/68; umfasst Runner-Ingestion,
+  Wiederholungsgruppierung, datensparsame Fehlerklassifikation,
+  exakte Bestätigung mit verknüpften Belegen, Projekttrennung, Manipulations-
+  und Schemafehler, CI-Schrittbegrenzung, Promptkontext und Dashboard.
+- Statische Analyse: `npm run check` erfolgreich, 81 Dateien;
+  `node --check src/pwa/app.js` erfolgreich; `npm run demo` erfolgreich mit
+  `queued → running → succeeded` und sieben Ereignissen.
+- `git diff --check` erfolgreich; Git meldet lediglich die konfigurierte
+  LF/CRLF-Konvertierung für Arbeitsdateien.
+- Abnahmereferenz: A27 und A28 lokal bestanden. A23 bleibt für kontrollierte
+  gepaarte Commit-/CI-Experimente teilweise offen. Echte GitHub-CI-Läufe,
+  private Remote-Control-Repository-Konfiguration, HTTPS/OAuth, Cloud-Binding
+  und Mac-/Cloud-Runner wurden nicht ausgeführt oder vorgetäuscht.
+- Implementierungscommit: `2e747ad` (`Implement error prevention learning engine`).
+- Kosten: keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
+
+## CP-005 – GitHub-Zuordnung und Laufzeitinventar
+
+- Datum: 2026-11-15
+- Nutzerentscheidung: Das bestehende Angebotsküche-Projekt heißt auf GitHub
+  `Einkaufen`. Sein Inhalt bleibt bis zur bestandenen technischen PromptHub-
+  Abnahme und anschließenden einmaligen MVP-Umfangsbestätigung unangetastet.
+- PromptHub-Remote: Der Nutzer hat `prompthub-studio` ausdrücklich zur Anlage
+  auf GitHub freigegeben. GitHub-Connector und lokaler Credential-Manager stellen
+  derzeit keinen Repository-Erstellungszugang bereit; die GitHub-Weboberfläche
+  konnte mit der verfügbaren UI-Automation nicht sicher bedient werden. Das
+  Formular blieb ungesendet und mit Standard-Sichtbarkeit Public geöffnet.
+  Repository-Erstellung, Push und GitHub-CI sind daher noch nicht erfolgt. Der
+  Nutzer richtet einen Erstellungszugang ein.
+- Laufzeitinventar: Windows (`win32`); `codex-cli 0.167.0-alpha.4.1` installiert.
+  `codex login status` meldete mit gesetztem vorhandenem `CODEX_HOME` eine
+  ChatGPT-Sitzung. Der nichtinteraktive Smoke-Test mit `--ephemeral` und
+  `--sandbox read-only` endete mit Exitcode 1: Zugriff verweigert beim Erzeugen
+  temporärer CLI-Dateien und beim Schreiben der lokalen Diagnose-Datenbank.
+  Daher gilt tatsächliche Codex-Ausführung in dieser gesperrten Umgebung als
+  nicht nachgewiesen; es wurde kein weiterer Modellauftrag gestartet.
+  `gh`- und `wrangler`-Kommandos sind nicht installiert.
+- Lokalprüfung in diesem Durchlauf: `npm test` 70/70, `npm run check` 83 Dateien;
+  keine Quelldatei wurde nach diesen Prüfungen geändert.
+- Abnahmestatus bleibt `conditional_local_pass`. Remote-Control-Repository,
+  OAuth/HTTPS, echtes GitHub-CI, kostenloser Cloud-Runner und Mac-Runner fehlen.
+- Kosten: keine kostenpflichtige Ressource aktiviert.
+- Angebotsküche bleibt bis zur vollständigen PromptHub-Abnahme gesperrt.
+
+## CP-004 – Beleggestützte Regressionstest-Aufträge
+
+- Datum: 2026-11-15
+- Ergänzung: Bei wiederholten Runnerfehlern oder menschlich bestätigten
+  Ursachen mit aktuell verfügbaren Belegen kann die PWA einen begrenzten
+  Regressionstest-Auftrag aus den strukturierten Incident-Feldern vorbereiten.
+  Der Auftrag verlangt Reproduktion und einen gezielten Vorher-/Nachher-Test,
+  behandelt Diagnosefelder als Hinweise und wird erst nach Prompt-QA und
+  ausdrücklicher Nutzerfreigabe als Entwicklungsjob erstellt.
+- Einmalige und unbestätigte Berichte oder gealterte Belege zeigen keinen
+  Regressionstest-Auftrag an. Die Funktion erzeugt keinen Code, speichert keine
+  vollständigen Runnerlogs und verändert kein verbundenes Repository selbst.
+- Tests: `npm test` 70/70; `npm run check` erfolgreich für 83 Dateien;
+  `npm run demo` erfolgreich mit `queued → running → succeeded` und sieben
+  Ereignissen; PWA-JavaScript-Syntax und `git diff --check` erfolgreich.
+- Abnahmereferenz: A29 lokal bestanden. Ausführung in einem verbundenen
+  Nutzerprojekt bleibt mangels Remote und Runner offen.
+- Implementierungscommit: `30a94ed` (`Add evidence-based regression task preparation`).
+- Kosten: keine kostenpflichtigen Ressourcen oder Dienste aktiviert.
