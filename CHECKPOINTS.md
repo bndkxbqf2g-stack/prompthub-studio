@@ -644,3 +644,19 @@
   erfolgreich (95 Dateien, Prompt-Library synchron); `git diff --check`
   erfolgreich. Die Änderung ist dokumentarisch; Runtime, Tests und Kosten-
   beziehungsweise Deployment-Einstellungen wurden nicht verändert.
+
+## CP-024 – CI prüft den tatsächlichen Patch auf Whitespace
+
+- Datum: 2026-11-15, 19:57 UTC.
+- `git diff --check` lief zuvor ohne Vergleichsbereich nach einem sauberen
+  Checkout und prüfte dadurch nicht die PR-Änderungen. Der Workflow lädt jetzt
+  die vollständige Git-Historie und prüft `base...head` für PRs sowie
+  `before...head` für normale Pushes. Ein Regressionstest schützt beide Pfade.
+- PR #7, Head `ac0c376e7ee63fc7f02a4de38d8d0e94277f767b`: GitHub Actions Run 34
+  (`43755283240`) bestand. Der Job `test` führte den Schritt
+  `Check pull request patch whitespace` erfolgreich aus; der Push-spezifische
+  Schritt war beim PR-Ereignis erwartungsgemäß übersprungen.
+- Pflichtprüfungen lokal: `npm test` 105/105 bestanden; `npm run check`
+  erfolgreich (96 Dateien, Prompt-Library synchron); `git diff --check`
+  erfolgreich. Keine Pflichtprüfung wurde abgeschwächt; ein Regressionstest
+  wurde ergänzt.
