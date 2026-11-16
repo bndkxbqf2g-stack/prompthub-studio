@@ -1356,3 +1356,21 @@
   keinen Live-Kontingentnachweis. Netlify-Anmeldung, Free-Tarif, autoritativer
   Readback, OAuth und produktiver API-Betrieb bleiben offen. Keine
   kostenpflichtige Ressource wurde aktiviert.
+## CP-059 – Abnahmestatus nach PR #46 revalidiert
+
+- Datum: 2026-11-16. PR #46 wurde als Main-Commit
+  `4d4904a1764105fa8ca97412d6160e8488dfa4d4` gemergt. PR-CI `43901291322`
+  bestand `test`, `macos-latest` und `macos-15-intel`; Main-CI `43901746256`
+  bestand dieselben Pflichtjobs; Pages-Run `43901742433` bestand Build, Deploy
+  und Statusbericht.
+- Live-Browserprüfung lud die PWA unter `/src/pwa/` und zeigte
+  „Control API nicht verfügbar“. API, OAuth und GitHub-persistente Jobs sind
+  damit weiterhin nicht live nachgewiesen.
+- Der aktuelle Branch-Schutz-Readback über die GitHub-Integration antwortete
+  `403 Resource not accessible by integration`; die Browser-Sitzung war
+  abgemeldet. Keine Branch-Regel wurde geändert. Eine direkte Push-Sperre ist
+  damit für diese Revalidierung nicht nachgewiesen.
+- `ACCEPTANCE_CRITERIA.md` aktualisiert A01, A09, A16, A17 und A30 sowie den
+  aktuellen Status auf Commit `4d4904a`. Netlify-Anmeldung und Einrichtung
+  bleiben wie vom Nutzer gewünscht bis zur Rückkehr an den Desktop offen.
+- Es wurde kein kostenpflichtiger Dienst aktiviert; Cloudflare bleibt pausiert.
