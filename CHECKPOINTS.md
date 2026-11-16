@@ -1307,3 +1307,35 @@
   und unterscheidet ausdrücklich zwischen GitHub-Repositoryansicht und PWA.
   Login, API, iPhone-Installation, Offlineverhalten und Updateverhalten sind
   weiterhin nicht abgenommen. Kein kostenpflichtiger Dienst wurde aktiviert.
+
+## CP-057 – Post-Merge-CI und Netlify-Quota-Schnittstelle revalidiert
+
+- Datum: 2026-11-16. PR #43 ist als Merge-Commit
+  `026838b056ad474abfd272596706dfd34622697c` auf `main`. Der Pull-Request-
+  Lauf `43890738802` und der Post-Merge-Main-Lauf `43891014436` bestanden
+  jeweils `test`, `macos-latest` und `macos-15-intel`. Pages-Lauf
+  `43891011644` bestand `build`, `deploy` und `report-build-status`.
+- Lokale Pflichtprüfungen auf dem unveränderten Produktcode-Arbeitsstand
+  (`HEAD 4be6b8bb0ff73a14a3670423d6de7c3de3fc6ce1`; PR #42/#43 waren
+  Dokumentationsänderungen): `npm test` 138/138, `npm run check` erfolgreich
+  für 108 Dateien samt Prompt-Library-Abgleich und `git diff --check` ohne
+  Befund. Die GitHub-CI-Nachweise gelten für den neueren Remote-Main-Stand.
+- Die am 2026-11-16 geprüfte öffentliche Netlify-OpenAPI-Referenz 2.63.1
+  dokumentiert keinen Team-Credit-/Balance-Endpunkt; die Textsuche nach
+  `credit` ergab keinen Treffer. `getAccountBuildStatus` liefert Buildstatus
+  und Build-Minuten, nicht den Credit-Saldo.
+  Netlifys [Anleitung zur Nutzungsüberwachung](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/monitor-usage-for-credit-based-plans/)
+  verweist für Team-Credit-Balance und Credit-Aufschlüsselung auf das
+  authentifizierte Dashboard. Quellen:
+  [öffentliche Netlify-API-Referenz](https://open-api.netlify.com/).
+- Ohne einen autoritativen, automatisiert lesbaren Teamverbrauch bleibt das
+  vorhandene Quoten-Gate absichtlich `unknown` und geschlossen. Eine
+  Dashboard-Anzeige oder ein alter manueller Wert wird nicht als frischer
+  maschinengeprüfter Nachweis behandelt. Netlify-Konto, Free-Tarif,
+  Auto-Recharge-Einstellung, OAuth-Callback und Control-API-Livebetrieb sind
+  nicht verifiziert; es wurde kein Hosting oder Tarif aktiviert.
+- PR #43 war dokumentationsbezogen. Der bereits dokumentierte Pages-Browser-
+  Smoke bestätigt weiterhin nur die statische PWA und die ehrliche Meldung
+  „Control API nicht verfügbar“; ein API-Live-Smoke, echte iPhone-Installation,
+  echter MacBook-Runner und GitHub-persistente Runner-Ausführung fehlen.
+
