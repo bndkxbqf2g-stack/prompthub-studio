@@ -1338,4 +1338,3 @@
   Smoke bestätigt weiterhin nur die statische PWA und die ehrliche Meldung
   „Control API nicht verfügbar“; ein API-Live-Smoke, echte iPhone-Installation,
   echter MacBook-Runner und GitHub-persistente Runner-Ausführung fehlen.
-
