@@ -76,13 +76,16 @@ Run 80 (`43770627889`) auf beiden macOS-Architekturen und für `test`; GitHub
 führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte die
 Erklärung zur fehlenden Control API; ein Klick auf Aktualisieren erhielt den
 Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
-Beim letzten Main-Abgleich war Merge-Commit
-`86202135780f25f63c288886c85d7694d4204410` aus PR #24. PR-CI-Run 89
-(`43774470371`) bestand `macos-latest`, `macos-15-intel` und `test`, woraufhin
-GitHub automatisch mergte. Der letzte separat verifizierte Main-CI-/Pages-Lauf
-bleibt Run 84/22 auf dem älteren Dokumentationscommit
-`9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; ein Pages-Readback nach PR #23/#24
-liegt nicht vor. PR #24 änderte keine PWA-Dateien.
+Beim Abgleich am 2026-11-16 war der lokale und entfernte `main` auf
+`a80bab8cb7f15bc1012efde888f106267c47ea03`, dem Merge-Commit von PR #27. Die
+verbundene GitHub-Prüfung bestätigte für PR-Head
+`d30c6ef61425f5a585427efa0cbc9964d4fef830` in Actions-Runs `43777050095` und
+`43777063773` erfolgreiche Jobs für `macos-latest`, `macos-15-intel` und
+`test`. Einen Main-Push-Workflow-Readback nach dem Merge konnte ich nicht
+abrufen. Der letzte separat verifizierte Pages-Lauf bleibt Run 22
+(`43771264030`) auf dem älteren Dokumentationscommit
+`9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; ein Pages-Readback nach PR #27
+liegt nicht vor.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
