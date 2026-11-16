@@ -1059,3 +1059,28 @@
   zu bestätigen.
 - Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
   97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.
+
+## CP-045 – Auto-Merge und Branch-Schutz unabhängig ausgelesen
+
+- Datum: 2026-11-16.
+- PR #30 mit Head `8581fdfd19c73b034702834f287e5a0af696b887` bestand `test`,
+  `macos-latest` und `macos-15-intel` in Actions-Runs `43780749466` und
+  `43780772252`. GitHub Auto-Merge integrierte den PR als
+  `7058c1c10721ff661f30ccb26891bfca7d3d0982`; der lokale `main` wurde per
+  Fast-Forward aktualisiert und war sauber.
+- Main-CI-Run `43780867661` und GitHub-Pages-Run `43780867315` endeten beide mit
+  `completed/success` auf diesem Merge-Commit. Ein erneuter HTTP-Smoke der
+  veröffentlichten URL sowie echte iPhone-, Offline- und Update-Prüfungen liegen
+  nicht vor.
+- Der authentifizierte REST-Readback der `main`-Branchregel bestätigt den
+  erforderlichen Statuscheck `test` von GitHub Actions (`app_id=15368`),
+  `strict=true`, `enforce_admins=true`, `allow_force_pushes=false` und
+  `allow_deletions=false`. Pull-Request-Reviews sind nicht erforderlich; die
+  Regel verlangt somit keinen PR bzw. Review. Diese verbleibende Lücke wird
+  offengelegt und nicht als geschützte PR-Pflicht ausgegeben.
+- GitHub dokumentiert Branch-Schutzregeln für öffentliche Repositories im
+  Free-Tarif:
+  https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches
+- Lokale Pflichtprüfungen nach dieser Dokumentationsänderung: `npm test` 109/109;
+  `npm run check` erfolgreich für 97 Dateien und Prompt-Library-Synchronisierung;
+  `git diff --check` ohne Befund.
