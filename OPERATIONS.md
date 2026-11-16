@@ -57,6 +57,31 @@ Prüfung bestätigt nur den CLI-Login des aktuellen Hosts. Sie konfiguriert wede
 den PromptHub-Runner noch einen Cloud-Executor. Zugangsdaten aus `auth.json`
 werden weder kopiert noch in PromptHub gespeichert.
 
+## Verifizierter Codex-Executor-Smoke
+
+Am 2026-11-16 meldete `codex login status` nach einem prozesslokalen
+`CODEX_HOME`-Override eine aktive ChatGPT-Sitzung. Ein echter Auftrag lief
+anschließend über `ProcessExecutor` und `PromptHubRunner` in einem neu erzeugten
+Git-Fixture: Codex änderte eine Quelldatei, der Node-Pflichtcheck bestand, der
+Job wurde `succeeded`, vier Checkpoints wurden erfasst und der Lease danach
+freigegeben. Der Test verwendete eine `MemoryControlPlane`, keinen
+GitHub-Control-Plane-Adapter.
+
+Die verwaltete Windows-Sandbox verweigerte zunächst den Zugriff auf die Codex-
+SQLite-/App-Server-Zustandsdateien. Für den einmaligen Smoke wurde
+`CODEX_SQLITE_HOME` auf das automatisch entfernte Temp-Verzeichnis gesetzt;
+`CODEX_HOME` blieb der vorhandene Anmeldeordner. Der Prozess lief mit
+`--ephemeral` und `--sandbox workspace-write`; eine äußere Prozessfreigabe war
+für den Zugriff auf den vorhandenen CLI-Zustand nötig. Es wurden weder
+Anmeldedaten kopiert noch dauerhafte Umgebungswerte oder Codex-Einstellungen
+geändert. `CODEX_SQLITE_HOME` ist eine von Codex dokumentierte Variable für
+SQLite-Zustand ([offizielle Umgebungsvariablen](https://learn.chatgpt.com/docs/config-file/environment-variables)).
+
+Dieser einmalige Windows-Fixture-Smoke richtet keinen dauerhaften Runner ein und
+belegt weder GitHub-Persistenz noch den Betrieb auf dem MacBook. Der
+`ProcessExecutor` meldete keine vertrauenswürdigen Token-/Modellverbrauchswerte;
+diese bleiben unbekannt.
+
 ## PWA-Veröffentlichung
 
 GitHub Pages ist der aktive statische PWA-Host:
@@ -87,6 +112,12 @@ wurde als `792c96e3e8be2db849143b8420baea9c241f8eb2` gemergt. Main-CI-Run 117
 diesem Produktcode-Stand. Ein direkter HTTP-Smoke nach diesem Deployment war
 nicht verfügbar; der Run bestätigt die erfolgreiche Pages-Veröffentlichung,
 nicht iPhone-Installation oder Offline-/Update-Bedienung.
+Dokumentations-PR #34, Head `8ba96a8fcbac80f722208914535dfff39460cc1c`, bestand
+`test`, `macos-latest` und `macos-15-intel` in Runs `43784925947` und
+`43784944320` und wurde automatisch als
+`bb06cd93872860cfd88f89ec555bac0d2bdf1e83` gemergt. Ein Main-/Pages-Run und ein
+direkter HTTPS-Smoke nach diesem Merge wurden in der aktuellen Prüfung nicht
+unabhängig ausgelesen.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
@@ -110,11 +141,12 @@ Der authentifizierte Branch-Schutz-Readback vom 2026-11-16 bestätigt für `main
 den erforderlichen Check `test` von GitHub Actions (`app_id=15368`) mit
 `strict=true` und `enforce_admins=true`; Force-Pushes und Löschen sind
 deaktiviert. Die Regel verlangt keinen Pull Request und keine Review, daher sind
-PR-freie Schreibwege nicht ausgeschlossen. Auto-Merge wurde für PR #30 aktiviert
-und nach bestandenen Pflichtchecks ausgeführt. Historische Cloudflare-
+PR-freie Schreibwege nicht ausgeschlossen. Auto-Merge wurde für PR #30 bis #34
+nach bestandenen Pflichtchecks ausgeführt. Historische Cloudflare-
 Konfiguration und aktuelle Einschränkungen stehen in
-`CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner bleibt mangels verifizierter
-Laufzeitschnittstelle `not_configured`.
+`CLOUDFLARE_OPERATIONS.md`. Ein Cloud-Codex-Runner bleibt mangels verifizierter
+Laufzeitschnittstelle `not_configured`; der bestandene lokale Windows-Smoke ist
+kein Mac- oder Cloud-Runner-Nachweis.
 
 ## Pull Requests und Auto-Merge
 

@@ -8,12 +8,12 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A01 | PWA, API und Control-Plane-Datenfluss | `test/api.test.mjs`; lokaler HTTP-Smoke für UI, Assets, `/healthz` und `/api/me` | Pflicht | lokal bestanden: `npm start` lieferte am 2026-11-16 für `/`, Manifest, PNG-Icon, `sw.js`, `/api/me` und `/healthz` HTTP 200. Listener-Inspektion des Betriebssystems wurde mit Zugriff verweigert; `src/config.mjs` setzt weiterhin `127.0.0.1` als Host-Default. |
 | A02 | Sichere Authentifizierung | `test/auth.test.mjs`, `test/config.test.mjs` | Pflicht | lokal bestanden |
 | A03 | Keine Geheimnisse im Browser/GitHub/Log | `scripts/check.mjs`, OAuth-/Payload-Assertions | Pflicht | lokal bestanden |
-| A04 | Zuverlässige Auftragsverarbeitung | `test/runner.test.mjs`, `npm run demo` | Pflicht | lokal bestanden: Demo-Auftrag `job_4883cfd5-d035-47ef-b9de-d0bcce8095f7` erreichte `succeeded` nach Pflichtcheck und sieben Ereignissen; Executor war ausdrücklich geskriptet |
+| A04 | Zuverlässige Auftragsverarbeitung | `test/runner.test.mjs`, `npm run demo`, echter Executor-Smoke in isoliertem Git-Fixture | Pflicht | lokal bestanden: Am 2026-11-16 führte `PromptHubRunner` mit `ProcessExecutor`, echtem Codex CLI, `MemoryControlPlane` und `GitWorktreeManager` einen Fixture-Auftrag aus. Die Datei wurde von 41 auf 42 geändert, der echte Node-Pflichtcheck bestand, der Job erreichte `succeeded`, der Executor beendete sich mit Exitcode 0, vier Checkpoints wurden aufgezeichnet und danach blieb kein aktiver Lease zurück. Das belegt keine GitHub-Control-Plane-Persistenz oder MacBook-Ausführung |
 | A05 | Global maximal zwei aktive Jobs | `test/lease-store.test.mjs`, Control-Plane-Cap-Test | Pflicht | lokal bestanden |
-| A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false`, echte macOS-CI und lokaler Mac-Runner | Pflicht | Windows-Live-Smoke bestätigte `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen. PR #21 verifizierte auf Head `a873695153a6bb24e61b149d5ee0fc64108e33a4` mit Actions-Run 80 (`43770627889`) erfolgreiche vollständige Tests und Static-Checks auf `macos-latest` (Apple Silicon) und `macos-15-intel`; der erforderliche Job `test` bestand ebenfalls. Main-Run 84 (`43771264550`) auf Commit `9c5e4b40adaaccfb6065e177cdad01ab7fd3d816` bestätigte beide macOS-Lanes und `test` erneut. Ein echter lokaler MacBook-Runner und dessen Codex-Ausführung sind weiterhin nicht nachgewiesen. |
+| A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false`, echte macOS-CI und lokaler Mac-Runner | Pflicht | Windows-Smoke bestätigte `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen. PR #21 verifizierte auf Head `a873695153a6bb24e61b149d5ee0fc64108e33a4` mit Actions-Run 80 (`43770627889`) erfolgreiche vollständige Tests und Static-Checks auf `macos-latest` (Apple Silicon) und `macos-15-intel`; Main-Run 84 (`43771264550`) bestätigte beide Lanes und `test` erneut. Am 2026-11-16 bestand zusätzlich ein echter Codex-CLI-/PromptHubRunner-Smoke auf Windows in einem temporären Fixture. Ein echter lokaler MacBook-Runner, dessen Start nach Mac-Neustart und seine GitHub-gebundene Ausführung sind weiterhin nicht nachgewiesen. |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | PR #30, Head `8581fdfd19c73b034702834f287e5a0af696b887`, bestand in Runs `43780749466` und `43780772252` jeweils `test`, `macos-latest` und `macos-15-intel`; GitHub Auto-Merge integrierte ihn als `7058c1c10721ff661f30ccb26891bfca7d3d0982`. Dokumentations-PRs #31 bis #33 bestanden jeweils `test` und beide macOS-Lanes. PR #33, Head `b7eee065c1ff259cab82324abc5c76bd888807b2`, wurde als `792c96e3e8be2db849143b8420baea9c241f8eb2` gemergt. Main-CI-Run 117 (`43783987471`) und Pages-Run 33 (`43783986387`) endeten erfolgreich auf diesem Commit. Branch-API-Readback vom 2026-11-16: required check `test` von GitHub Actions (`app_id=15368`), `strict=true`, `enforce_admins=true`, Force-Push und Löschen deaktiviert. Die Regel verlangt keinen PR und keine Review; PR-freie Schreibwege sind dadurch nicht ausgeschlossen. Auto-Merge ist vom Nutzer freigegeben. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-036 |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | PR #34, Head `8ba96a8fcbac80f722208914535dfff39460cc1c`, bestand `test`, `macos-latest` und `macos-15-intel` in Runs `43784925947` und `43784944320` und wurde automatisch als `bb06cd93872860cfd88f89ec555bac0d2bdf1e83` gemergt. Branch-API-Readback vom 2026-11-16: required check `test` von GitHub Actions (`app_id=15368`), `strict=true`, `enforce_admins=true`, Force-Push und Löschen deaktiviert. Die Regel verlangt keinen PR und keine Review; PR-freie Schreibwege sind dadurch nicht ausgeschlossen. Auto-Merge ist vom Nutzer freigegeben. Ein aktueller Main-/Pages-Post-Merge-Run wurde in dieser Prüfung nicht unabhängig ausgelesen. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-036 |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -46,34 +46,33 @@ ausgewiesen und nicht als bestanden markiert.
 ## Aktueller Status
 
 Status zum Abgleich am 2026-11-16: `conditional_local_pass`; die Erstabnahme ist
-nicht bestanden. Lokale Pflichtprüfungen ergaben `npm test` 109/109, `npm run
-check` erfolgreich für 97 Dateien und `git diff --check` ohne Befund. Ein
-HTTP-Smoke des lokalen Servers erhielt für PWA-Startseite, Manifest, Icon,
-Service Worker, `/api/me` und `/healthz` jeweils HTTP 200. `npm run demo`
-beendete den geskripteten Auftrag `job_356a3002-4b0e-4419-8a04-f113a932da4a`
-mit `succeeded` und sieben Ereignissen; dies ist kein Nachweis realer Codex-
-Ausführung. PR #30, Head `8581fdfd19c73b034702834f287e5a0af696b887`, bestand in
-Actions-Runs `43780749466` und `43780772252` jeweils `macos-latest`,
-`macos-15-intel` und `test`; GitHub Auto-Merge integrierte den PR als
-`7058c1c10721ff661f30ccb26891bfca7d3d0982`. Dokumentations-PR #33, Head
-`b7eee065c1ff259cab82324abc5c76bd888807b2`, bestand in Runs `43783867866` und
-`43783879946` dieselben Jobs und wurde als
-`792c96e3e8be2db849143b8420baea9c241f8eb2` gemergt. Main-CI-Run 117
-(`43783987471`) und GitHub-Pages-Run 33 (`43783986387`) endeten erfolgreich auf
-diesem Produktcode-Stand. PR #33 änderte nur Dokumentation. Ein direkter
-HTTP-Smoke nach diesem Deployment war nicht verfügbar; der Run bestätigt die
-erfolgreiche Pages-Veröffentlichung, nicht iPhone-Installation oder
-Offline-/Update-Bedienung.
-Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich; kein
-kostenpflichtiger Plan wurde aktiviert. Cloudflare bleibt pausiert; die
-Projektlöschung wartet auf die gesonderte Bestätigung des Nutzers.
-GitHub Pages stellt keine Control API
-bereit, und es ist noch kein alternativer API-Host freigegeben oder konfiguriert.
-Der authentifizierte Branch-Schutz-Readback vom 2026-11-16 bestätigt für `main`
-den erforderlichen Check `test` von GitHub Actions (`app_id=15368`) mit
-`strict=true` und `enforce_admins=true`; Force-Pushes und Löschen sind
-deaktiviert. Die Regel verlangt keinen Pull Request und keine Review, daher sind
-PR-freie Schreibwege nicht ausgeschlossen. Auto-Merge wurde für PR #30 aktiviert
-und nach bestandenen Pflichtchecks ausgeführt. OAuth-/Sitzungsbetrieb, echter Mac-/Cloud-Runner,
-iPhone-Installation, Kontobilling und externe Lernexperimente sind nicht
-nachgewiesen. Die vollständige technische Erstabnahme ist daher nicht bestanden.
+nicht bestanden. Lokale Pflichtprüfungen für diese Dokumentationsänderung
+ergaben `npm test` 109/109, `npm run check` erfolgreich für 97 Dateien und
+`git diff --check` ohne Befund. Ein echter Codex-CLI-/PromptHubRunner-Smoke in
+einem temporären Windows-Git-Fixture bestand: Executor-Exitcode 0,
+Dateiänderung verifiziert,
+Node-Pflichtcheck bestanden, Job `succeeded`, vier Checkpoints und null aktive
+Leases. Dabei nutzte der Runner eine `MemoryControlPlane`; GitHub-Persistenz,
+MacBook-Betrieb und dauerhafte Codex-Sitzung wurden nicht geprüft.
+
+PR #34, Head `8ba96a8fcbac80f722208914535dfff39460cc1c`, bestand `test`,
+`macos-latest` und `macos-15-intel` in Runs `43784925947` und `43784944320` und
+wurde automatisch als `bb06cd93872860cfd88f89ec555bac0d2bdf1e83` gemergt. Ein
+unabhängiger Main-/Pages-Post-Merge-Run und direkter HTTPS-Smoke nach diesem
+Merge wurden in dieser Prüfung nicht ausgelesen. Der letzte dokumentierte
+GitHub-Pages-Run 33 (`43783986387`) war erfolgreich auf Produktcode-Commit
+`792c96e3e8be2db849143b8420baea9c241f8eb2`; er belegt weder iPhone-Installation
+noch Offline-/Update-Verhalten.
+
+Das Quell-Repository bleibt auf ausdrückliche Nutzeranweisung öffentlich. Kein
+kostenpflichtiger Plan wurde aktiviert. Cloudflare bleibt pausiert und die alte
+Veröffentlichung ist nicht gelöscht. GitHub Pages hostet nur die statische PWA;
+die Control API hat keinen freigegebenen, konfigurierten Host. Der
+Branch-Readback vom 2026-11-16 bestätigt `test`/Actions-App 15368, `strict=true`
+und Admin-Enforcement; die Regel verlangt keinen PR und keine Review. Auto-Merge
+ist freigegeben und für PR #34 nach bestandenen Checks erfolgt.
+
+OAuth-/Sitzungsbetrieb, GitHub-gebundene Runner-Ausführung, echter MacBook-/Cloud-
+Runner, iPhone-Installation, accountweiter Billing-Readback und externe
+Lernexperimente sind nicht nachgewiesen. Die vollständige technische Erstabnahme
+ist daher nicht bestanden.

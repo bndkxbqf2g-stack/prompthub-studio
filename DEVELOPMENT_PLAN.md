@@ -60,7 +60,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Memory-Control-Plane für deterministische Tests, GitHub-Adapter für Betrieb.
 - OAuth-Session, Jobanlage, Status-/Event-Ansicht.
 - Runner: Claim, Lease-Cap, Heartbeat, Checkpoint, Resume, sauberer Stopp.
-- Mock-Executor und Tests für die vollständige Kette.
+- Deterministische Kettentests mit `ScriptedExecutor`; zusätzlich bestand am
+  2026-11-16 ein echter Codex-CLI-/`ProcessExecutor`-Smoke mit
+  `PromptHubRunner`, isoliertem Git-Worktree, Memory-Control-Plane und echtem
+  Pflichtcheck in einem temporären Windows-Fixture. Das bestätigt lokale
+  Ausführung, aber weder GitHub-Persistenz noch einen MacBook-Runner.
 - Mehrprojekt-Katalog mit rein lesender GitHub-Analyse, Wiederverbinden,
   bestätigtem Entfernen und separat bestätigter projektbezogener Datenlöschung.
 - Prompt-Designer mit getrennten Anforderungen/Annahmen, einem Interviewschritt,
@@ -108,7 +112,10 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   22 (`43771264030`) bestand Build, Deployment und Statusreport. Der PWA-Code
   wurde in diesem Dokumentationspaket nicht geändert.
 - Ein kostenloser Cloud-Codex-Runner bleibt mangels verifizierter Schnittstelle
-  `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt.
+  `not_configured`; Queue/Control-Plane und Ausführung bleiben getrennt. Die
+  echte lokale Windows-Ausführung ist nur ein einmaliger Fixture-Smoke; sie
+  konfiguriert keinen dauerhaften Runner und liefert keine gemessenen
+  Tokenwerte.
 - CI prüft jetzt vollständig auf Apple-Silicon- und Intel-macOS-Standard-Runnern.
   Der bestehende Pflichtjob `test` blockiert bei fehlgeschlagenem oder
   übersprungenem macOS-Lauf. PR #21 und Main-Run 81 bestanden diese Lanes. Das
@@ -128,7 +135,7 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   `strict=true`, `enforce_admins=true`, Force-Push und Löschen deaktiviert.
   Die Regel verlangt keinen PR und keine Review; PR-freie Schreibwege bleiben
   damit möglich. Auto-Merge ist vom Nutzer autorisiert und wurde für PR #30 bis
-  #33 nach bestandenen Checks ausgeführt. Die zusätzliche PR-Pflicht ist
+  #34 nach bestandenen Checks ausgeführt. Die zusätzliche PR-Pflicht ist
   angefragt und noch nicht bestätigt. Es wurde kein kostenpflichtiger Plan
   aktiviert. Remote-Control- und Runner-Integrationschecks bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.

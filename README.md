@@ -7,36 +7,31 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 ## Status
 
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
-am 2026-11-15 veröffentlichte GitHub-Quell-Repository
+öffentliche GitHub-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. Der zuletzt geprüfte
-Produktcode-Stand war `a80bab8cb7f15bc1012efde888f106267c47ea03` aus PR #27.
-Der anschließende Dokumentations-PR #28 wurde als
-`4fe86ec1463152d21f6fda2744166da9470a2e65` gemergt; sein Head
-`596260a56dbb28c9f917da751debcc9a6eb0e520` bestand `macos-latest`,
-`macos-15-intel` und `test` in den Workflow-Runs `43778439577` und
-`43778467602`. GitHub bestätigte das Hauptrepo als öffentlich und das separate
-`prompthub-studio-control`-Repo als privat. PR #27 bestand auf Head
-`d30c6ef61425f5a585427efa0cbc9964d4fef830` dieselben drei Jobs in den Runs
-`43777050095` und `43777063773`. Der Nutzer hat
-automatische Merges nach bestandenen Pflichtprüfungen ausdrücklich autorisiert.
-Der letzte Branch-Regel-Readback zeigte `test`, `strict=true` und
-Admin-Enforcement, aber keine PR-Pflicht. Ein erneuter API-Readback ist nicht
-verfügbar; direkte Pushes auf `main` sind laut letztem bestätigten Stand weiter
+ist die dauerhafte Quelle für den Quellcode. Lokales `main` steht auf
+`bb06cd93872860cfd88f89ec555bac0d2bdf1e83`; PR #34 war ein Dokumentations-PR,
+bestand `test`, `macos-latest` und `macos-15-intel` in Runs `43784925947` und
+`43784944320` und wurde automatisch gemergt. Auto-Merge nach bestandenen
+Pflichtchecks ist ausdrücklich autorisiert. Der bestätigte Branch-Readback
+verlangt `test`, aber keine PR-Pflicht oder Review; direkte Pushes bleiben
 möglich.
 
 GitHub Pages ist unter
 [bndkxbqf2g-stack.github.io/prompthub-studio](https://bndkxbqf2g-stack.github.io/prompthub-studio/)
-aktiv; der Live-Browser lädt die PWA unter
+als statischer Host eingerichtet; die PWA-Dateien liegen unter
 [`/src/pwa/`](https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/).
-GitHub Pages liefert statische Dateien, aber keine serverseitige Control API.
-Nach Pages-Run 18 antworteten PWA-Startseite, Manifest, PNG-App-Icon, Service
-Worker, App-JavaScript und Stylesheet live per HTTPS mit HTTP 200 und passenden
-Inhaltstypen. Die PWA zeigt
-„Die Control API ist derzeit nicht erreichbar.“ Die Installation auf einem
-echten iPhone sowie Offline- und Updateverhalten sind live noch nicht abgenommen.
-Die macOS-CI deckt beide CPU-Architekturen ab, weist aber keinen lokalen
-MacBook-Runner mit Codex-Ausführung nach.
+GitHub Pages liefert keine serverseitige Control API. Der letzte dokumentierte
+Pages-Run 33 (`43783986387`) war erfolgreich auf Produktcode-Commit
+`792c96e3e8be2db849143b8420baea9c241f8eb2`; ein Main-/Pages-Post-Merge-Run nach
+PR #34 und ein direkter aktueller HTTP-Smoke wurden nicht unabhängig
+ausgelesen. Ein früherer HTTPS-Smoke bestätigte Startseite, Manifest,
+PNG-App-Icon, Service Worker und Assets mit HTTP 200. Eine echte iPhone-
+Installation sowie Offline- und Updateverhalten sind nicht abgenommen.
+
+Am 2026-11-16 bestand ein echter Codex-CLI-/PromptHubRunner-Smoke auf Windows in
+einem temporären Git-Fixture. Er nutzte eine `MemoryControlPlane` und beweist
+weder GitHub-Persistenz noch einen lokalen MacBook-Runner.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt bleibt
 pausiert; die alte Veröffentlichung und `*.pages.dev`-Adresse sind noch
