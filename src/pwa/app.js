@@ -588,22 +588,27 @@ function renderMetrics(metrics, snapshot = {}) {
   const errors = metrics.errors ?? { status: "not_available" };
   const failureRate = metrics.observed.failed_job_rate === null ? "nicht berechenbar" : `${(metrics.observed.failed_job_rate * 100).toFixed(1)} %`;
   const trendPrefix = errors.failure_history_may_be_truncated ? "≥" : "";
+  const formatTokenCount = (value) => Number.isSafeInteger(value) && value >= 0 ? value.toLocaleString("de-DE") : "nicht verfügbar";
+  const formatMetricCount = (value) => Number.isSafeInteger(value) && value >= 0 ? value.toLocaleString("de-DE") : "nicht verfügbar";
+  const runtimeSummary = Number.isSafeInteger(metrics.observed.runtime_ms) && metrics.observed.runtime_ms >= 0
+    ? `${(metrics.observed.runtime_ms / 1000).toFixed(1)} s beobachtet`
+    : "Laufzeit nicht verfügbar";
   const items = [
-    ["KI-Anbieteraufrufe", `${metrics.observed.designer_provider_calls} tatsächlich ausgelöste, verifizierte Prompt-Designer-Aufrufe`],
+    ["KI-Anbieteraufrufe", `${formatMetricCount(metrics.observed.designer_provider_calls)} tatsächlich ausgelöste, verifizierte Prompt-Designer-Aufrufe`],
     ["Redundanz-Cache", `${metrics.observed.redundant_provider_requests_avoided} wiederverwendete oder zusammengeführte Analysen`],
     ["Fallback-Analysen", `${metrics.observed.fallback_analyses} mit deterministischem Fallback`],
     ["Codex-Modellaufrufe", metrics.observed.codex_model_calls.status === "measured" ? `${metrics.observed.codex_model_calls.value} gemessen` : "Nicht verfügbar"],
     ["Tokenverbrauch", metrics.tokens.status === "measured" || metrics.tokens.status === "partial"
-      ? `${metrics.tokens.input_tokens.toLocaleString("de-DE")} Eingabe · ${metrics.tokens.output_tokens.toLocaleString("de-DE")} Ausgabe (${metrics.tokens.status === "partial" ? "teilweise gemessen" : "gemessen"}; ${metrics.tokens.measured_requests} Messdatensätze)`
+      ? `${formatTokenCount(metrics.tokens.input_tokens)} Eingabe · ${formatTokenCount(metrics.tokens.output_tokens)} Ausgabe${Number.isSafeInteger(metrics.tokens.cached_input_tokens) ? ` · davon ${formatTokenCount(metrics.tokens.cached_input_tokens)} Cache-Eingabe` : ""}${Number.isSafeInteger(metrics.tokens.reasoning_output_tokens) ? ` · davon ${formatTokenCount(metrics.tokens.reasoning_output_tokens)} Reasoning-Ausgabe` : ""} (${metrics.tokens.status === "partial" ? "teilweise gemessen" : "gemessen"}; ${metrics.tokens.measured_requests} Messdatensätze)`
       : "Nicht verfügbar · keine Tokens geschätzt"],
-    ["Runner-Laufzeit / Wiederholungen", `${(metrics.observed.runtime_ms / 1000).toFixed(1)} s beobachtet · ${metrics.observed.retries} Wiederholungen`],
+    ["Runner-Laufzeit / Wiederholungen", `${runtimeSummary} · ${formatMetricCount(metrics.observed.retries)} Wiederholungen`],
     ["Pflichtchecks", metrics.quality.checked_jobs ? `${metrics.quality.passed_jobs}/${metrics.quality.checked_jobs} Jobs mit bestandenen Checks` : "Noch keine abgeschlossenen Pflichtchecks"],
     ["Fehlerquote", `${failureRate} · ${metrics.observed.failed_jobs ?? 0}/${metrics.observed.completed_jobs ?? 0} abgeschlossene Jobs in der geladenen Stichprobe`],
     ["Fehlerentwicklung", errors.status === "not_available" ? "Nicht verfügbar" : `${trendPrefix}${errors.failure_observations_last_7d} Fehlerbeobachtungen letzte 7 Tage · ${trendPrefix}${errors.failure_observations_previous_7d} in den 7 Tagen davor${errors.failure_history_may_be_truncated ? " · ältere Historie kann gekürzt sein" : ""}`],
     ["Fehler / Regressionen", errors.status === "not_available" ? "Fehlerlernhistorie nicht verfügbar" : `${errors.observed_incidents} Vorfälle · ${errors.observed_failure_occurrences} beobachtete Runnerfehler · ${errors.recurring_failures} wiederkehrende Muster · ${errors.confirmed_regressions} aktuell belegte bestätigte Regressionen`],
     ["Verbesserungsnachweise", errors.status === "not_available" ? "Nicht verfügbar" : `${errors.confirmed_causes} Ursachen bestätigt (${errors.archived_confirmed_causes ?? 0} ohne aktuell gespeicherten Jobbeleg) · ${errors.open_hypotheses} Hypothesen offen · ${errors.user_reports} Nutzerberichte`],
     ["GitHub-CI-Signale", `${metrics.ci_diagnostic?.failed_runs_in_recent_project_snapshots ?? 0} fehlgeschlagene Läufe in jüngsten Snapshots · keine Ursachenbestätigung`],
-    ["Executor-Starts", `${metrics.observed.executor_invocations} tatsächlich gestartete Executor-Aufrufe`],
+    ["Executor-Starts", `${formatMetricCount(metrics.observed.executor_invocations)} tatsächlich gestartete Executor-Aufrufe`],
     ["Datenstand", `${snapshot.measured_at ? new Date(snapshot.measured_at).toLocaleTimeString("de-DE") : "unbekannt"} · ${snapshot.cache_source === "live" ? "live gelesen" : snapshot.cache_source === "coalesced" ? "gemeinsame Abfrage" : "kurz zwischengespeichert"} · ${snapshot.coverage?.listed_jobs ?? 0} gelistete Jobs${snapshot.coverage?.job_list_limit ? ` (max. ${snapshot.coverage.job_list_limit}${snapshot.coverage.job_list_may_be_limited ? ", Grenze erreicht" : ""})` : ""} · ${snapshot.coverage?.retained_prompt_drafts ?? 0} Entwürfe aus ${snapshot.coverage?.connected_projects ?? 0} Projekten (max. ${snapshot.coverage?.prompt_draft_retention_per_project ?? 50}/Projekt)`],
   ];
   elements.metrics.replaceChildren();

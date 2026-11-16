@@ -1,11 +1,13 @@
+export const TOKEN_USAGE_SOURCES = Object.freeze(["execution_provider", "verified_free_provider"]);
+
 export function normalizeTokenUsage(usage, source) {
+  if (!TOKEN_USAGE_SOURCES.includes(source)) return null;
   if (!usage || typeof usage !== "object") return null;
-  const input = Number.isSafeInteger(usage.input_tokens) && usage.input_tokens >= 0 ? usage.input_tokens : null;
-  const output = Number.isSafeInteger(usage.output_tokens) && usage.output_tokens >= 0 ? usage.output_tokens : null;
-  if (input === null && output === null) return null;
+  const fields = ["input_tokens", "output_tokens", "cached_input_tokens", "reasoning_output_tokens"];
+  const measured = Object.fromEntries(fields.flatMap((field) => Number.isSafeInteger(usage[field]) && usage[field] >= 0 ? [[field, usage[field]]] : []));
+  if (!Object.hasOwn(measured, "input_tokens") && !Object.hasOwn(measured, "output_tokens")) return null;
   return {
-    ...(input === null ? {} : { input_tokens: input }),
-    ...(output === null ? {} : { output_tokens: output }),
+    ...measured,
     source,
   };
 }

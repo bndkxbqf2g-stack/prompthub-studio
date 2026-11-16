@@ -55,6 +55,10 @@ nur an `127.0.0.1`.
   Abschlussbelege.
 - `src/runner/executor.mjs`: enger Adapter für ein explizit konfiguriertes
   Codex-Binary; keine Shell und keine aus dem Job übernommene Kommandozeile.
+  `codex exec --json` ist der Standard. Der Parser liest ausschließlich
+  genau ein `turn.completed.usage`, verwirft übrige JSONL-Rohinhalte innerhalb
+  fester Byte-, Zeilen- und Eventlimits und leitet nicht gelieferte
+  Modellaufrufzahlen nicht ab.
 - `src/runner/worktree.mjs`: validierte Git-Worktrees je Auftrag.
 - `src/pwa/`: statische PWA ohne Geheimnisse.
 - `src/projects/`: read-only Repository-Inventar, private Control-Repo-Registry,

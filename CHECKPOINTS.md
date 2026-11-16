@@ -1060,6 +1060,36 @@
 - Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
   97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.
 
+## CP-050 – Codex-JSONL-Telemetrie sicher erfasst und angezeigt
+
+- Datum: 2026-11-16.
+- Der `ProcessExecutor` verwendet standardmäßig `codex exec --json`, verarbeitet
+  ausschließlich ein gültiges `turn.completed.usage`-Ereignis und begrenzt
+  Bytes, Ereignisse und Zeilenlänge. Mehrdeutige, fehlerhafte, doppelte,
+  ungültige oder übergroße Streams liefern keine Tokenmessung. JSONL-Rohdaten
+  werden nicht an Logs oder Runner-Ausgaben weitergereicht; `error` und
+  `turn.failed` lassen den Executor auch bei Exitcode 0 fehlschlagen.
+- Tokenquellen sind allowlistet. Summen und Ressourcenwerte werden auf sichere,
+  nichtnegative Ganzzahlen begrenzt; Überläufe oder ungültige Zähler werden als
+  nicht verfügbar angezeigt. Cache- und Reasoning-Teilsummen erscheinen nur bei
+  vollständigen Daten. Codex-Modellaufrufe bleiben unbekannt, weil das
+  unterstützte Usage-Ereignis keine verlässliche Anzahl liefert.
+- Die PWA zeigt gemessene, teilweise gemessene und nicht verfügbare Werte samt
+  Cache-/Reasoning-Teilsummen an. `ACCEPTANCE_CRITERIA.md`, `OPERATIONS.md`,
+  `ARCHITECTURE.md`, `DEVELOPMENT_PLAN.md` und `.env.example` dokumentieren
+  Konfiguration, Parsergrenzen und den offenen Live-Nachweis. Die Quelle des
+  JSONL-Schemas ist die offizielle Codex-Dokumentation zum nicht-interaktiven
+  Modus; CLI-Ausgabe wird nicht separat signiert.
+- Unabhängiger Review fand zwei Lücken: Fehlerereignisse bei Exitcode 0 und
+  ausgelassene Modellaufrufe ohne Executor-Zähler. Beide wurden korrigiert und
+  mit Regressionstests abgedeckt; der anschließende unabhängige Review meldete
+  keine weiteren Befunde.
+- `npm test`: 126/126 bestanden. `npm run check`: bestanden für 98 Dateien,
+  einschließlich Prompt-Library-Abgleich. `git diff --check`: Exitcode 0.
+- Ein echter Codex-Lauf mit beobachteten JSONL-Tokenwerten wurde noch nicht
+  ausgeführt; daher ist die Live-Telemetrie weiterhin unbestätigt und es werden
+  keine Tokenzahlen behauptet.
+
 ## CP-049 – Echter Codex-Executor durch PromptHubRunner verifiziert
 
 - Datum: 2026-11-16.

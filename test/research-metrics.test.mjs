@@ -36,20 +36,49 @@ test("resource dashboard distinguishes measured tokens from unavailable values",
 
 test("token totals are summed only from actual provider measurements", () => {
   const metrics = summarizeResourceMetrics({ jobs: [
-    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { runtime_ms: 20, executor_invocations: 1, retries: 0, token_usage: { input_tokens: 31, output_tokens: 9, source: "provider" }, model_calls: 1 } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { runtime_ms: 20, executor_invocations: 1, retries: 0, token_usage: { input_tokens: 31, output_tokens: 9, source: "verified_free_provider" }, model_calls: 1 } },
   ] });
   assert.equal(metrics.tokens.status, "measured");
   assert.equal(metrics.tokens.input_tokens, 31);
   assert.equal(metrics.tokens.output_tokens, 9);
+  assert.equal(metrics.tokens.cached_input_tokens, null);
+  assert.equal(metrics.tokens.reasoning_output_tokens, null);
   assert.equal(metrics.observed.codex_model_calls.value, 1);
   assert.equal(metrics.observed.executor_invocations, 1);
+});
+
+test("Codex token subtotals remain measured only when every included token record reports them", () => {
+  const metrics = summarizeResourceMetrics({ jobs: [
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, token_usage: { input_tokens: 40, output_tokens: 12, cached_input_tokens: 18, reasoning_output_tokens: 4, source: "execution_provider" } } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, token_usage: { input_tokens: 30, output_tokens: 8, cached_input_tokens: 10, reasoning_output_tokens: 2, source: "execution_provider" } } },
+  ] });
+  assert.equal(metrics.tokens.status, "partial");
+  assert.equal(metrics.tokens.cached_input_tokens, 28);
+  assert.equal(metrics.tokens.reasoning_output_tokens, 6);
+
+  const partial = summarizeResourceMetrics({ jobs: [
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, token_usage: { input_tokens: 40, output_tokens: 12, cached_input_tokens: 18, reasoning_output_tokens: 4, source: "execution_provider" } } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, token_usage: { input_tokens: 30, output_tokens: 8, source: "execution_provider" } } },
+  ] });
+  assert.equal(partial.tokens.cached_input_tokens, null);
+  assert.equal(partial.tokens.reasoning_output_tokens, null);
+});
+
+test("resource token sums that overflow safe integers are unavailable instead of rounded", () => {
+  const metrics = summarizeResourceMetrics({ jobs: [
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, model_calls: 1, token_usage: { input_tokens: Number.MAX_SAFE_INTEGER, output_tokens: 1, source: "execution_provider" } } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, model_calls: 1, token_usage: { input_tokens: 1, output_tokens: 1, source: "execution_provider" } } },
+  ] });
+  assert.equal(metrics.tokens.status, "partial");
+  assert.equal(metrics.tokens.input_tokens, null);
+  assert.equal(metrics.tokens.output_tokens, 2);
 });
 
 test("resource dashboard marks partial token telemetry and counts only executed provider requests", () => {
   const metrics = summarizeResourceMetrics({
     jobs: [{ status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { runtime_ms: 12, executor_invocations: 1, retries: 0, model_calls: null, token_usage: null } }],
     drafts: [
-      { source: "verified_free_provider", resource_metrics: { provider_requests: 1, token_usage: { input_tokens: 12, output_tokens: 5 } } },
+      { source: "verified_free_provider", resource_metrics: { provider_requests: 1, token_usage: { input_tokens: 12, output_tokens: 5, source: "verified_free_provider" } } },
       { source: "verified_free_provider", analysis_cache: { status: "hit" }, resource_metrics: { provider_requests: 0, token_usage: null } },
       { source: "deterministic_fallback", analysis_cache: { status: "not_applicable" }, resource_metrics: { provider_requests: 0, token_usage: null } },
     ],
@@ -67,6 +96,57 @@ test("invalid or negative provider token values are never accepted as measuremen
   ] });
   assert.equal(metrics.tokens.status, "not_available");
   assert.equal(metrics.tokens.input_tokens, null);
+});
+
+test("token values without an allowed provider provenance are unavailable", () => {
+  for (const source of [undefined, "provider", "unknown_provider"]) {
+    const metrics = summarizeResourceMetrics({ jobs: [
+      { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, model_calls: 1, token_usage: { input_tokens: 31, output_tokens: 9, ...(source === undefined ? {} : { source }) } } },
+    ] });
+    assert.equal(metrics.tokens.status, "not_available");
+    assert.equal(metrics.tokens.input_tokens, null);
+  }
+});
+
+test("invalid provider request counts make token completeness partial", () => {
+  const metrics = summarizeResourceMetrics({ drafts: [{
+    source: "verified_free_provider",
+    resource_metrics: { provider_requests: 1.5, token_usage: { input_tokens: 12, output_tokens: 5, source: "verified_free_provider" } },
+  }] });
+  assert.equal(metrics.tokens.status, "partial");
+  assert.equal(metrics.observed.designer_provider_calls, null);
+});
+
+test("invalid and overflowing runtime or resource counts are unavailable", () => {
+  const metrics = summarizeResourceMetrics({ jobs: [
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { runtime_ms: Number.MAX_SAFE_INTEGER, executor_invocations: 1, retries: -1, model_calls: Number.MAX_SAFE_INTEGER, token_usage: { input_tokens: 1, output_tokens: 1, source: "execution_provider" } } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { runtime_ms: 1, executor_invocations: 1.5, retries: 0.5, model_calls: 1, token_usage: { input_tokens: 1, output_tokens: 1, source: "execution_provider" } } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { runtime_ms: 1, executor_invocations: 1, retries: 0, model_calls: 1, token_usage: { input_tokens: 1, output_tokens: 1, source: "execution_provider" } } },
+  ], drafts: [{ resource_metrics: { provider_requests: Number.MAX_SAFE_INTEGER } }, { resource_metrics: { provider_requests: 1 } }] });
+  assert.equal(metrics.observed.runtime_ms, null);
+  assert.equal(metrics.observed.executor_invocations, null);
+  assert.equal(metrics.observed.retries, null);
+  assert.equal(metrics.observed.designer_provider_calls, null);
+  assert.deepEqual(metrics.observed.codex_model_calls, { status: "not_available", value: null });
+  assert.equal(metrics.tokens.status, "partial");
+});
+
+test("an invalid executor count makes model-call totals unavailable even with valid jobs", () => {
+  const metrics = summarizeResourceMetrics({ jobs: [
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, model_calls: 2 } },
+    { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1.5, model_calls: 3 } },
+  ] });
+  assert.deepEqual(metrics.observed.codex_model_calls, { status: "not_available", value: null });
+});
+
+test("model-call counts are retained when executor invocation counts are absent", () => {
+  for (const executorCount of [undefined, null]) {
+    const metrics = summarizeResourceMetrics({ jobs: [
+      { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { model_calls: 2, ...(executorCount === undefined ? {} : { executor_invocations: executorCount }) } },
+      { status: "succeeded", required_checks: { passed: true, names: ["test"] }, resource_metrics: { executor_invocations: 1, model_calls: 3 } },
+    ] });
+    assert.deepEqual(metrics.observed.codex_model_calls, { status: "measured", value: 5 });
+  }
 });
 
 test("library audit marks duplicate, stale, conflicting and unsafe research entries", () => {

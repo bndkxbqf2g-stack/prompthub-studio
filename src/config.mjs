@@ -69,7 +69,7 @@ export function readConfig(env = process.env) {
   const projectRoot = env.PROMPTHUB_PROJECT_ROOT || process.cwd();
   const allowedProjects = listValue(env.PROMPTHUB_ALLOWED_PROJECTS, DEFAULT_ALLOWED_PROJECTS);
   const projectPaths = jsonObjectValue(env.PROMPTHUB_PROJECT_PATHS_JSON, "PROMPTHUB_PROJECT_PATHS_JSON", {});
-  const codexArgs = jsonArrayValue(env.CODEX_ARGS_JSON, "CODEX_ARGS_JSON", ["exec", "--", "$PROMPTHUB_PROMPT"]);
+  const codexArgs = jsonArrayValue(env.CODEX_ARGS_JSON, "CODEX_ARGS_JSON", ["exec", "--json", "--", "$PROMPTHUB_PROMPT"]);
   const npmExecutable = env.PROMPTHUB_NPM_EXECUTABLE ?? (process.platform === "win32" ? "npm.cmd" : "npm");
   const requiredCommands = jsonCommandListValue(env.PROMPTHUB_REQUIRED_CHECKS_JSON, "PROMPTHUB_REQUIRED_CHECKS_JSON", [[npmExecutable, "test"], [npmExecutable, "run", "check"]]);
   const sessionSecret = env.SESSION_SECRET ?? "development-only-session-secret-change-me";
