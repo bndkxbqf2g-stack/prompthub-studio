@@ -11,4 +11,3 @@ test("GitHub Pages project root opens the real PWA instead of rendering the READ
   const destination = new URL("./src/pwa/", "https://bndkxbqf2g-stack.github.io/prompthub-studio/");
   assert.equal(destination.pathname, "/prompthub-studio/src/pwa/");
 });
-
