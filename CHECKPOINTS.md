@@ -1022,10 +1022,17 @@
 ## CP-042 – Lokale Laufzeit und aktueller Integrationsstand verifiziert
 
 - Datum: 2026-11-16.
-- Der lokale und entfernte `main` stehen auf `a80bab8cb7f15bc1012efde888f106267c47ea03` (Merge von PR #27). GitHub bestätigt das Quell-Repository öffentlich und das separate Control-Repository privat.
+- Zum Snapshot-Zeitpunkt vor Dokumentations-PR #28 standen lokaler und entfernter `main` auf `a80bab8cb7f15bc1012efde888f106267c47ea03` (Merge von PR #27). GitHub bestätigt das Quell-Repository öffentlich und das separate Control-Repository privat.
 - PR #27, Head `d30c6ef61425f5a585427efa0cbc9964d4fef830`, wurde über zwei erfolgreiche Actions-Runs (`43777050095`, `43777063773`) mit jeweils `macos-latest`, `macos-15-intel` und Pflichtjob `test` verifiziert.
 - `npm test`: 108/108 bestanden. `npm run check`: bestanden für 97 Dateien; Prompt-Library-Synchronisierung erfolgreich. `git diff --check`: ohne Befund.
 - Ein echter lokaler `npm start`-Lauf antwortete für `/`, `/manifest.webmanifest`, `/app-icon-source.png`, `/sw.js`, `/api/me` und `/healthz` mit HTTP 200. Die Prozessausgabe meldete `127.0.0.1:8787` und `runner inbound port: disabled`. Eine zusätzliche Listener-Abfrage wurde vom Betriebssystem mit `Zugriff verweigert` abgewiesen; kein weitergehender Socket-Readback wird behauptet.
 - `npm run demo` beendete den geskripteten Auftrag `job_356a3002-4b0e-4419-8a04-f113a932da4a` mit `succeeded` und sieben Ereignissen. Der Executor war simuliert; kein realer Codex-Aufruf wurde ausgeführt.
 - Externe HTTPS-Smokes waren aus der aktuellen Shell nicht erreichbar (`HttpRequestException`). Der letzte dokumentierte Pages-Readback bleibt Run 22 auf dem älteren Commit; PWA-Livezustand, iPhone-Installation, OAuth, echter Runner und Cloud-API bleiben nicht abgenommen. Cloudflare bleibt pausiert; kein anderer Provider wurde aktiviert.
 - Lokale Pflichtprüfungen vor diesem Checkpoint: `npm test` 108/108, `npm run check` erfolgreich für 97 Dateien, `git diff --check` ohne Befund.
+
+## CP-043 – Verifikationscheckpoint integriert
+
+- Datum: 2026-11-16.
+- PR #28 mit dem Dokumentationscheckpoint wurde nach erfolgreichen Pflichtchecks gemergt. GitHub bestätigte für Head `596260a56dbb28c9f917da751debcc9a6eb0e520` in beiden Actions-Runs `43778439577` und `43778467602` erfolgreiche `macos-latest`-, `macos-15-intel`- und `test`-Jobs.
+- GitHub lehnte das Aktivieren von Auto-Merge für diesen bereits `clean` markierten PR ab. Nach dem vollständigen grünen Readback wurde der geprüfte Head mit SHA-Schutz gemergt; Merge-Commit `4fe86ec1463152d21f6fda2744166da9470a2e65`. Kein Check wurde übersprungen.
+- Der lokale `main` wurde per Fast-Forward auf den Merge-Commit aktualisiert. Cloudflare bleibt pausiert; PR-/Branch-Schutz, Pages-Live-Readback, API-Host, OAuth, iPhone-Installation und echter Runner bleiben offen.

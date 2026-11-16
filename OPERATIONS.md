@@ -76,13 +76,13 @@ Run 80 (`43770627889`) auf beiden macOS-Architekturen und für `test`; GitHub
 führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte die
 Erklärung zur fehlenden Control API; ein Klick auf Aktualisieren erhielt den
 Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
-Beim Abgleich am 2026-11-16 war der lokale und entfernte `main` auf
-`a80bab8cb7f15bc1012efde888f106267c47ea03`, dem Merge-Commit von PR #27. Die
-verbundene GitHub-Prüfung bestätigte für PR-Head
-`d30c6ef61425f5a585427efa0cbc9964d4fef830` in Actions-Runs `43777050095` und
-`43777063773` erfolgreiche Jobs für `macos-latest`, `macos-15-intel` und
-`test`. Einen Main-Push-Workflow-Readback nach dem Merge konnte ich nicht
-abrufen. Der letzte separat verifizierte Pages-Lauf bleibt Run 22
+Der lokale Main-Stand vor dem Dokumentations-PR #28 war der Merge-Commit
+`a80bab8cb7f15bc1012efde888f106267c47ea03` aus PR #27. PR #28 bestand mit Head
+`596260a56dbb28c9f917da751debcc9a6eb0e520` die Jobs `macos-latest`,
+`macos-15-intel` und `test` in Actions-Runs `43778439577` und `43778467602` und
+wurde als `4fe86ec1463152d21f6fda2744166da9470a2e65` gemergt. Einen
+Main-Push-Workflow-Readback nach den Merges konnte ich nicht abrufen. Der letzte
+separat verifizierte Pages-Lauf bleibt Run 22
 (`43771264030`) auf dem älteren Dokumentationscommit
 `9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; ein Pages-Readback nach PR #27
 liegt nicht vor.

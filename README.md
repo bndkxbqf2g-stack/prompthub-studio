@@ -9,13 +9,16 @@ Budget für zusätzliche laufende Dienste beträgt 0 €.
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
 am 2026-11-15 veröffentlichte GitHub-Quell-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. Der aktuelle Commit des entfernten
-Main-Branches ist `a80bab8cb7f15bc1012efde888f106267c47ea03`, der Merge von PR #27.
-GitHub bestätigte das Hauptrepo als öffentlich und das separate
+ist die dauerhafte Quelle für den Quellcode. Der zuletzt geprüfte
+Produktcode-Stand war `a80bab8cb7f15bc1012efde888f106267c47ea03` aus PR #27.
+Der anschließende Dokumentations-PR #28 wurde als
+`4fe86ec1463152d21f6fda2744166da9470a2e65` gemergt; sein Head
+`596260a56dbb28c9f917da751debcc9a6eb0e520` bestand `macos-latest`,
+`macos-15-intel` und `test` in den Workflow-Runs `43778439577` und
+`43778467602`. GitHub bestätigte das Hauptrepo als öffentlich und das separate
 `prompthub-studio-control`-Repo als privat. PR #27 bestand auf Head
-`d30c6ef61425f5a585427efa0cbc9964d4fef830` die Jobs `macos-latest`,
-`macos-15-intel` und `test` in den Workflow-Runs `43777050095` und
-`43777063773`; beide Runs wurden erfolgreich ausgelesen. Der Nutzer hat
+`d30c6ef61425f5a585427efa0cbc9964d4fef830` dieselben drei Jobs in den Runs
+`43777050095` und `43777063773`. Der Nutzer hat
 automatische Merges nach bestandenen Pflichtprüfungen ausdrücklich autorisiert.
 Der letzte Branch-Regel-Readback zeigte `test`, `strict=true` und
 Admin-Enforcement, aber keine PR-Pflicht. Ein erneuter API-Readback ist nicht
