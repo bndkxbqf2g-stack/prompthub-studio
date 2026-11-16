@@ -4,31 +4,32 @@ PromptHub Studio ist eine cloud-first Control API, iPhone-PWA und austauschbare
 Runner für Entwicklungsaufträge in mehreren GitHub-Projekten. Das verbindliche
 Budget für zusätzliche laufende Dienste beträgt 0 €.
 
-[PromptHub Studio App direkt öffnen](https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/)
+[PromptHub Studio öffnen (iPhone-PWA)](https://bndkxbqf2g-stack.github.io/prompthub-studio/)
+
+> Die GitHub-Repositoryansicht zeigt diese README. Die App selbst öffnet sich
+> über den Pages-Link oben. Sie ist erreichbar; Anmeldung, Projekte, Aufträge
+> und Freigaben bleiben bis zur Einrichtung der Control API ausgeblendet.
 
 ## Status
 
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
 öffentliche GitHub-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
-ist die dauerhafte Quelle für den Quellcode. Lokales `main` steht auf
-`bb06cd93872860cfd88f89ec555bac0d2bdf1e83`; PR #34 war ein Dokumentations-PR,
-bestand `test`, `macos-latest` und `macos-15-intel` in Runs `43784925947` und
-`43784944320` und wurde automatisch gemergt. Auto-Merge nach bestandenen
-Pflichtchecks ist ausdrücklich autorisiert. Der bestätigte Branch-Readback
-verlangt `test`, aber keine PR-Pflicht oder Review; direkte Pushes bleiben
-möglich.
+ist die dauerhafte Quelle für den Quellcode. `main` steht auf
+`4be6b8bb0ff73a14a3670423d6de7c3de3fc6ce1`. CI-Run 150
+(`43882260206`) bestand `test`, `macos-latest` und `macos-15-intel`; Pages-Run
+41 (`43882257544`) wurde auf demselben Commit erfolgreich bereitgestellt.
+Auto-Merge nach bestandenen Pflichtchecks ist ausdrücklich autorisiert. Der
+Branch-Readback verlangt `test`, aber keine PR-Pflicht oder Review; direkte
+Pushes bleiben möglich.
 
 GitHub Pages ist unter
 [bndkxbqf2g-stack.github.io/prompthub-studio](https://bndkxbqf2g-stack.github.io/prompthub-studio/)
 als statischer Host eingerichtet; die PWA-Dateien liegen unter
 [`/src/pwa/`](https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/).
-GitHub Pages liefert keine serverseitige Control API. Der letzte dokumentierte
-Pages-Run 33 (`43783986387`) war erfolgreich auf Produktcode-Commit
-`792c96e3e8be2db849143b8420baea9c241f8eb2`; ein Main-/Pages-Post-Merge-Run nach
-PR #34 und ein direkter aktueller HTTP-Smoke wurden nicht unabhängig
-ausgelesen. Ein früherer HTTPS-Smoke bestätigte Startseite, Manifest,
-PNG-App-Icon, Service Worker und Assets mit HTTP 200. Eine echte iPhone-
+GitHub Pages liefert keine serverseitige Control API. Am 2026-11-16 öffnete ein
+Browser-Smoke die Pages-Root-Adresse und landete in der PWA unter `/src/pwa/`.
+Die Oberfläche meldet die fehlende Control API korrekt. Eine echte iPhone-
 Installation sowie Offline- und Updateverhalten sind nicht abgenommen.
 
 Am 2026-11-16 bestand ein echter Codex-CLI-/PromptHubRunner-Smoke auf Windows in

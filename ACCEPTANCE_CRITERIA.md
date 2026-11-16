@@ -36,6 +36,36 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A29 | Regressionstest-Prävention aus Fehlerhistorie | `test/regression-test-request.test.mjs`, `test/api.test.mjs`: nur wiederholte Runnerfehler oder menschlich bestätigte Ursachen mit aktuellen Belegen erstellen einen begrenzten, projektbezogenen Testauftrag; Reproduktion und Vorher/Nachher-Nachweis erforderlich; Auftrag bleibt Entwurf bis regulärer Nutzerfreigabe | Pflicht | lokal bestanden; externe Ausführung in angeschlossenem Projekt offen |
 | A30 | Serverless Hosting, Preview-Isolation und Credit-Gate | `test/netlify-function.test.mjs`, `test/netlify-quota-gate.test.mjs`: nicht-produktive Deploy-Kontexte erhalten keine Produktions-Sessions; Originbindung; unbekannte/veraltete/≥75-%-Free-Usage sperrt Jobanlage, Jobfreigabe und Prompt-Übergabe; CI-Build führt Tests und Check aus | Pflicht | lokal bestanden; unabhängige Sicherheitsprüfung abgeschlossen. Konto, Free-Tarif, OAuth-Callback, HTTPS-Live-Smoke und maschinenlesbarer Team-Credit-Readback sind nicht nachgewiesen. Der Job-Gate-Block bleibt aktiv. lokale Netlify-Function-/Quota-Regressionen bestanden; PR #39 und Main-CI bestanden `test` und beide macOS-Lanes; unabhängige Sicherheitsprüfung abgeschlossen ohne Auth-/Session-Sicherheitsbefunde. Netlify-Konto, Free-Tarif, OAuth-Callback, HTTPS-Live-Smoke und maschinenlesbarer Team-Credit-Readback sind nicht nachgewiesen. Das Job-Gate bleibt geschlossen. |
 
+## Aktuelle Revalidierung – 2026-11-16
+
+- GitHub API bestätigt öffentliches Repository `bndkxbqf2g-stack/prompthub-studio`
+  und `main` auf `4be6b8bb0ff73a14a3670423d6de7c3de3fc6ce1`. Actions-Run
+  `43882260206` bestand `test`, `macos-latest` und `macos-15-intel`; Pages-Run
+  `43882257544` stellte denselben Commit erfolgreich bereit.
+- Live-Browserprüfung der Pages-Root-Adresse leitete zur PWA unter `/src/pwa/`
+  weiter. Die Oberfläche wurde geladen und zeigte ausdrücklich „Control API
+  nicht verfügbar“. Das belegt statische PWA und Routing, nicht Authentifizierung
+  oder Auftragssteuerung. Die `github.com/...`-Adresse zeigt die
+  Repository-Ansicht mit dieser README; für die App ist die Pages-Adresse zu
+  verwenden.
+- Die aktuelle Netlify-Browserregisterkarte zeigt die Anmeldeseite. Damit sind
+  weder eine angemeldete Sitzung noch Netlify-Konto, Free-Tarif, Quotenstand,
+  OAuth-Callback oder Deployment nachgewiesen. Es wurde nichts in Netlify
+  verändert.
+- Codex-Cloud-Inventar liefert `asenvcfg_base` als `ready/runnable`, aber ohne
+  Repository-Zuordnung. Eine autonome PromptHub-Cloud-Ausführung ist damit nicht
+  verfügbar.
+- `codex login status` meldet ChatGPT-Authentifizierung. Ein schreibgeschützter
+  ephemerer `codex exec --json`-Versuch endete vor dem ersten JSONL-Event mit
+  Exitcode 1: die CLI konnte ihr temporäres Alias und den lokalen Memories-State
+  unter dem schreibgeschützten `CODEX_HOME` nicht öffnen/anlegen. Es wurden
+  keine Tokenwerte gemessen.
+- Lokale Prüfungen auf `4be6b8b`: `npm test` 138/138 bestanden;
+  `npm run check` bestanden (108 Dateien und Prompt-Library-Synchronisierung).
+  Live-Control-API, echter MacBook-Runner, iPhone-Installation sowie Offline-
+  und Updateverhalten bleiben offen. Kein neuer kostenpflichtiger Dienst wurde
+  aktiviert.
+
 ## Abnahmeregel
 
 Die technische Erstabnahme ist `bestanden`, wenn alle Pflichtkriterien einen
