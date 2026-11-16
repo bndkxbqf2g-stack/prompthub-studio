@@ -65,6 +65,10 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
   Live-Control-API, echter MacBook-Runner, iPhone-Installation sowie Offline-
   und Updateverhalten bleiben offen. Kein neuer kostenpflichtiger Dienst wurde
   aktiviert.
+- Nach PR #42 ist `main` auf `9e34b719ec5cf7e6de128efc4e83b7a01e480c02`.
+  Der PR-Lauf `43888056302`, Main-CI `43889567863` und Pages-Deploy
+  `43889567107` bestanden; der Browser-Smoke nach diesem Deploy öffnete die PWA
+  über die Root-Adresse und meldete weiterhin korrekt die fehlende Control API.
 
 ## Abnahmeregel
 

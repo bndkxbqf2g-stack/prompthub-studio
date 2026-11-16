@@ -16,9 +16,9 @@ Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
 öffentliche GitHub-Repository
 [`bndkxbqf2g-stack/prompthub-studio`](https://github.com/bndkxbqf2g-stack/prompthub-studio)
 ist die dauerhafte Quelle für den Quellcode. `main` steht auf
-`4be6b8bb0ff73a14a3670423d6de7c3de3fc6ce1`. CI-Run 150
-(`43882260206`) bestand `test`, `macos-latest` und `macos-15-intel`; Pages-Run
-41 (`43882257544`) wurde auf demselben Commit erfolgreich bereitgestellt.
+`9e34b719ec5cf7e6de128efc4e83b7a01e480c02`. CI-Run `43889567863` bestand
+`test`, `macos-latest` und `macos-15-intel`; Pages-Run `43889567107` stellte
+diesen Commit erfolgreich bereit.
 Auto-Merge nach bestandenen Pflichtchecks ist ausdrücklich autorisiert. Der
 Branch-Readback verlangt `test`, aber keine PR-Pflicht oder Review; direkte
 Pushes bleiben möglich.
