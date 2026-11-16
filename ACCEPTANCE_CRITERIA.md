@@ -5,7 +5,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 
 | ID | Kriterium | Nachweis / Test | Gate | Status |
 |---|---|---|---|---|
-| A01 | PWA, API und Control-Plane-Datenfluss | `test/api.test.mjs`; lokaler HTTP-Smoke auf `127.0.0.1:18787` für `/`, Manifest, PNG-Icon, `/healthz` und `/api/me` | Pflicht | lokal bestanden: alle fünf Antworten HTTP 200; CSP vorhanden; lokale Sitzung ohne Tokenantwort |
+| A01 | PWA, API und Control-Plane-Datenfluss | `test/api.test.mjs`; lokaler HTTP-Smoke für UI, Assets, `/healthz` und `/api/me` | Pflicht | lokal bestanden: `npm start` lieferte am 2026-11-16 für `/`, Manifest, PNG-Icon, `sw.js`, `/api/me` und `/healthz` HTTP 200. Listener-Inspektion des Betriebssystems wurde mit Zugriff verweigert; `src/config.mjs` setzt weiterhin `127.0.0.1` als Host-Default. |
 | A02 | Sichere Authentifizierung | `test/auth.test.mjs`, `test/config.test.mjs` | Pflicht | lokal bestanden |
 | A03 | Keine Geheimnisse im Browser/GitHub/Log | `scripts/check.mjs`, OAuth-/Payload-Assertions | Pflicht | lokal bestanden |
 | A04 | Zuverlässige Auftragsverarbeitung | `test/runner.test.mjs`, `npm run demo` | Pflicht | lokal bestanden: Demo-Auftrag `job_4883cfd5-d035-47ef-b9de-d0bcce8095f7` erreichte `succeeded` nach Pflichtcheck und sieben Ereignissen; Executor war ausdrücklich geskriptet |
@@ -13,7 +13,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A06 | Outbound-only Mac-Runner | Runner-Quellpfad ohne Listener, `/healthz` mit `runner_inbound_port=false`, echte macOS-CI und lokaler Mac-Runner | Pflicht | Windows-Live-Smoke bestätigte `runner_inbound_port=false`; Port 18787 war nach dem Stopp geschlossen. PR #21 verifizierte auf Head `a873695153a6bb24e61b149d5ee0fc64108e33a4` mit Actions-Run 80 (`43770627889`) erfolgreiche vollständige Tests und Static-Checks auf `macos-latest` (Apple Silicon) und `macos-15-intel`; der erforderliche Job `test` bestand ebenfalls. Main-Run 84 (`43771264550`) auf Commit `9c5e4b40adaaccfb6065e177cdad01ab7fd3d816` bestätigte beide macOS-Lanes und `test` erneut. Ein echter lokaler MacBook-Runner und dessen Codex-Ausführung sind weiterhin nicht nachgewiesen. |
 | A07 | Heartbeats und Checkpoints | Runner-Ereignisfolge und Checkpoint-Assertions | Pflicht | lokal bestanden |
 | A08 | Wiederaufnahme nach Unterbrechung | Lease-Ablauf → `stale` → explizites Resume in `test/control-plane.test.mjs` | Pflicht | lokal bestanden |
-| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | PR #24 auf Head `761b7510a4206d83e318252a168be92f14c17234`: Actions-Run 89 (`43774470371`) bestand `macos-latest`, `macos-15-intel` und `test`; PR #24 wurde danach mit Merge-Commit `86202135780f25f63c288886c85d7694d4204410` automatisch gemergt. Der ältere Main-CI-Run 84 (`43771264550`) und Pages-Run 22 (`43771264030`) bleiben historische Nachweise für Commit `9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`. `allow_auto_merge=true`; automatische Merges nach bestandenen Pflichtchecks sind vom Nutzer ausdrücklich autorisiert. Die zuletzt ausgelesene Branch-Regel verlangt keinen PR; direkte Commits auf `main` bleiben möglich. Branch-API-Readback zuletzt HTTP 403; eine PR-Pflicht ist nicht bestätigt. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-036 |
+| A09 | CI, Pflichtchecks und verpflichtender Merge-Gate | `.github/workflows/ci.yml`; erfolgreicher Actions-Job `test`; Branch-API-Readback | Pflicht | PR #27, Head `d30c6ef61425f5a585427efa0cbc9964d4fef830`, ist mit Merge-Commit `a80bab8cb7f15bc1012efde888f106267c47ea03` integriert. GitHub-Readback bestätigte erfolgreiche `macos-latest`-, `macos-15-intel`- und `test`-Jobs in Runs `43777050095` und `43777063773`. Ein Main-Push-Run nach dem Merge wurde nicht gelesen. `allow_auto_merge=true`; automatische Merges nach bestandenen Pflichtchecks sind autorisiert. Der letzte Branch-Regel-Readback verlangt keinen PR; direkte Commits auf `main` bleiben möglich. Branch-API-Readback zuletzt HTTP 403; PR-Pflicht nicht bestätigt. Frühere Nachweise: CP-021 bis CP-024 und CP-029 bis CP-036 |
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
@@ -45,17 +45,21 @@ ausgewiesen und nicht als bestanden markiert.
 
 ## Aktueller Status
 
-Status zum letzten Abgleich: `conditional_local_pass`. Die lokale Implementierung sowie
-A27/A28 sind durch reproduzierbare Tests belegt. Der zuletzt verifizierte Main-Commit war
-`86202135780f25f63c288886c85d7694d4204410`, Merge von PR #24. Dessen Head
-`761b7510a4206d83e318252a168be92f14c17234` bestand Actions-Run 89
-(`43774470371`) mit `macos-latest`, `macos-15-intel` und `test`; GitHub führte
-danach den Auto-Merge aus. Der letzte separat verifizierte Main-CI-/Pages-Lauf
-bleibt Run 84/22 auf dem älteren Commit
-`9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; ein Pages-Readback nach PR #23/#24
-liegt nicht vor. Der vorherige Produktänderungs-Commit
-`bf5a15c1b8a4fc0f832e55aefcdc84bfa440c5a5` und PR #21 bleiben als Nachweis der
-PWA-Ausfallbehandlung dokumentiert.
+Status zum Abgleich am 2026-11-16: `conditional_local_pass`; die Erstabnahme ist
+nicht bestanden. Lokale Pflichtprüfungen ergaben `npm test` 108/108, `npm run
+check` erfolgreich für 97 Dateien und `git diff --check` ohne Befund. Ein
+HTTP-Smoke des lokalen Servers erhielt für PWA-Startseite, Manifest, Icon,
+Service Worker, `/api/me` und `/healthz` jeweils HTTP 200. `npm run demo`
+beendete den geskripteten Auftrag `job_356a3002-4b0e-4419-8a04-f113a932da4a`
+mit `succeeded` und sieben Ereignissen; dies ist kein Nachweis realer Codex-
+Ausführung. Der aktuelle Main-Commit ist
+`a80bab8cb7f15bc1012efde888f106267c47ea03`, Merge von PR #27. Dessen Head
+`d30c6ef61425f5a585427efa0cbc9964d4fef830` bestand in Actions-Runs
+`43777050095` und `43777063773` jeweils `macos-latest`, `macos-15-intel` und
+`test`. Ein Main-Push-Workflow-Readback nach dem Merge liegt nicht vor. Der
+letzte separat bestätigte Pages-Lauf bleibt Run 22 auf dem älteren Commit
+`9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; ein aktueller Pages-Readback war
+aus der Laufzeit nicht erreichbar.
 Das Quell-Repository ist auf ausdrückliche Nutzeranweisung öffentlich; kein
 kostenpflichtiger Plan wurde aktiviert. Cloudflare bleibt pausiert; die
 Projektlöschung wartet auf die gesonderte Bestätigung des Nutzers.
