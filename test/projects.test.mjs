@@ -89,7 +89,7 @@ test("verified job outcomes are derived from completed control-plane events, iso
   await controlPlane.claimJob(created.id, "runner-test");
   await controlPlane.completeJob(created.id, "runner-test", "succeeded", {
     requiredChecks: { passed: true, names: ["npm test", "npm run check"] },
-    resourceMetrics: { runtime_ms: 1200, retries: 0, executor_invocations: 1, model_calls: 1, token_usage: { input_tokens: 40, output_tokens: 12, source: "execution_provider" } },
+    resourceMetrics: { runtime_ms: 1200, retries: 0, executor_invocations: 1, model_calls: 1, token_usage: { input_tokens: 40, output_tokens: 12, cached_input_tokens: 18, reasoning_output_tokens: 4, source: "execution_provider" } },
   });
 
   const first = await service.recordVerifiedJobOutcome(created.id);
@@ -99,7 +99,7 @@ test("verified job outcomes are derived from completed control-plane events, iso
   assert.equal(first.outcome.outcome, "success");
   assert.equal(first.outcome.evidence_level, "required_checks_passed");
   assert.equal(first.outcome.required_checks.passed, true);
-  assert.deepEqual(first.outcome.resource_metrics.token_usage, { input_tokens: 40, output_tokens: 12, source: "execution_provider" });
+  assert.deepEqual(first.outcome.resource_metrics.token_usage, { input_tokens: 40, output_tokens: 12, cached_input_tokens: 18, reasoning_output_tokens: 4, source: "execution_provider" });
   assert.equal("prompt" in first.outcome, false);
   const listed = await service.listVerifiedOutcomes(project.id);
   assert.equal(listed.length, 1);

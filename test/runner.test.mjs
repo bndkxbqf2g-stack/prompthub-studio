@@ -20,7 +20,7 @@ test("runner writes checkpoints and only succeeds after required checks", async 
   const recordedOutcomes = [];
   const runner = new PromptHubRunner({
     controlPlane: control,
-    executor: new ScriptedExecutor([{ ok: true, exitCode: 0, usage: { input_tokens: 41, output_tokens: 12 }, modelCalls: 1 }]),
+    executor: new ScriptedExecutor([{ ok: true, exitCode: 0, usage: { input_tokens: 41, output_tokens: 12, cached_input_tokens: 7, reasoning_output_tokens: 3 } }]),
     worktrees: { prepare: async () => ({ path: "C:/worktrees/job", resumed: false }) },
     checkRunner: async () => ({ passed: true, names: ["test", "check"] }),
     outcomeRecorder: { async recordVerifiedJobOutcome(jobId) { recordedOutcomes.push(jobId); return { created: true }; } },
@@ -35,8 +35,8 @@ test("runner writes checkpoints and only succeeds after required checks", async 
   assert.equal(finalJob.required_checks.passed, true);
   assert.equal(finalJob.resource_metrics.executor_invocations, 1);
   assert.equal(finalJob.resource_metrics.retries, 0);
-  assert.equal(finalJob.resource_metrics.model_calls, 1);
-  assert.deepEqual(finalJob.resource_metrics.token_usage, { input_tokens: 41, output_tokens: 12, source: "execution_provider" });
+  assert.equal(finalJob.resource_metrics.model_calls, null);
+  assert.deepEqual(finalJob.resource_metrics.token_usage, { input_tokens: 41, output_tokens: 12, cached_input_tokens: 7, reasoning_output_tokens: 3, source: "execution_provider" });
   assert.ok(Number.isFinite(finalJob.resource_metrics.runtime_ms));
   assert.ok(finalJob.events.some((event) => event.type === "checkpoint"));
   assert.equal(control.getActiveLeases().length, 0);

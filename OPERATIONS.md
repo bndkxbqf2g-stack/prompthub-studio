@@ -57,6 +57,30 @@ Prüfung bestätigt nur den CLI-Login des aktuellen Hosts. Sie konfiguriert wede
 den PromptHub-Runner noch einen Cloud-Executor. Zugangsdaten aus `auth.json`
 werden weder kopiert noch in PromptHub gespeichert.
 
+### Codex-Tokenmessung
+
+Die Standardargumente verwenden `codex exec --json`. `ProcessExecutor` verarbeitet
+aus dem JSONL-Strom ausschließlich nichtnegative Ganzzahlen aus
+`turn.completed.usage`: Input-, Output-, Cache- und Reasoning-Tokens. Sonstige
+JSONL-Rohinhalte werden verworfen; für `error`/`turn.failed` bleibt nur ein
+generischer Diagnosehinweis; ein solches Fehlerereignis lässt den Executor auch
+bei Prozess-Exitcode 0 fehlschlagen. Es wird genau ein gültiges Abschlussereignis als
+Messung akzeptiert. Duplikate, fehlerhafte Zeilen oder Überschreiten von 4 MB,
+10.000 Ereignissen beziehungsweise 1.000.000 Zeichen je Zeile machen die
+Messung vollständig unbekannt. Nicht unterstützte Usage-Felder machen die
+Messung ebenfalls unbekannt. Die Werte stammen aus der Ausgabe des lokal
+konfigurierten Codex-CLI-Prozesses und sind nicht separat signiert. Cache- und
+Reasoning-Werte werden nur angezeigt, wenn alle
+einbezogenen Tokenmessungen diese Teilwerte enthalten. Summen außerhalb sicherer
+Ganzzahlen bleiben unbekannt. Modellaufrufe bleiben unbekannt, weil dieses
+Ereignis keine verlässliche Aufrufzahl enthält. Bei einem manuell gesetzten
+`CODEX_ARGS_JSON` muss `--json` enthalten sein, damit der Executor Tokenwerte
+messen kann. Fehlende oder ungültige Telemetrie bleibt `unbekannt`.
+
+Die JSONL-Ausgabe und das `turn.completed.usage`-Beispiel sind in der
+[offiziellen Codex-Dokumentation zum nicht-interaktiven Modus](https://learn.chatgpt.com/docs/non-interactive-mode#make-output-machine-readable)
+dokumentiert. Der Parser folgt nur diesem dokumentierten Usage-Ereignis.
+
 ## Verifizierter Codex-Executor-Smoke
 
 Am 2026-11-16 meldete `codex login status` nach einem prozesslokalen
@@ -77,10 +101,13 @@ Anmeldedaten kopiert noch dauerhafte Umgebungswerte oder Codex-Einstellungen
 geändert. `CODEX_SQLITE_HOME` ist eine von Codex dokumentierte Variable für
 SQLite-Zustand ([offizielle Umgebungsvariablen](https://learn.chatgpt.com/docs/config-file/environment-variables)).
 
-Dieser einmalige Windows-Fixture-Smoke richtet keinen dauerhaften Runner ein und
-belegt weder GitHub-Persistenz noch den Betrieb auf dem MacBook. Der
-`ProcessExecutor` meldete keine vertrauenswürdigen Token-/Modellverbrauchswerte;
-diese bleiben unbekannt.
+Dieser einmalige Windows-Fixture-Smoke richtete keinen dauerhaften Runner ein
+und belegt weder GitHub-Persistenz noch den Betrieb auf dem MacBook. Er lief vor
+der JSONL-Telemetrieänderung; für diesen Auftrag bleiben Tokenwerte unbekannt.
+Automatische JSONL-Erfassung und Speicherung sind durch deterministische Tests
+abgedeckt. Ein erneuter echter Codex-Auftrag zur Beobachtung gelieferter
+Tokenwerte ist noch nicht erfolgt. Modellaufrufzahlen bleiben auch dann
+unbekannt, wenn Tokenwerte geliefert werden.
 
 ## PWA-Veröffentlichung
 

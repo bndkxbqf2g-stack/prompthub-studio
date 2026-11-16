@@ -70,6 +70,11 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Prompt-Designer mit getrennten Anforderungen/Annahmen, einem Interviewschritt,
   versioniertem Prompt, QA und explizitem Übergabegate.
 - Kuratierte, quellenbelegte Prompt-Bibliothek und präzise Ressourcenmetriken.
+- Codex-Tokenwerte werden im Standardlauf aus einem allowlisteten, dokumentierten
+  JSONL-Abschlussereignis gemessen; Cache-/Reasoning-Teilsummen bleiben bei
+  unvollständigen Quelldaten verborgen. Doppelte, ungültige, mehrdeutige oder
+  übergroße Telemetrie und unsichere Summen ergeben unbekannte Werte;
+  Modellaufrufzahlen bleiben unbekannt.
 - Projekt-Snapshot-Versionen, aufgabenbezogene Kontextauswahl und begrenzte,
   nicht persistente Deduplizierung verifizierter kostenfreier Provider-Analysen.
 - Tests für gemessene, teilweise und nicht verfügbare Tokenwerte sowie
