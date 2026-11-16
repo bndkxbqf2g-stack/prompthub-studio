@@ -4,6 +4,8 @@ PromptHub Studio ist eine cloud-first Control API, iPhone-PWA und austauschbare
 Runner für Entwicklungsaufträge in mehreren GitHub-Projekten. Das verbindliche
 Budget für zusätzliche laufende Dienste beträgt 0 €.
 
+[PromptHub Studio App direkt öffnen](https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/)
+
 ## Status
 
 Die technische Erstabnahme ist noch offen. Das auf ausdrücklichen Nutzerwunsch
