@@ -79,8 +79,9 @@ Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
 PR #30, Head `8581fdfd19c73b034702834f287e5a0af696b887`, bestand in Actions-
 Runs `43780749466` und `43780772252` jeweils `macos-latest`, `macos-15-intel`
 und `test`; GitHub Auto-Merge integrierte den PR als
-`7058c1c10721ff661f30ccb26891bfca7d3d0982`. Main-CI-Run `43780867661` und
-GitHub-Pages-Run 30 (`43780867315`) endeten erfolgreich auf diesem Commit.
+`7058c1c10721ff661f30ccb26891bfca7d3d0982`. Dokumentations-PR #31 wurde als
+`7531c20d500178a572bfe624dc9ad3250440c59e` gemergt. Main-CI-Run `43782152767`
+und GitHub-Pages-Run 31 (`43782151964`) endeten erfolgreich auf diesem Commit.
 Ein direkter HTTP-Smoke nach diesem Deployment war nicht verfügbar; der Run
 bestätigt die erfolgreiche Pages-Veröffentlichung, nicht iPhone-Installation
 oder Offline-/Update-Bedienung.

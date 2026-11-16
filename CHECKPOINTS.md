@@ -1084,3 +1084,18 @@
 - Lokale Pflichtprüfungen nach dieser Dokumentationsänderung: `npm test` 109/109;
   `npm run check` erfolgreich für 97 Dateien und Prompt-Library-Synchronisierung;
   `git diff --check` ohne Befund.
+
+## CP-046 – Abnahmestatus auf den aktuellen Main-Stand gebracht
+
+- Datum: 2026-11-16.
+- PR #31 mit Head `f9907b2883ee375eefcbb0b5076b084ec03a0341` bestand `test`,
+  `macos-latest` und `macos-15-intel` in den Actions-Runs `43782026840` und
+  `43782041326`; GitHub Auto-Merge integrierte ihn als
+  `7531c20d500178a572bfe624dc9ad3250440c59e`.
+- Main-CI-Run `43782152767` und GitHub-Pages-Run `43782151964` endeten beide
+  erfolgreich auf diesem Commit. A09, A17 und der aktuelle Abnahmeabschnitt
+  verweisen jetzt auf diese Nachweise. Ein neuer HTTP-Smoke oder echter
+  iPhone-Test wurde damit nicht ersetzt.
+- Lokale Pflichtprüfungen nach dieser Dokumentationsaktualisierung: `npm test`
+  109/109; `npm run check` erfolgreich für 97 Dateien und Prompt-Library-
+  Synchronisierung; `git diff --check` ohne Befund.
