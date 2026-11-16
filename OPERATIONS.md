@@ -76,16 +76,14 @@ Run 80 (`43770627889`) auf beiden macOS-Architekturen und für `test`; GitHub
 führte den Merge automatisch aus. Ein Browser-Smoke bei 390×844 zeigte die
 Erklärung zur fehlenden Control API; ein Klick auf Aktualisieren erhielt den
 Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
-Der lokale Main-Stand vor dem Dokumentations-PR #28 war der Merge-Commit
-`a80bab8cb7f15bc1012efde888f106267c47ea03` aus PR #27. PR #28 bestand mit Head
-`596260a56dbb28c9f917da751debcc9a6eb0e520` die Jobs `macos-latest`,
-`macos-15-intel` und `test` in Actions-Runs `43778439577` und `43778467602` und
-wurde als `4fe86ec1463152d21f6fda2744166da9470a2e65` gemergt. Einen
-Main-Push-Workflow-Readback nach den Merges konnte ich nicht abrufen. Der letzte
-separat verifizierte Pages-Lauf bleibt Run 22
-(`43771264030`) auf dem älteren Dokumentationscommit
-`9c5e4b40adaaccfb6065e177cdad01ab7fd3d816`; ein Pages-Readback nach PR #27
-liegt nicht vor.
+PR #30, Head `8581fdfd19c73b034702834f287e5a0af696b887`, bestand in Actions-
+Runs `43780749466` und `43780772252` jeweils `macos-latest`, `macos-15-intel`
+und `test`; GitHub Auto-Merge integrierte den PR als
+`7058c1c10721ff661f30ccb26891bfca7d3d0982`. Main-CI-Run `43780867661` und
+GitHub-Pages-Run 30 (`43780867315`) endeten erfolgreich auf diesem Commit.
+Ein direkter HTTP-Smoke nach diesem Deployment war nicht verfügbar; der Run
+bestätigt die erfolgreiche Pages-Veröffentlichung, nicht iPhone-Installation
+oder Offline-/Update-Bedienung.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
@@ -105,12 +103,13 @@ Browserausfall konnte diese Einstellung nicht erneut ausgelesen werden. Bei
 einer späteren Aktivierung wären Preview-Adressen öffentlich; dafür keine
 Preview-Secrets setzen und zuvor Cloudflare Access konfigurieren.
 
-Die GitHub-Branch-Einstellungsseite wurde am 2026-11-15 erneut geprüft: Für
-`main` sind der Pflichtcheck `test`, `strict=true` und Admin-Enforcement aktiv.
-„Require a pull request before merging“ ist ausgeschaltet; direkte Commits auf
-`main` sind somit möglich. `allow_auto_merge=true` ist aktiviert. Die verbundene
-GitHub-API verweigert den Branch-Schutz-Readback mit HTTP 403. Historische
-Cloudflare-Konfiguration und aktuelle Einschränkungen stehen in
+Der authentifizierte Branch-Schutz-Readback vom 2026-11-16 bestätigt für `main`
+den erforderlichen Check `test` von GitHub Actions (`app_id=15368`) mit
+`strict=true` und `enforce_admins=true`; Force-Pushes und Löschen sind
+deaktiviert. Die Regel verlangt keinen Pull Request und keine Review, daher sind
+PR-freie Schreibwege nicht ausgeschlossen. Auto-Merge wurde für PR #30 aktiviert
+und nach bestandenen Pflichtchecks ausgeführt. Historische Cloudflare-
+Konfiguration und aktuelle Einschränkungen stehen in
 `CLOUDFLARE_OPERATIONS.md`. Der Cloud-Codex-Runner bleibt mangels verifizierter
 Laufzeitschnittstelle `not_configured`.
 
