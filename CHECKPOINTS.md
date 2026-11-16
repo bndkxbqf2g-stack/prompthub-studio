@@ -1249,3 +1249,24 @@
   Free-Tarif, Runtime-Secrets oder teamweiter Credit-Readback ist verifiziert.
 - Das Quoten-Gate bleibt fail-closed. Kein kostenpflichtiger Dienst wurde
   aktiviert; Cloudflare bleibt pausiert.
+
+## CP-054 – Lokale Control API und PWA per HTTP verifiziert
+
+- Datum: 2026-11-16. Im lokalen PromptHub-Arbeitsstand wurde `npm.cmd start`
+  ausgeführt; die Anwendung meldete `http://127.0.0.1:8787` und
+  `Runner inbound port: disabled`.
+- HTTP 200: `/`, `/manifest.webmanifest`, das Manifest-Icon
+  `./app-icon-source.png` (`image/png`), `/sw.js`, `/api/me`,
+  `/api/jobs` und `/healthz`.
+- `/api/me` meldete die lokale Entwicklungsanmeldung. `/api/jobs` lieferte
+  eine leere Liste. `/healthz` meldete `control_plane=memory`,
+  `runner_status=not_observed`, `runner_inbound_port=false` und
+  `job_admission=not_gated`. Der Socket war nur an `127.0.0.1:8787`
+  gebunden; nach dem Stopp war Port 8787 geschlossen.
+- Pflichtprüfungen auf demselben lokalen Arbeitsstand: `npm.cmd test`
+  138/138 bestanden; `npm.cmd run check` bestanden (108 Dateien und
+  Prompt-Library-Synchronisierung); `git diff --check` ohne Whitespace-Fehler.
+- Der Smoke belegt einen lokalen Entwicklungs-Control-Plane-Pfad mit
+  flüchtigem Memory-Store. Er belegt weder GitHub-Persistenz noch eine für das
+  iPhone erreichbare oder produktive Cloud-API. Die technische Erstabnahme
+  bleibt offen.
