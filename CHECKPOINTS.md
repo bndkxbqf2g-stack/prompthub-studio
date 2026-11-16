@@ -1060,6 +1060,37 @@
 - Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
   97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.
 
+## CP-049 – Echter Codex-Executor durch PromptHubRunner verifiziert
+
+- Datum: 2026-11-16.
+- `codex-cli 0.167.0-alpha.4.1`; `codex login status` meldete nach einem
+  prozesslokalen `CODEX_HOME`-Override „Logged in using ChatGPT“. Keine
+  Auth-Datei wurde kopiert oder ausgegeben; der Override wurde wieder entfernt.
+- Echter Job in einem automatisch angelegten und wieder gelöschten
+  Wegwerf-Git-Fixture: `ProcessExecutor` startete Codex mit `--ephemeral` und
+  `--sandbox workspace-write`; `PromptHubRunner`, `MemoryControlPlane`,
+  `GitWorktreeManager` und der tatsächliche Node-Pflichtcheck liefen zusammen.
+  Codex änderte `answer.mjs` von 41 auf 42. Ergebnis: Executor-Exitcode 0,
+  Pflichtcheck bestanden, Job `succeeded`, vier Checkpoint-Ereignisse und null
+  aktive Leases nach Abschluss.
+- Die normale Windows-Sandbox verweigerte den Zugriff auf Codex-App-Server/
+  SQLite-State. Das isolierte `CODEX_SQLITE_HOME` allein reichte dort nicht;
+  der erfolgreiche Smoke lief mit erforderlicher äußerer Prozessfreigabe und
+  SQLite-State im temporären Fixture. Keine dauerhafte Konfiguration wurde
+  geändert. Dies ist kein Nachweis eines MacBook- oder GitHub-Control-Plane-
+  Betriebs. `ProcessExecutor` lieferte keine Token-/Modellverbrauchsmessung.
+- PR #34, Head `8ba96a8fcbac80f722208914535dfff39460cc1c`, bestand `test`,
+  `macos-latest` und `macos-15-intel` in Runs `43784925947` und `43784944320`
+  und wurde automatisch als `bb06cd93872860cfd88f89ec555bac0d2bdf1e83`
+  gemergt. Lokales `main` wurde auf diesen Commit fast-forwarded.
+- `ACCEPTANCE_CRITERIA.md` unterscheidet jetzt den echten lokalen Codex-Smoke
+  von GitHub-Persistenz und Mac-Runner-Abnahme. `DEVELOPMENT_PLAN.md`,
+  `OPERATIONS.md` und `README.md` nennen den aktuellen PR-/Merge- und
+  Runner-Nachweis.
+- Lokale Pflichtprüfungen für dieses Paket: `npm test` 109/109 bestanden;
+  `npm run check` erfolgreich für 97 Dateien einschließlich
+  Prompt-Library-Abgleich; `git diff --check` ohne Befund.
+
 ## CP-048 – Abnahmematrix auf den aktuellen Produktcode-Stand gebracht
 
 - Datum: 2026-11-16.
