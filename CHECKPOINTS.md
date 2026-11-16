@@ -1099,3 +1099,16 @@
 - Lokale Pflichtprüfungen nach dieser Dokumentationsaktualisierung: `npm test`
   109/109; `npm run check` erfolgreich für 97 Dateien und Prompt-Library-
   Synchronisierung; `git diff --check` ohne Befund.
+
+## CP-047 – Aktuellen Main-CI- und Pages-Stand belegt
+
+- Datum: 2026-11-16.
+- Der aktuelle lokale und entfernte `main` steht auf
+  `ff90a0ae3d9a89ef44bf77b9cde0a4da35b66186` aus PR #32. Main-CI-Run
+  `43782926429` und GitHub-Pages-Run `43782925620` endeten beide mit
+  `completed/success` auf diesem Commit.
+- A09, A17, der aktuelle Statusabschnitt und `OPERATIONS.md` wurden auf diese
+  Belege aktualisiert. Der erfolgreiche Pages-Run ist kein Ersatz für einen
+  aktuellen externen HTTP-Smoke oder einen echten iPhone-Test.
+- Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
+  97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.
