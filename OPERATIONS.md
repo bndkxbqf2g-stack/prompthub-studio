@@ -203,19 +203,22 @@ Das separate private GitHub-Control-Repository ist angelegt. Auf seinem
 `{"version":1,"leases":[]}`. Es ist noch nicht mit der Anwendung verbunden:
 GitHub-OAuth-App, Runtime-Token/-Secrets und serverloser API-Host fehlen.
 
-## Netlify-Free-Deployment (vorbereitet, noch nicht verbunden)
+## Netlify-Free-Deployment (vorbereitet, nicht live verbunden)
 
 `netlify.toml` konfiguriert `main` als Produktionsquelle, `src/pwa` als
 statisches Veröffentlichungsverzeichnis und `netlify/functions` als
 Functions-Verzeichnis. Jeder Netlify-Build führt zuerst `npm test` und
 `npm run check` aus. Die PWA und die API nutzen danach dieselbe HTTPS-Origin.
 
-Vor dem Verbinden muss im Netlify-Dashboard der Free-Tarif für genau dieses
-Repository read-only bestätigt werden. Keinen Tarifwechsel, Zusatzcredits,
-kostenpflichtige Domain oder Auto-Recharge aktivieren. Das Konto und sein
-teamweiter Verbrauch sind in dieser Sitzung nicht verifiziert. Netlify Free
-hat laut Anbieter ein festes monatliches Credit-Limit und pausiert Sites am
-Limit; das ersetzt PromptHubs eigenes Job-Gate nicht.
+Das Netlify-Dashboard bestätigte den Free-Tarif. Der kontobezogene
+Credit-Stand wird nicht in diesem öffentlichen Repository gespeichert. Zum
+Zeitpunkt der Prüfung existierte noch kein Netlify-Projekt, deshalb ist kein
+PromptHub-App-Verbrauch bekannt. Netlify Free hat ein Hard Limit und pausiert
+bei Erschöpfung alle Team-Sites; das ersetzt PromptHubs eigenes Job-Gate nicht.
+Aktuelle öffentliche Raten: 15 Credits je Produktions-Deployment, 10 je
+GB-Stunde Compute, 20 je GB Bandbreite und 2 je 10.000 Requests. Alle Meter
+teilen denselben Pool. Keine Zusatzcredits, kostenpflichtige Domain,
+Tarifänderung oder kostenpflichtige Funktion aktivieren.
 
 Netlify Production-Context erhält die folgenden Variablen ausschließlich über
 die verschlüsselte Environment-Variable-Verwaltung des Anbieters:
@@ -240,20 +243,23 @@ Branch-Deployments liefern für API-, OAuth- und Health-Routen `404` und öffnen
 keinen Produktions-Blobs-Store; Produktions-Secrets dürfen deshalb nur dem
 Production-Context zugewiesen werden.
 
-Das Netlify-Free-Credit-Readback ist noch nicht in PromptHub angebunden. Der
-öffentliche Zustand `/healthz` und `/api/metrics` weist die Jobannahme deshalb
-als `unknown` aus; `POST /api/jobs`, Jobfreigaben und Prompt-Übergaben antworten
-mit `503 job_admission_paused`. Es gibt keinen manuellen Environment-Override,
-der diese Sperre öffnen kann. Erst ein frischer, maschinenlesbarer Readback des
-richtigen Free-Teams unter 75 % der 300 Credits kann die Prüfung bestehen.
+Das Netlify-Free-Credit-Readback ist nicht in PromptHub angebunden.
+Der öffentliche Zustand `/healthz` und `/api/metrics` weist die Jobannahme
+deshalb als `unknown` aus; `POST /api/jobs`, Jobfreigaben und Prompt-Übergaben
+antworten mit `503 job_admission_paused`. Es gibt keinen manuellen
+Environment-Override, der diese Sperre öffnen kann. Die öffentliche
+Netlify-API-Referenz dokumentiert keinen vollständigen teamweiten
+Credit-Readback. Erst ein frischer, maschinenlesbarer Readback des richtigen
+Free-Teams unter 75 % des 300-Credit-Monatslimits kann die Prüfung bestehen.
 
 Nach einer erfolgreichen Konto- und Integrationsprüfung löst jeder erfolgreiche
 Push/Merge auf `main` einen Netlify-Build aus. Ein fehlgeschlagener Test oder
 Check verhindert den Build. Der veröffentlichte Zustand muss anschließend mit
 `GET /healthz`, `GET /api/me`, OAuth-Login und einem durch das Job-Gate
-abgelehnten Auftrag geprüft werden. In diesem Workspace fehlen Netlify-CLI,
-Netlify-Konto-Token und die nötigen Netlify/GitHub-Runtime-Secrets; es wurde
-deshalb weder ein Projekt angelegt noch ein Deployment ausgelöst.
+abgelehnten Auftrag geprüft werden. In diesem Workspace fehlen Netlify-CLI, Netlify-Konto-Token und die nötigen Netlify/GitHub-Runtime-Secrets; es wurde
+deshalb weder ein Projekt angelegt noch ein Deployment ausgelöst. Ein
+aufrufbares Netlify-Connector-Tool steht in der aktuellen Codex-Sitzung nicht
+zur Verfügung; Projektimport und Deployment bleiben offen.
 
 ## Monitoring
 
@@ -313,4 +319,3 @@ Prozesscache enthält höchstens 32 Einträge für fünf Minuten. Ein Cache-Tref
 überspringt weder Nutzerfreigaben noch Prompt-Versionierung oder Pflichtchecks.
 Cache-Hit-Zähler sind lokal zum laufenden Prozess und keine dauerhaften
 Einsparungs- oder Tokenangaben.
-
