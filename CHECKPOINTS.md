@@ -1231,3 +1231,21 @@
 - Netlify-Konto, Free-Tarif, Secrets, OAuth-Callback und HTTPS-Live-Smoke sind
   nicht eingerichtet oder geprüft. Kein kostenpflichtiger Dienst wurde
   aktiviert. Cloudflare bleibt pausiert.
+
+## CP-053 – Netlify-Vorbereitung gemergt, Abnahmebelege aktualisiert
+
+- Datum: 2026-11-16. PR #39 mit Head
+  `bb97184871fbb2300110c60e6fe0d89dcaaf3882` bestand `test` und beide macOS-
+  Lanes in Actions-Runs 43802529338 und 43802533487 und wurde automatisch als
+  `cd54c9226067950f775f28c09ef142b1423310e5` in `main` integriert.
+- Main-CI-Run 43802724233 und Pages-Build/Deploy 43802723564 endeten erfolgreich
+  auf diesem Commit. Das belegt Tests und statisches Deployment, aber keine
+  Netlify-Control-API, OAuth-Liveverbindung oder iPhone-Installation.
+- Lokale Pflichtprüfungen des enthaltenen Arbeitsstands: `npm test` 138/138,
+  `npm run check` erfolgreich für 108 Dateien sowie Prompt-Library-
+  Synchronisierung, `git diff --check` ohne Fehler.
+- Codex-Cloud-Inventar zeigte die Standardumgebung `asenvcfg_base` als
+  `ready/runnable`, aber ohne verknüpfte Repositories. Kein Netlify-Konto,
+  Free-Tarif, Runtime-Secrets oder teamweiter Credit-Readback ist verifiziert.
+- Das Quoten-Gate bleibt fail-closed. Kein kostenpflichtiger Dienst wurde
+  aktiviert; Cloudflare bleibt pausiert.
