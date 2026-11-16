@@ -1,7 +1,7 @@
 const CACHE_PREFIX = "prompthub-static-";
-const CACHE = "prompthub-static-v6";
+const CACHE = "prompthub-static-v7";
 const APP_BASE = new URL("./", self.location.href);
-const STATIC_ASSETS = ["", "styles.css", "app.js", "strategy-presentation.mjs", "service-worker-client.mjs", "regression-test-request.js", "manifest.webmanifest", "app-icon-source.png"]
+const STATIC_ASSETS = ["", "styles.css", "app.js", "strategy-presentation.mjs", "quota-presentation.mjs", "service-worker-client.mjs", "regression-test-request.js", "manifest.webmanifest", "app-icon-source.png"]
   .map((path) => new URL(path, APP_BASE).href);
 
 self.addEventListener("install", (event) => {

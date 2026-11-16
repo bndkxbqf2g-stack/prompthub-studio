@@ -1338,3 +1338,21 @@
   Smoke bestätigt weiterhin nur die statische PWA und die ehrliche Meldung
   „Control API nicht verfügbar“; ein API-Live-Smoke, echte iPhone-Installation,
   echter MacBook-Runner und GitHub-persistente Runner-Ausführung fehlen.
+
+## CP-058 – Cloud-Kontingentstatus in der PWA sichtbar
+
+- Datum: 2026-11-16. Die PWA zeigt den Control-API-Aufnahmestatus für
+  Cloud-Aufträge direkt im Ressourcen-Dashboard und bei abgewiesener Freigabe.
+  Gründe werden auf feste, geheimnisfreie Meldungen abgebildet; beliebige
+  Providertexte werden nicht gerendert. Zahlen erscheinen nur bei frischer
+  autoritativer Netlify-Teamquelle und gültigen Messwerten. Unbekannte,
+  unvollständige und nicht verifizierte Angaben bleiben sichtbar pausiert;
+  lokale Entwicklung wird ausdrücklich nicht als Cloud-Freigabe bezeichnet.
+- Service-Worker-Cache auf v7 aktualisiert und das Darstellungsskript für den
+  Offline-App-Start vorgeladen.
+- Lokale Prüfungen: `npm test` 143/143, `npm run check` für 110 Dateien und
+  Prompt-Library-Abgleich erfolgreich, `git diff --check` ohne Befund.
+- Dieser UI-Checkpoint implementiert keinen Control API Provider und erzeugt
+  keinen Live-Kontingentnachweis. Netlify-Anmeldung, Free-Tarif, autoritativer
+  Readback, OAuth und produktiver API-Betrieb bleiben offen. Keine
+  kostenpflichtige Ressource wurde aktiviert.

@@ -1,5 +1,6 @@
 import { registerServiceWorker } from "./service-worker-client.mjs";
 import { strategyApprovalGate, strategyStatusLabel } from "./strategy-presentation.mjs";
+import { quotaPresentation } from "./quota-presentation.mjs";
 
 const state = {
   user: null,
@@ -27,7 +28,7 @@ const elements = {
   incidentPanel: el("#incident-panel"), incidentReportForm: el("#incident-report-form"), incidentSummary: el("#incident-summary"), incidentComponents: el("#incident-components"), incidents: el("#incidents"),
   strategyPanel: el("#strategy-panel"), strategyForm: el("#strategy-form"), strategies: el("#strategies"),
   designerForm: el("#designer-form"), draftView: el("#draft-view"), intent: el("#intent"),
-  jobs: el("#jobs"), jobCount: el("#job-count"), metrics: el("#metrics"), jobCap: el("#job-cap"),
+  jobs: el("#jobs"), jobCount: el("#job-count"), metrics: el("#metrics"), jobCap: el("#job-cap"), jobAdmission: el("#job-admission"),
   librarySearch: el("#library-search"), libraryCategory: el("#library-category"), libraryResults: el("#library-results"),
   dialog: el("#confirmation-dialog"), dialogTitle: el("#confirmation-title"), dialogDescription: el("#confirmation-description"),
   dialogLabel: el("#confirmation-label"), dialogInput: el("#confirmation-value"), dialogError: el("#confirmation-error"),
@@ -585,6 +586,7 @@ async function decide(jobId, decision) {
 }
 
 function renderMetrics(metrics, snapshot = {}) {
+  renderQuotaAdmission(snapshot.job_admission);
   const errors = metrics.errors ?? { status: "not_available" };
   const failureRate = metrics.observed.failed_job_rate === null ? "nicht berechenbar" : `${(metrics.observed.failed_job_rate * 100).toFixed(1)} %`;
   const trendPrefix = errors.failure_history_may_be_truncated ? "≥" : "";
@@ -622,12 +624,19 @@ function renderMetrics(metrics, snapshot = {}) {
   elements.jobCap.textContent = `${metrics.observed.active_jobs ?? 0} / 2 aktive Jobs`;
 }
 
+function renderQuotaAdmission(status) {
+  const presentation = quotaPresentation(status);
+  elements.jobAdmission.className = `quota-status ${presentation.tone}`;
+  elements.jobAdmission.textContent = presentation.message;
+}
+
 async function loadMetrics() {
   try {
     const snapshot = await request("/api/metrics");
     renderMetrics(snapshot.metrics, snapshot);
   } catch {
     elements.metrics.textContent = "Nutzungswerte derzeit nicht verfügbar.";
+    renderQuotaAdmission(null);
   }
 }
 
@@ -731,6 +740,11 @@ async function runDraftAction(action, payload = {}) {
       renderDraft(saved.draft);
     }
   } catch (error) {
+    if (error.payload?.job_admission) {
+      renderQuotaAdmission(error.payload.job_admission);
+      notice(quotaPresentation(error.payload.job_admission).message, "error");
+      return;
+    }
     notice(error.message || "Prompt-Designer-Schritt fehlgeschlagen.", "error");
   }
 }

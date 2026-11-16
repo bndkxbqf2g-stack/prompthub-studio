@@ -74,6 +74,10 @@ textarea:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .danger-outline { border: 1px solid rgba(255, 141, 145, .5); color: var(--danger); background: transparent; }
 .button:disabled { opacity: .45; cursor: not-allowed; }
 .metrics-card { margin-bottom: 18px; }
+.quota-status { margin: 0 0 14px; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: rgba(5, 11, 22, .32); font-size: .8rem; line-height: 1.45; }
+.quota-status.allowed { color: var(--success); border-color: rgba(102, 214, 164, .38); }
+.quota-status.paused, .quota-status.unknown { color: var(--warning); border-color: rgba(244, 199, 107, .38); }
+.quota-status.local { color: var(--muted); }
 .metrics-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
 .metric-item { min-width: 0; padding: 12px; border: 1px solid rgba(43, 59, 91, .7); border-radius: 13px; background: rgba(5, 11, 22, .28); }
 .metric-label { display: block; margin-bottom: 6px; color: var(--muted); font-size: .72rem; }
