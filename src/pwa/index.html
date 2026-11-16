@@ -53,6 +53,42 @@
           <div id="metrics" class="metrics-grid"><p class="muted">Messwerte werden geladen …</p></div>
         </section>
 
+        <section class="card automation-card" aria-labelledby="automation-title">
+          <div class="section-heading">
+            <div><p class="eyebrow">MOBIL ABRUFBARE STEUERUNG</p><h2 id="automation-title">Automatisierung &amp; Freigaben</h2></div>
+          </div>
+          <p class="muted">Freigaben gelten nur für die angezeigte Aktion. Native Codex-Berechtigungen und OAuth-Zustimmungen bleiben bei Codex beziehungsweise dem Anbieter. Die Inbox wird beim Öffnen und Aktualisieren abgerufen; Push ist nicht eingerichtet.</p>
+          <div id="automation-status" class="automation-status" aria-live="polite"></div>
+          <form id="approval-form" class="approval-form">
+            <h3>Einrichtungsaktion vorbereiten</h3>
+            <p class="muted">Hier wird nur eine konkrete Freigabeanfrage angelegt. Ohne serverseitig nachgewiesene kostenfreie Ausführung und passenden Adapter startet keine externe Aktion.</p>
+            <label for="approval-project">Projekt</label>
+            <select id="approval-project" required></select>
+            <label for="approval-service">Dienst</label>
+            <input id="approval-service" maxlength="80" required placeholder="z. B. netlify">
+            <label for="approval-action-type">Aktionstyp</label>
+            <input id="approval-action-type" maxlength="100" required placeholder="z. B. netlify.link_repository">
+            <label for="approval-action-title">Geplante Aktion</label>
+            <input id="approval-action-title" maxlength="160" required placeholder="GitHub-Repository mit Netlify verbinden">
+            <label for="approval-action-description">Details</label>
+            <textarea id="approval-action-description" rows="3" maxlength="3000" required placeholder="Was soll genau konfiguriert werden?"></textarea>
+            <label for="approval-reason">Warum ist die Freigabe nötig?</label>
+            <textarea id="approval-reason" rows="2" maxlength="1500" required></textarea>
+            <label for="approval-permissions">Berechtigungen (kommasepariert)</label>
+            <input id="approval-permissions" maxlength="1000" placeholder="repository read, deploy">
+            <label for="approval-impacts">Mögliche Auswirkungen (kommasepariert)</label>
+            <input id="approval-impacts" maxlength="1000" required placeholder="Eine konkrete Auswirkung oder: keine identifiziert">
+            <label for="approval-risks">Sicherheitsrisiken (kommasepariert)</label>
+            <input id="approval-risks" maxlength="1000" required placeholder="Risiko benennen oder begründet ausschließen">
+            <button class="button secondary full" type="submit">Freigabeanfrage speichern</button>
+          </form>
+          <div class="section-heading approval-list-heading">
+            <div><p class="eyebrow">ABRUFBARE INBOX</p><h3>Wartende und abgeschlossene Freigaben</h3></div>
+            <button id="refresh-approvals" class="button secondary" type="button">Aktualisieren</button>
+          </div>
+          <div id="approvals" class="approval-list" aria-live="polite"></div>
+        </section>
+
         <section class="card project-section">
           <div class="section-heading">
             <div><p class="eyebrow">MEHRPROJEKTVERWALTUNG</p><h2>GitHub-Projekte</h2></div>

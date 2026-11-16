@@ -54,6 +54,6 @@ test("PWA exposes quota status to assistive technology and precaches the present
   assert.match(html, /id="job-admission"[^>]*role="status"[^>]*aria-live="polite"/);
   assert.match(app, /renderQuotaAdmission\(snapshot\.job_admission\)/);
   assert.match(app, /error\.payload\?\.job_admission/);
-  assert.match(worker, /prompthub-static-v7/);
+  assert.match(worker, /prompthub-static-v8/);
   assert.match(worker, /"quota-presentation\.mjs"/);
 });

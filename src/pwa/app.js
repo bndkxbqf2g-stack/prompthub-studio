@@ -18,12 +18,16 @@ const state = {
   library: [],
   favorites: new Set(),
   libraryReviews: new Map(),
+  approvals: [],
+  automationStatus: null,
+  automationLoadStatus: "idle",
 };
 
 const el = (selector) => document.querySelector(selector);
 const elements = {
   notice: el("#notice"), authPanel: el("#auth-panel"), appPanel: el("#app-panel"), unavailablePanel: el("#unavailable-panel"), userLabel: el("#user-label"),
   updateButton: el("#update-app"),
+  approvalForm: el("#approval-form"), approvalProject: el("#approval-project"), automationStatus: el("#automation-status"), approvals: el("#approvals"),
   projects: el("#projects"), projectForm: el("#project-form"), projectDetail: el("#project-detail"),
   incidentPanel: el("#incident-panel"), incidentReportForm: el("#incident-report-form"), incidentSummary: el("#incident-summary"), incidentComponents: el("#incident-components"), incidents: el("#incidents"),
   strategyPanel: el("#strategy-panel"), strategyForm: el("#strategy-form"), strategies: el("#strategies"),
@@ -66,6 +70,13 @@ function button(label, className, onClick) {
 function statusLabel(status) {
   return ({ queued: "Wartend", running: "Läuft", awaiting_approval: "Freigabe nötig", succeeded: "Erfolgreich", failed: "Fehlgeschlagen", paused: "Pausiert", stale: "Prüfung nötig" })[status] ?? "Unbekannt";
 }
+
+const APPROVAL_STATUS_LABELS = Object.freeze({
+  pending: "Freigabe offen", approved: "Genehmigt", rejected: "Abgelehnt", info_requested: "Information angefordert", deferred: "Zurückgestellt",
+  expired: "Abgelaufen", cancelled: "Abgebrochen", blocked_cost: "Kostenprüfung blockiert", awaiting_executor: "Wartet auf Provider-Adapter",
+  executing: "Ausführung läuft", awaiting_verification: "Wartet auf unabhängige Prüfung", succeeded: "Nachweislich abgeschlossen",
+  failed: "Fehlgeschlagen", execution_unknown: "Ausführung unklar – manuell prüfen",
+});
 
 function addText(parent, tagName, text, className = "") {
   const node = document.createElement(tagName);
@@ -482,6 +493,7 @@ async function loadProjects() {
     }
     renderProjects();
     renderProjectDetail();
+    renderApprovalProjectOptions();
     if (state.selectedProject) await Promise.all([loadJobs(), loadIncidents(), loadStrategies()]);
     else {
       state.jobs = [];
@@ -511,6 +523,160 @@ async function loadProjects() {
     if (error.status === 501) notice("Multi-Projektverwaltung ist erst nach Einrichtung der GitHub-Control-Plane verfügbar.");
     else notice("Projektübersicht konnte nicht geladen werden.", "error");
   }
+}
+
+function renderApprovalProjectOptions() {
+  if (!elements.approvalProject) return;
+  const previous = elements.approvalProject.value;
+  const connected = state.projects.filter((project) => project.status === "connected");
+  elements.approvalProject.replaceChildren(new Option(connected.length ? "Projekt auswählen" : "Kein verbundenes Projekt", ""));
+  for (const project of connected) elements.approvalProject.append(new Option(project.full_name, project.id));
+  elements.approvalProject.value = connected.some((project) => project.id === previous)
+    ? previous
+    : connected.some((project) => project.id === state.selectedProject) ? state.selectedProject : "";
+  elements.approvalForm.querySelector("button[type=submit]").disabled = connected.length === 0;
+}
+
+function renderAutomationStatus() {
+  elements.automationStatus.replaceChildren();
+  const status = state.automationStatus;
+  if (state.automationLoadStatus === "loading" || state.automationLoadStatus === "idle") return addText(elements.automationStatus, "p", "Provider- und Runnerstatus werden geladen …", "muted");
+  if (state.automationLoadStatus === "error" || !status) return addText(elements.automationStatus, "p", "Provider- und Runnerstatus sind nicht verfügbar. Es wird keine Ausführung angenommen.", "error-text");
+  const values = [
+    ["GitHub", status.github], ["Netlify-Laufzeit", status.netlify], ["Codex Remote", status.codex_remote],
+    ["Codex Cloud", status.codex_cloud], ["Browsersteuerung in der PWA", status.browser_automation], ["Provider-Berechtigungen", status.provider_authorization], ["Ausführung", status.execution], ["Push", status.push_notifications],
+  ];
+  const grid = document.createElement("div");
+  grid.className = "automation-status-grid";
+  for (const [label, value] of values) {
+    const item = document.createElement("div");
+    item.className = "metric-item";
+    addText(item, "span", label, "metric-label");
+    addText(item, "strong", value ?? "unbekannt", "metric-value");
+    grid.append(item);
+  }
+  elements.automationStatus.append(grid);
+  addText(elements.automationStatus, "p", `Zusatzbudget: ${status.recurring_budget_eur} € laufend · kostenpflichtige Aktionen: gesperrt · aktive Entwicklungsjobs maximal ${status.maximum_active_development_jobs}.`, "quota-status unknown");
+  addText(elements.automationStatus, "p", "Native Codex-Freigaben werden ausschließlich in Codex Remote beantwortet. Die PWA kann sie weder auslösen noch umgehen.", "muted");
+}
+
+function renderApprovals() {
+  elements.approvals.replaceChildren();
+  if (state.automationLoadStatus === "error") return addText(elements.approvals, "p", "Freigabe-Inbox konnte nicht abgerufen werden. Aktualisieren, um erneut zu prüfen.", "error-text");
+  if (!state.approvals.length) return addText(elements.approvals, "p", "Keine Freigabeanfragen vorhanden.", "empty");
+  for (const approval of state.approvals) {
+    const card = document.createElement("article");
+    card.className = "approval-card";
+    const header = document.createElement("header");
+    addText(header, "h4", approval.action?.title ?? "Einrichtungsaktion");
+    const chip = addText(header, "span", APPROVAL_STATUS_LABELS[approval.status] ?? approval.status, "chip");
+    if (["rejected", "expired", "blocked_cost", "execution_unknown", "failed"].includes(approval.status)) chip.classList.add("paused");
+    if (approval.status === "succeeded") chip.classList.add("succeeded");
+    card.append(header);
+    addText(card, "p", `${approval.project_name} · ${approval.service} · ${approval.action?.type}`, "approval-meta");
+    addText(card, "p", approval.action?.description ?? "", "approval-description");
+    addText(card, "p", `Grund: ${approval.reason}`, "approval-description");
+    addText(card, "p", `Angeforderte Berechtigungen: ${approval.requested_permissions.length ? approval.requested_permissions.join(", ") : "keine angegeben"} · Providerprüfung: ${approval.permission_check?.status ?? "unbekannt"}${approval.permission_check?.missing_permissions?.length ? ` · fehlen: ${approval.permission_check.missing_permissions.join(", ")}` : ""}`, "muted");
+    addText(card, "p", `Auswirkungen: ${approval.impacts.length ? approval.impacts.join(" · ") : "nicht angegeben"}`, "muted");
+    addText(card, "p", `Risiken: ${approval.security_risks.length ? approval.security_risks.join(" · ") : "nicht angegeben"}`, "muted");
+    const costLabel = approval.cost.status === "verified_zero"
+      ? `Kosten serverseitig geprüft: 0 € einmalig und laufend · Freikontingent ${approval.cost.free_quota.remaining_credits} Credits verfügbar, ${approval.cost.free_quota.required_credits} erforderlich`
+      : approval.cost.status === "quota_exhausted"
+        ? "Freikontingent erschöpft — Aktion gesperrt"
+      : approval.cost.status === "paid"
+        ? `Kostenpflichtig: ${approval.cost.one_time_eur} € einmalig, ${approval.cost.recurring_eur ?? "unbekannt"} € laufend — gesperrt`
+        : "Kosten nicht verifiziert — Ausführung bleibt gesperrt";
+    addText(card, "p", costLabel, `approval-cost ${approval.cost.status === "verified_zero" ? "safe" : "blocked"}`);
+    addText(card, "p", `Ablauf: ${new Date(approval.expires_at).toLocaleString("de-DE")} · Status der Ausführung: ${approval.execution_status}`, "muted");
+    if (approval.decision?.message) addText(card, "p", `Rückmeldung: ${approval.decision.message}`, "muted");
+    const actions = document.createElement("div");
+    actions.className = "job-actions approval-actions";
+    const actionable = ["pending", "deferred", "info_requested"].includes(approval.status);
+    const human = state.provider === "github";
+    if (actionable) {
+      const approve = button("Genehmigen", "primary", () => decideApproval(approval, "approve"));
+      approve.disabled = !human || approval.cost.status !== "verified_zero" || approval.permission_check?.status !== "verified";
+      approve.title = !human ? "GitHub-Anmeldung erforderlich" : approval.cost.status !== "verified_zero" ? "Erst nach unabhängigem 0-€-Kostennachweis freigebbar" : approval.permission_check?.status !== "verified" ? "Provider-Berechtigungen sind nicht verifiziert" : "";
+      actions.append(approve);
+      const reject = button("Ablehnen", "secondary", () => decideApproval(approval, "reject"));
+      reject.disabled = !human;
+      actions.append(reject);
+      const info = button("Rückfrage", "secondary", () => decideApproval(approval, "request_information"));
+      info.disabled = !human;
+      actions.append(info);
+      const defer = button("Später", "secondary", () => decideApproval(approval, "defer"));
+      defer.disabled = !human;
+      actions.append(defer);
+    }
+    if (["pending", "deferred", "info_requested", "approved", "awaiting_executor"].includes(approval.status) && approval.created_by === state.user?.login) {
+      actions.append(button("Abbrechen", "danger-outline", () => cancelApproval(approval)));
+    }
+    if (approval.status === "awaiting_executor" && human) actions.append(button("Wiederaufnahme prüfen", "secondary", () => resumeApproval(approval)));
+    if (actions.childElementCount) card.append(actions);
+    if (approval.history?.length) {
+      const details = document.createElement("details");
+      const summary = addText(details, "summary", "Auditverlauf");
+      summary.tabIndex = 0;
+      const list = document.createElement("ul");
+      for (const event of approval.history.slice(-8).reverse()) addText(list, "li", `${new Date(event.at).toLocaleString("de-DE")} · ${event.event} · ${event.actor}`);
+      details.append(list);
+      card.append(details);
+    }
+    elements.approvals.append(card);
+  }
+}
+
+async function loadAutomation() {
+  state.automationLoadStatus = "loading";
+  renderAutomationStatus();
+  renderApprovals();
+  try {
+    const [status, approvals] = await Promise.all([request("/api/automation/status"), request("/api/automation/approvals")]);
+    state.automationStatus = status.automation;
+    state.approvals = approvals.approvals;
+    state.automationLoadStatus = "ready";
+  } catch {
+    state.automationStatus = null;
+    state.approvals = [];
+    state.automationLoadStatus = "error";
+  }
+  renderAutomationStatus();
+  renderApprovals();
+}
+
+async function decideApproval(approval, decision) {
+  const expected = `APPROVE ${approval.id}`;
+  if (decision === "approve" && !await confirmation({ title: "Externe Aktion freigeben?", description: `Diese Entscheidung gilt nur für „${approval.action.title}“ bei ${approval.service} für ${approval.project_name}. Kosten: serverseitig verifiziert 0 €. Eine Ausführung startet nur, wenn ein passender Adapter und unabhängiger Ergebnisnachweis verfügbar sind.`, expected, label: `Zur Freigabe exakt „${expected}“ eingeben` })) return;
+  let message = "";
+  if (decision === "request_information") {
+    message = window.prompt("Welche konkrete Information fehlt?")?.trim() ?? "";
+    if (!message) return;
+  }
+  try {
+    await request(`/api/automation/approvals/${encodeURIComponent(approval.id)}/decision`, {
+      method: "POST", headers: { "Idempotency-Key": crypto.randomUUID() }, body: JSON.stringify({ decision, ...(message ? { message } : {}) }),
+    });
+    await loadAutomation();
+    notice(decision === "approve" ? "Freigabe gespeichert; Ausführung und unabhängiger Nachweis werden getrennt ausgewiesen." : "Freigabeentscheidung gespeichert.", "success");
+  } catch (error) {
+    notice(error.message === "zero_cost_not_verified_action_remains_paused" ? "Freigabe blockiert: ein serverseitiger 0-€-Nachweis fehlt." : error.message || "Entscheidung konnte nicht gespeichert werden.", "error");
+  }
+}
+
+async function cancelApproval(approval) {
+  try {
+    await request(`/api/automation/approvals/${encodeURIComponent(approval.id)}/cancel`, { method: "POST", body: "{}" });
+    await loadAutomation();
+    notice("Freigabeanfrage abgebrochen.", "success");
+  } catch (error) { notice(error.message || "Anfrage konnte nicht sicher abgebrochen werden.", "error"); }
+}
+
+async function resumeApproval(approval) {
+  try {
+    await request(`/api/automation/approvals/${encodeURIComponent(approval.id)}/resume`, { method: "POST", body: "{}" });
+    await loadAutomation();
+    notice("Wiederaufnahme geprüft; ohne konfigurierten Adapter bleibt die Aktion pausiert.");
+  } catch (error) { notice(error.message || "Wiederaufnahme ist derzeit nicht möglich.", "error"); }
 }
 
 function renderJobs() {
@@ -630,6 +796,26 @@ function renderQuotaAdmission(status) {
   elements.jobAdmission.textContent = presentation.message;
 }
 
+function prepareApprovalForm(requirement, draft) {
+  if (!requirement.provider_id || !state.projects.some((project) => project.id === draft.project && project.status === "connected")) {
+    notice("Für diesen Dienst ist kein verbundenes Projekt oder kein bestätigter Anbieter vorhanden.", "error");
+    return;
+  }
+  const setField = (selector, value) => { elements.approvalForm.querySelector(selector).value = value; };
+  elements.approvalProject.value = draft.project;
+  setField("#approval-service", requirement.provider_id);
+  setField("#approval-action-type", `${requirement.provider_id}.setup`);
+  setField("#approval-action-title", `${requirement.service}-Einrichtung konkretisieren`);
+  setField("#approval-action-description", `Heuristischer Hinweis aus dem Prompt-Entwurf. Erkannte Begriffe: ${requirement.matched_terms.join(", ")}. Bitte die genaue Aktion beschreiben. Dienststatus, Kontingent und Zugriffsrechte sind noch nicht geprüft.`);
+  setField("#approval-reason", "Der Entwurf erwähnt diesen externen Dienst. Diese konkrete Freigabeanfrage muss vor dem Speichern geprüft und eingegrenzt werden.");
+  setField("#approval-permissions", "");
+  setField("#approval-impacts", "Mögliche Änderung der externen Projektkonfiguration; genaue Auswirkung vor Freigabe prüfen.");
+  setField("#approval-risks", "Anbieterberechtigungen und Kosten sind noch nicht nachgewiesen; Ausführung bleibt serverseitig gesperrt.");
+  elements.approvalForm.scrollIntoView?.({ behavior: "smooth", block: "center" });
+  elements.approvalForm.querySelector("#approval-service").focus();
+  notice("Freigabeformular vorbereitet. Prüfe und konkretisiere Aktion sowie Berechtigungen; beim Anbieter wurde nichts geändert.");
+}
+
 async function loadMetrics() {
   try {
     const snapshot = await request("/api/metrics");
@@ -655,6 +841,18 @@ function renderDraft(draft) {
   analysis.className = "analysis-summary";
   addText(analysis, "p", `Erkanntes Ziel: ${draft.analysis.goals.join("; ")}`);
   addText(analysis, "p", `Komplexität: ${draft.analysis.complexity}/5 · Risiko: ${draft.analysis.risks[0]?.level ?? "niedrig"}`);
+  if (draft.analysis.service_requirements?.length) {
+    addText(analysis, "p", "Erkannte externe Dienste (Hinweise, noch nicht verbunden):", "metric-label");
+    for (const item of draft.analysis.service_requirements) {
+      const repositorySignal = item.repository_signal === "reference_found_in_limited_snapshot_unverified"
+        ? "Projektverweis gefunden, nicht verifiziert"
+        : item.repository_signal === "no_reference_in_limited_snapshot"
+          ? "Kein Verweis im begrenzten Snapshot"
+          : "Anbieter im Snapshot nicht verifiziert";
+      addText(analysis, "p", `${item.service} · ${repositorySignal} · ${item.next_step}`, "recommendation");
+      if (item.provider_id) analysis.append(button("Freigabeformular vorbereiten", "secondary", () => prepareApprovalForm(item, draft)));
+    }
+  } else addText(analysis, "p", "Keine externe Dienstabhängigkeit im Wunsch erkannt; Projektkonfiguration muss trotzdem geprüft werden.", "muted");
   if (draft.analysis.knowledge_hints.length) {
     addText(analysis, "p", "Relevante Quellenmuster:", "metric-label");
     for (const hint of draft.analysis.knowledge_hints) {
@@ -857,6 +1055,34 @@ elements.projectForm.addEventListener("submit", async (event) => {
   }
 });
 
+elements.approvalForm.addEventListener("submit", async (event) => {
+  event.preventDefault();
+  const listField = (selector) => el(selector).value.split(",").map((item) => item.trim()).filter(Boolean);
+  try {
+    await request("/api/automation/approvals", {
+      method: "POST",
+      headers: { "Idempotency-Key": crypto.randomUUID() },
+      body: JSON.stringify({
+        project: elements.approvalProject.value,
+        service: el("#approval-service").value,
+        action_type: el("#approval-action-type").value,
+        action_title: el("#approval-action-title").value,
+        action_description: el("#approval-action-description").value,
+        reason: el("#approval-reason").value,
+        requested_permissions: listField("#approval-permissions"),
+        impacts: listField("#approval-impacts"),
+        security_risks: listField("#approval-risks"),
+      }),
+    });
+    elements.approvalForm.reset();
+    renderApprovalProjectOptions();
+    await loadAutomation();
+    notice("Freigabeanfrage protokolliert. Kostenprüfung und ausführbare Integration bleiben davon getrennte Gates.", "success");
+  } catch (error) {
+    notice(error.message || "Freigabeanfrage konnte nicht gespeichert werden.", "error");
+  }
+});
+
 elements.strategyForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!state.selectedProject) return notice("Wähle zuerst ein verbundenes Projekt.", "error");
@@ -922,6 +1148,7 @@ el("#refresh").addEventListener("click", async () => {
   const refreshed = await boot();
   if (refreshed) notice("Projekt- und Nutzungsübersicht aktualisiert.", "success");
 });
+el("#refresh-approvals").addEventListener("click", loadAutomation);
 el("#logout").addEventListener("click", async () => {
   await request("/api/logout", { method: "POST" }).catch(() => {});
   window.location.reload();
@@ -936,7 +1163,7 @@ async function boot() {
     elements.authPanel.hidden = true;
     elements.unavailablePanel.hidden = true;
     elements.appPanel.hidden = false;
-    await Promise.all([loadLibrary(), loadProjects(), loadMetrics()]);
+    await Promise.all([loadLibrary(), loadProjects(), loadMetrics(), loadAutomation()]);
     return true;
   } catch (error) {
     if (error.status === 401) {

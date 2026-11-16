@@ -94,6 +94,24 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   verwerfen verspätete Antworten nach Projektwechseln.
   Echte Review-/Actions-Nachweise, produktive API-Konfiguration und kontrollierte
   Wirksamkeitsvergleiche bleiben offene Arbeit.
+- Remote Approval Manager: projektbezogene, atomare Freigaben mit Audit,
+  Ablauf, ursprüngliche Nutzerbindung und GitHub-Sitzungsprüfung. Kosten-,
+  Kontingent- und Berechtigungsreadbacks sind frisch und exakt an Dienst,
+  Projekt und Aktion gebunden. Die persistierte Zustandsänderung sichert
+  parallele Managerstarts; Provideradapter müssen zusätzlich providerseitige
+  Idempotenz deklarieren, das Abbruchsignal beachten und den stabilen Schlüssel
+  im Beleg zurückgeben. Eine unabhängige Verifikation muss genau diesen
+  eingereichten Providerbeleg bestätigen.
+  Überfällige Verifikationen werden zu `execution_unknown`. Die PWA zeigt eine
+  abrufbare Mobile-Inbox. Native Codex-Freigaben bleiben in Codex Remote. Ohne
+  nachgewiesene 0-€-Quota, Provider-Scope und getrennte Verifikation wird nichts
+  extern ausgeführt. `test/api-approvals.test.mjs` deckt unter anderem
+  Fremdzugriff, Ablauf nach Freigabe, Scope-/Frischeprüfung, Ablehnung,
+  Unterbrechung, Lease-Recovery, Deadline und doppelte Ausführung ab.
+- Der Prompt-Designer erkennt explizit genannte Dienste deterministisch aus
+  Wunsch und Anhängen. Ein begrenzter Repository-Snapshot liefert nur
+  unverifizierte Hinweise. Die PWA kann daraus ein Freigabeformular vorbereiten;
+  dadurch wird kein Anbieter verbunden und keine Aktion ausgeführt.
 - Offene Wissensarbeit: kontrollierte, explizit geprüfte projektübergreifende
   Übertragung und gepaarte Strategieexperimente mit Commit-/CI-Vergleich.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
@@ -172,6 +190,15 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   Nicht-Kommerz-Bedingung nicht verwendet. Ohne verifizierten Gesamtverbrauch
   bleiben Cloud-Jobs gesperrt.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.
+- Revalidierung 2026-11-16: Netlify Free ist mit dem GitHub-Repository
+  `bndkxbqf2g-stack/prompthub-studio` und `main` verbunden. Production-Deploy
+  `6afb55fca23ea397af718ef7` (Commit `3eca5bb`) ist `ready`; die HTTPS-Root
+  liefert die PWA. Team-SSO bleibt eingeschaltet. `/healthz` meldet
+  `production_api_disabled`, da Runtime-Secrets und OAuth fehlen. Die
+  Connector-API hat keine GitHub-Link-/Deploy-Erstellungsaktion; die
+  Repository-Verknüpfung wurde über die angemeldete Netlify-Weboberfläche
+  abgeschlossen. Cloud-Umgebung `asenvcfg_base` ist bereit/lauffähig, aber ohne
+  Repository. Quoten-Readback und Control-API-Livebetrieb bleiben blockiert.
 
 ### Phase 4 – technische Abnahme
 

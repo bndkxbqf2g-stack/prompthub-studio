@@ -1398,3 +1398,38 @@
   kostenpflichtigen Ressourcen wurden eingerichtet.
 - Technische Erstabnahme bleibt offen. Keine Kriterien oder Kostenregeln wurden
   abgeschwächt.
+
+## CP-061 – Netlify-PWA live; Approval-Handoff gegen Entfernung abgesichert
+
+- Datum: 2026-11-16. Der Nutzer bestätigte die GitHub-Mobile-Sicherheitsabfrage
+  für die auf `bndkxbqf2g-stack/prompthub-studio` beschränkte Netlify-GitHub-App.
+  Netlify verbindet nun das Repository und `main` mit dem Projekt
+  `prompthub-studio`.
+- Netlify-Deploy `6afb55fca23ea397af718ef7` (Build
+  `6afb55fca23ea397af718ef5`) für Commit
+  `3eca5bb33ecfaa8664eb34a5e84da4de6e31a47b` meldet `ready`. Die HTTPS-Root
+  lädt die PromptHub-PWA statt der GitHub-README. Live-`/healthz` liefert
+  `{"error":"production_api_disabled"}`. Das bestätigt bewusst den
+  nicht konfigurierten Control-API-Status, nicht dessen Betriebsbereitschaft.
+- Netlify-Projektzugriff ist weiterhin Team-SSO für alle Deploys. Runtime-
+  Environment-Variablen sind nicht gesetzt; es wurde keine SSO-/Sicherheits-
+  Einstellung verändert. Free hat laut offizieller Preisseite 300 Credits pro
+  Monat, ein hartes Limit und keine Überschreitungsgebühren; der genaue
+  Kontostand wurde nicht gelesen. Keine kostenpflichtige Option wurde aktiviert.
+- Der Netlify-Free-Build führt `npm test && npm run check` aus, veröffentlicht
+  `src/pwa` und lädt `netlify/functions`. Automatische Folge-Deployments von
+  `main` sind konfiguriert, aber noch nicht mit einem Folge-Commit live geprüft.
+- Die lokale Erweiterung der Remote-Approval-API, idempotenten Handoffs und
+  projektbezogenen PWA-Inbox blockiert jetzt Entfernung während laufender oder
+  unklarer Prompt-Handoffs. Ein Statusformatierungsfehler wurde reproduziert
+  und behoben. Unabhängiger Read-only-Review durch Beauvoir: keine
+  kritischen, hohen oder mittleren Befunde im geprüften Race-/Handoff-Bereich.
+- Lokale Pflichtprüfungen: `npm test` 175/175; `npm run check` erfolgreich
+  (113 Dateien und Prompt-Library-Abgleich); `git diff --check` erfolgreich.
+  Diese Feature-Änderungen liegen im lokalen Branch und sind noch nicht in
+  `main` integriert oder im Netlify-Deploy enthalten.
+- A01, A13, A16, A17, A30 und A31 sowie `OPERATIONS.md`,
+  `DEVELOPMENT_PLAN.md` und `REMOTE_OPERATIONS.md` wurden mit dem Nachweis und
+  den offenen Grenzen aktualisiert. Technische Erstabnahme bleibt offen:
+  SSO-Entscheidung, OAuth/Secrets, API-Livebetrieb, maschinenlesbarer
+  Netlify-Credit-Readback und iPhone-Installation fehlen.

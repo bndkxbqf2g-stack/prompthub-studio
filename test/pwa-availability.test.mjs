@@ -27,3 +27,12 @@ test("voice entry uses user-controlled keyboard dictation without opening browse
   assert.match(headers, /Permissions-Policy:.*microphone=\(\)/);
   assert.doesNotMatch(app, /SpeechRecognition|webkitSpeechRecognition/);
 });
+
+test("PWA surfaces detected service requirements as unverified, unconnected hints", () => {
+  assert.match(app, /Erkannte externe Dienste \(Hinweise, noch nicht verbunden\)/);
+  assert.match(app, /Projektverweis gefunden, nicht verifiziert/);
+  assert.match(app, /Anbieter im Snapshot nicht verifiziert/);
+  assert.match(app, /Keine externe Dienstabhängigkeit im Wunsch erkannt/);
+  assert.match(app, /function prepareApprovalForm/);
+  assert.match(app, /beim Anbieter wurde nichts geändert/);
+});

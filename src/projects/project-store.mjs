@@ -18,11 +18,13 @@ function parseRegistry(file) {
 }
 
 function parseProjectData(file) {
-  if (!file) return { drafts: [], decisions: [] };
+  if (!file) return { drafts: [], decisions: [], approvals: [], approval_audit: [] };
   try {
     const data = JSON.parse(file.content);
-    if (data?.schema !== 1 || !Array.isArray(data.drafts) || !Array.isArray(data.decisions)) throw new Error();
-    return data;
+    if (data?.schema !== 1 || !Array.isArray(data.drafts) || !Array.isArray(data.decisions)
+      || (data.approvals !== undefined && !Array.isArray(data.approvals))
+      || (data.approval_audit !== undefined && !Array.isArray(data.approval_audit))) throw new Error();
+    return { ...data, approvals: data.approvals ?? [], approval_audit: data.approval_audit ?? [] };
   } catch {
     throw new Error("project data is invalid; refusing to overwrite it");
   }
@@ -34,12 +36,35 @@ export class MemoryProjectStore {
     this.data = new Map();
     this.globalData = new Map();
     this.projectDataQueues = new Map();
+    this.projectQueues = new Map();
   }
 
   async list() { return structuredClone([...this.projects.values()]); }
   async get(id) { return structuredClone(this.projects.get(id) ?? null); }
-  async save(project) { this.projects.set(project.id, structuredClone(project)); return structuredClone(project); }
-  async getProjectData(id) { return structuredClone(this.data.get(id) ?? { drafts: [], decisions: [] }); }
+  async save(project) {
+    const previous = this.projectQueues.get(project.id) ?? Promise.resolve();
+    const operation = previous.catch(() => {}).then(() => {
+      this.projects.set(project.id, structuredClone(project));
+      return structuredClone(project);
+    });
+    this.projectQueues.set(project.id, operation);
+    try { return await operation; }
+    finally { if (this.projectQueues.get(project.id) === operation) this.projectQueues.delete(project.id); }
+  }
+  async updateProject(id, updater) {
+    if (typeof updater !== "function") throw new Error("project updater is required");
+    const previous = this.projectQueues.get(id) ?? Promise.resolve();
+    const operation = previous.catch(() => {}).then(async () => {
+      const next = await updater(await this.get(id));
+      if (!next || typeof next !== "object" || Array.isArray(next) || next.id !== id) throw new Error("project update must preserve its id");
+      this.projects.set(id, structuredClone(next));
+      return structuredClone(next);
+    });
+    this.projectQueues.set(id, operation);
+    try { return await operation; }
+    finally { if (this.projectQueues.get(id) === operation) this.projectQueues.delete(id); }
+  }
+  async getProjectData(id) { return structuredClone(this.data.get(id) ?? { drafts: [], decisions: [], approvals: [], approval_audit: [] }); }
   async saveProjectData(id, value) { this.data.set(id, structuredClone(value)); }
   async updateProjectData(id, updater) {
     const previous = this.projectDataQueues.get(id) ?? Promise.resolve();
@@ -102,27 +127,50 @@ export class GitHubProjectStore {
     throw new Error("project registry could not be saved safely");
   }
 
+  async updateProject(id, updater) {
+    if (typeof updater !== "function") throw new Error("project updater is required");
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const { registry, sha } = await this.readRegistry();
+      const current = registry.projects.find((item) => item.id === id) ?? null;
+      const next = await updater(current ? structuredClone(current) : null);
+      if (!next || typeof next !== "object" || Array.isArray(next) || next.id !== id) throw new Error("project update must preserve its id");
+      const projects = registry.projects.filter((item) => item.id !== id);
+      projects.push(structuredClone(next));
+      try {
+        await this.client.putContent(this.controlRepository, REGISTRY_PATH, {
+          content: `${JSON.stringify({ schema: 1, updated_at: this.now().toISOString(), projects }, null, 2)}\n`,
+          sha,
+          branch: this.branch,
+          message: "chore(prompthub): atomically update project state",
+        });
+        return structuredClone(next);
+      } catch (error) {
+        if (!(error instanceof GitHubApiError) || ![409, 422].includes(error.status) || attempt === 2) throw error;
+      }
+    }
+    throw new Error("project update could not be saved safely");
+  }
+
   async getProjectData(id) {
     const file = await this.client.getContent(this.controlRepository, projectDataPath(id), this.branch);
     return parseProjectData(file);
   }
 
   async saveProjectData(id, value) {
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      const file = await this.client.getContent(this.controlRepository, projectDataPath(id), this.branch);
-      try {
-        await this.client.putContent(this.controlRepository, projectDataPath(id), {
-          content: `${JSON.stringify({ ...value, schema: 1, updated_at: this.now().toISOString() }, null, 2)}\n`,
-          sha: file?.sha,
-          branch: this.branch,
-          message: `chore(prompthub): update project data`,
-        });
-        return;
-      } catch (error) {
-        if (!(error instanceof GitHubApiError) || ![409, 422].includes(error.status) || attempt === 2) throw error;
+    const file = await this.client.getContent(this.controlRepository, projectDataPath(id), this.branch);
+    try {
+      await this.client.putContent(this.controlRepository, projectDataPath(id), {
+        content: `${JSON.stringify({ ...value, schema: 1, updated_at: this.now().toISOString() }, null, 2)}\n`,
+        sha: file?.sha,
+        branch: this.branch,
+        message: `chore(prompthub): update project data`,
+      });
+    } catch (error) {
+      if (error instanceof GitHubApiError && [409, 422].includes(error.status)) {
+        throw new Error("project data changed concurrently; reload and reapply changes");
       }
+      throw error;
     }
-    throw new Error("project data could not be saved safely");
   }
 
   async updateProjectData(id, updater) {

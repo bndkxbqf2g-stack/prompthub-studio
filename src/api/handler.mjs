@@ -111,7 +111,7 @@ async function handleDesigner({ request, url, pathname, promptDesigner, actor, c
   return json(404, { error: "not_found" });
 }
 
-export function createRequestHandler({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, logger = console, enforceSameOrigin = false, beforeProtectedApi = null, jobAdmissionGate = null } = {}) {
+export function createRequestHandler({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, approvalManager = null, logger = console, enforceSameOrigin = false, beforeProtectedApi = null, jobAdmissionGate = null } = {}) {
   if (!config || !controlPlane || !auth) throw new Error("config, controlPlane and auth are required");
   let metricCache = null;
   let metricPending = null;
@@ -223,6 +223,49 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
       if (request.method === "POST" && pathname === "/api/logout") {
         const cookie = typeof auth.logout === "function" ? await auth.logout(request) : undefined;
         return json(200, { ok: true }, cookie ? { "Set-Cookie": cookie } : {});
+      }
+      if (pathname === "/api/automation/status") {
+        if (!approvalManager) return json(501, { error: "automation_manager_not_configured" });
+        if (request.method !== "GET") return json(405, { error: "method_not_allowed" });
+        return json(200, { automation: await approvalManager.status() });
+      }
+      if (pathname === "/api/automation/approvals") {
+        if (!approvalManager) return json(501, { error: "automation_manager_not_configured" });
+        if (request.method === "GET") return json(200, { approvals: await approvalManager.list({ actor: session.user.login }) });
+        if (request.method === "POST") {
+          const payload = await bodyJson(request, 12_000);
+          return json(201, { approval: await approvalManager.create(payload, { actor: session.user.login, idempotencyKey: request.headers.get("idempotency-key") ?? payload.idempotency_key }) });
+        }
+        return json(405, { error: "method_not_allowed" });
+      }
+      const approvalMatch = /^\/api\/automation\/approvals\/([^/]+)(?:\/(decision|resume|cancel))?$/.exec(pathname);
+      if (approvalMatch) {
+        if (!approvalManager) return json(501, { error: "automation_manager_not_configured" });
+        const approvalId = decodeURIComponent(approvalMatch[1]);
+        const action = approvalMatch[2] ?? "get";
+        if (request.method === "GET" && action === "get") {
+          const approval = (await approvalManager.list({ actor: session.user.login })).find((item) => item.id === approvalId);
+          return approval ? json(200, { approval }) : json(404, { error: "approval_not_found" });
+        }
+        if (action === "decision" && request.method === "POST") {
+          if (session.provider !== "github" || session.local === true) return json(403, { error: "github_human_authentication_required_for_approval_decisions" });
+          const payload = await bodyJson(request, 10_000);
+          const approval = await approvalManager.decide(approvalId, payload, {
+            actor: session.user.login,
+            authenticatedGithub: true,
+            idempotencyKey: request.headers.get("idempotency-key") ?? payload.idempotency_key,
+          });
+          return json(200, { approval });
+        }
+        if (action === "resume" && request.method === "POST") {
+          if (session.provider !== "github" || session.local === true) return json(403, { error: "github_human_authentication_required_for_approval_decisions" });
+          return json(200, { approval: await approvalManager.resume(approvalId, { actor: session.user.login, authenticatedGithub: true }) });
+        }
+        if (action === "cancel" && request.method === "POST") {
+          if (session.provider !== "github" || session.local === true) return json(403, { error: "github_human_authentication_required_for_approval_decisions" });
+          return json(200, { approval: await approvalManager.cancel(approvalId, { actor: session.user.login, authenticatedGithub: true }) });
+        }
+        return json(405, { error: "method_not_allowed" });
       }
       if (pathname === "/api/projects") {
         if (!projectService) return json(501, { error: "project_management_not_configured" });
