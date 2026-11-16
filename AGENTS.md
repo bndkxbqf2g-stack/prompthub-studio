@@ -88,6 +88,14 @@ externen Zustandsänderung, einem produktiven Deployment, einer Migration,
 wird angehalten und eine Freigabe eingeholt. Unklare Zustände werden markiert,
 nicht überschrieben.
 
+Für erforderliche Nutzeraktionen gilt zusätzlich der Abschnitt
+„Nutzeraktionen und Remote-Unterstützung“ in `AUTONOMY_RULES.md`: erst autonome
+Wege prüfen, danach Codex Remote am iPhone, dann iPhone-Browser und den Laptop
+nur bei nachgewiesener technischer Notwendigkeit anfordern. Native Codex-, OAuth-
+und Anbieterfreigaben bleiben eigenständig erforderlich. Mitwirkungsanfragen
+enthalten den Grund, das bevorzugte Gerät, verifizierte Schritte und den
+Abschlussnachweis; Zugangsdaten werden nie im Chat angefordert.
+
 ## Fehlerprävention und Lernen
 
 - Vor Änderungen die Fehlerhistorie, bestätigten Ursachen, ungeeigneten Ansätze

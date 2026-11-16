@@ -214,10 +214,10 @@ Am 2026-11-16 bestätigte der Netlify-Connector das Free-Team `Booolio`
 (`bndkxbqf2g-stack`) und das Projekt `prompthub-studio`
 (`834e2ac8-5324-4b2c-bcb0-9c65a228e43b`). Das Repository
 `bndkxbqf2g-stack/prompthub-studio` ist mit Produktionsbranch `main` verbunden.
-Deploy `6afb55fca23ea397af718ef7` für Commit `3eca5bb33ecfaa8664eb34a5e84da4de6e31a47b`
-steht auf `ready`. `https://prompthub-studio.netlify.app/` liefert die PWA.
-Das Projekt verlangt weiterhin Team-SSO für alle Deploys; ein öffentlicher
-Zugriff wurde nicht freigeschaltet.
+Deploy `6afb5a720d006098c323d624` für Main-Commit
+`432010421a15956dbe3495c70a7be3df6a7ece2b` steht auf `ready`.
+`https://prompthub-studio.netlify.app/` liefert die PWA öffentlich; Deploy-
+Previews bleiben privat.
 
 Die Live-Route `/healthz` antwortet mit `production_api_disabled`; die
 Netlify-Function ist vorhanden, aber es gibt noch keine Production-Umgebungs-
@@ -269,14 +269,14 @@ Deploy-Erstellungsaktion. Die Repository-Verknüpfung wurde deshalb über die
 angemeldete Netlify-Weboberfläche abgeschlossen. `gh`, Wrangler und Netlify CLI
 sind nicht vorhanden. Es wurden keine Runtime-Umgebungsvariablen geschrieben;
 GitHub-OAuth, Live-Control-API und Quoten-Readback sind folglich nicht aktiv.
-Netlify zeigt als Quelle `main`; automatische Deployments bei künftigen
-Commits sind konfiguriert, aber noch nicht durch einen Folge-Commit live
-nachgeprüft.
+Netlify zeigt als Quelle `main`. Das automatische Deployment wurde durch den
+Merge von PR #49 unabhängig bestätigt: Main-Commit `4320104` wurde als Deploy
+`6afb5a720d006098c323d624` erfolgreich veröffentlicht.
 
 Vor dem Öffnen der Control API sind Production-Secrets, OAuth-Callback und eine
-geprüfte 0-€-Quota-Anbindung erforderlich. Der Zugriffsschutz des Projekts ist
-Team-SSO für alle Deploys und wurde nicht geändert. Keine kostenpflichtigen
-Ressourcen aktivieren. Der Free-Tarif hat ein hartes Limit und pausiert bei
+geprüfte 0-€-Quota-Anbindung erforderlich. Produktionszugriff ist nach
+ausdrücklicher Nutzerfreigabe öffentlich; Deploy-Previews bleiben privat.
+Keine kostenpflichtigen Ressourcen aktivieren. Der Free-Tarif hat ein hartes Limit und pausiert bei
 Erschöpfung; der tatsächliche Kontostand muss im Netlify-Dashboard geprüft
 werden. Quellen: [Netlify Free Pricing](https://www.netlify.com/pricing/) und
 [Credit-basierte Pläne](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/).

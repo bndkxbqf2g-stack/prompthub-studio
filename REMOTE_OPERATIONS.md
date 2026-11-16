@@ -8,16 +8,18 @@ Verfügung stehen.
 
 | Fähigkeit | Nachgewiesener Zustand | Konsequenz |
 |---|---|---|
-| ChatGPT/Codex Remote am Mobilgerät | Native Codex-Funktion; sie ist vom Codex-Cloud-Runner getrennt. | Native Fragen und Berechtigungen bleiben in Codex Remote. PromptHub leitet sie nicht weiter und simuliert sie nicht. |
+| Codex Remote am iPhone | Laut offizieller OpenAI-Dokumentation kann die ChatGPT-Mobile-App Aufgaben auf einem verbundenen Codex-Rechner starten, steuern und prüfen sowie Berechtigungsanfragen für Befehle, Dateiänderungen, Netzwerkzugriff und verbundene Tools beantworten. Der Host muss eingerichtet, wach, online und mit demselben Konto/Workspace angemeldet sein. | Die Remote-Gerätekopplung dieses Projekts wurde in dieser Sitzung nicht ausgelesen. Eine strukturierte Rückfrage im aktuellen Chat ist verfügbar und wurde vom Nutzer beantwortet. Es gibt hier kein aufrufbares Werkzeug, das eine native Codex-Freigabe oder Push-Mitteilung aktiv versendet. Native Freigaben bleiben in der ChatGPT-App; PromptHub kann sie nicht ersetzen. Ohne verbundenen Host kann das iPhone lokale Dateien oder Prozesse auf dem Laptop nicht ausführen. |
 | Codex Cloud | `Default environment` (`asenvcfg_base`) ist `ready` und `runnable`, hat aber `repositories: []`. | Kein PromptHub-Repository-Cloud-Job kann damit gestartet werden. Die Cloud-Einrichtung muss zuerst ein Repository enthalten. |
 | Computer Use im Codex-Desktop | In dieser Sitzung sind Codex und Chrome sichtbar; es gibt keinen verbundenen In-App-/Cloud-Browser-Tab. | Desktop-UI-Steuerung ist keine dauerhafte PromptHub-Browser-API und kein iPhone-Test. Keine Browseraktionen werden als PWA-Backend angeboten. |
 | GitHub | PromptHub-Repository und Actions sind vorhanden; GitHub-Connector und lokaler Git-Zugriff sind in der Sitzung verfügbar. | GitHub bleibt Quellcode-, CI- und Datenbasis. Providerzugriff in Codex stellt der veröffentlichten Function keine Zugangsdaten bereit. |
-| Netlify Connector | Free-Team `Booolio` (`bndkxbqf2g-stack`). Projekt `prompthub-studio` (`834e2ac8-5324-4b2c-bcb0-9c65a228e43b`) ist mit `bndkxbqf2g-stack/prompthub-studio` auf `main` verknüpft. Deploy `6afb55fca23ea397af718ef7` (Commit `3eca5bb`) steht auf `ready`; `requiresSSOTeamLogin=true` für alle Deploys. | HTTPS-Root liefert die PWA. `/healthz` liefert `production_api_disabled`, weil keine Production-Secrets/-Konfiguration existieren. Das Projekt bleibt privat/SSO-geschützt; der genaue Credit-Kontostand wurde nicht gelesen. |
+| Netlify Connector | Free-Team `Booolio` (`bndkxbqf2g-stack`). Projekt `prompthub-studio` (`834e2ac8-5324-4b2c-bcb0-9c65a228e43b`) ist mit `bndkxbqf2g-stack/prompthub-studio` auf `main` verknüpft. Deploy `6afb5a720d006098c323d624` für Commit `4320104` steht auf `ready`. Die Produktionsseite ist öffentlich; Deploy-Previews bleiben privat. | `https://prompthub-studio.netlify.app/` liefert die PWA. `/healthz` liefert `production_api_disabled`, weil keine Production-Secrets/-Konfiguration existieren. Das Free-Team ist verifiziert; der genaue Credit-Kontostand wurde nicht gelesen. |
 | Cloudflare | Vom Nutzer abgewählt und pausiert. | Wird nicht als Ersatzweg reaktiviert. |
 | PWA-Push | Kein Push-Abonnement, Push-Service oder Background-Service konfiguriert. | Die PWA nutzt eine abrufbare Inbox; der Aktualisierungsbutton holt den aktuellen Zustand. |
 
 ### Offizielle Codex-Referenzen
 
+- [Mastering remote engineering work from your phone](https://developers.openai.com/blog/mastering-codex-remote-for-engineering)
+- [Working on your phone](https://developers.openai.com/training/walkthroughs/working-on-your-phone)
 - [ChatGPT Work and Codex](https://help.openai.com/en/articles/20001275-chatgpt-work-and-codex)
 - [Using Codex Cloud](https://help.openai.com/en/articles/20001545-using-codex-cloud)
 - [Using Codex with your ChatGPT plan](https://help.openai.com/en/articles/11369540-using-codex-with-your-chatgpt-plan)
@@ -95,10 +97,10 @@ Der Produktions-Standard hat absichtlich keine `costPolicy`, keine
 - Codex Cloud und PWA-Browsersteuerung: nicht mit der PromptHub-Laufzeit
   verbunden.
 - Push: nicht verfügbar; Inbox-Polling ist aktiv.
-- Netlify-Projekt: mit GitHub verbunden und erfolgreich auf Free deployed;
-  PWA-Root ist unter `https://prompthub-studio.netlify.app/` mit SSO geladen.
-  `/healthz` meldet `production_api_disabled`. Es bestehen keine Production-
-  Secrets, kein OAuth-Livebetrieb und kein automatischer Kontingent-Readback.
+- Netlify-Projekt: Produktion ist öffentlich, Previews bleiben privat;
+  `https://prompthub-studio.netlify.app/` lädt die PWA. `/healthz` meldet
+  `production_api_disabled`. Es bestehen keine Production-Secrets, kein
+  OAuth-Livebetrieb und kein automatischer Kontingent-Readback.
 - Eine echte iPhone-Installation, Live-OAuth-, Control-API- und Provider-
   Ausführungsprüfung ist offen. Lokale HTTP-Integrationstests gelten nicht als
   Live- oder iPhone-Abnahme.
@@ -131,11 +133,11 @@ Empfohlene Statusdeutung:
 
 ## Noch nötige Integrationen vor Live-Abnahme
 
-1. Netlify-GitHub-Deployment ist auf `main` eingerichtet; der echte PWA-Zugriff
-   bleibt hinter Team-SSO. Vor einer Freischaltung für alle braucht es die
-   gesonderte Entscheidung des Nutzers.
-2. Production-Context-Secrets, GitHub OAuth-App und privates Control-Repository
-   müssen im Provider eingerichtet und serverseitig geprüft sein.
+1. Netlify-GitHub-Deployment ist auf `main` eingerichtet; Produktionszugriff
+   ist ausdrücklich öffentlich freigegeben, Deploy-Previews bleiben privat.
+2. Production-Context-Secrets, GitHub OAuth-App und der eng begrenzte Zugriff
+   auf das private Control-Repository müssen im Provider eingerichtet und
+   serverseitig geprüft sein.
 3. Ein maschinenlesbarer, frischer Netlify-Teamkontingent-Readback muss als
    `costPolicy` angebunden werden. Fehlt der Readback, muss die Aktion gesperrt
    bleiben.

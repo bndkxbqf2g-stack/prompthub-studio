@@ -16,6 +16,54 @@
 - Änderung kritischer Sicherheits-, Auth-, Freigabe- oder Recovery-Komponenten.
 - Produktive Migration, Löschung, Deployment oder kostenpflichtige Ressource.
 
+## Nutzeraktionen und Remote-Unterstützung
+
+Bevor eine Mitwirkung angefordert wird, werden vorhandene Connectoren, APIs,
+CLIs, Browserzugriff, bereits autorisierte Sitzungen und sichere Alternativen
+geprüft. Wenn möglich wird die Aufgabe autonom abgeschlossen. Erforderliche
+Freigaben und persönliche Entscheidungen bleiben ausdrücklich beim Nutzer.
+
+Verbindliche Reihenfolge:
+
+1. Selbstständige Ausführung mit tatsächlich verfügbaren Berechtigungen.
+2. Codex Remote auf dem iPhone für Start, Steuerung, Rückfragen, native
+   Freigaben und Review eines mit dem Telefon verbundenen Codex-Hosts.
+3. iPhone-Browser für Anbieteranmeldungen und Schritte, die der Nutzer selbst
+   in einer Website ausführen muss.
+4. Laptop nur, wenn lokale Dateien, Desktop-only-Werkzeuge oder ein verbundener
+   Rechner technisch erforderlich und die vorherigen Wege nicht ausreichend
+   sind. Den konkreten Grund nennen.
+
+Codex Remote steuert einen verbundenen Rechner; es verschiebt dessen lokale
+Ausführung nicht auf das iPhone. Der Host muss online, wach, angemeldet und mit
+dem passenden Workspace verbunden sein. Bei Schlaf oder Ausfall gibt es keine
+vorgegebene Aktivität. Eine mögliche Freigabe über Codex Remote umgeht keine
+native Codex-Prüfung, OAuth-Bestätigung oder Anbieterfreigabe.
+
+Wenn eine Aktion auf den Nutzer wartet, wird sie unmittelbar im laufenden Chat
+mit folgendem Inhalt beschrieben:
+
+- **Aktion erforderlich:** kurzer Titel.
+- **Warum?** höchstens zwei Sätze zur konkreten Grenze.
+- **Empfohlene Lösung:** einfachster sicherer Weg.
+- **Gerät:** iPhone, iPhone-Browser oder Laptop.
+- **Was muss ich tun?** verifizierte Schritte und Bedienelemente.
+- **Dauer:** nur bei begründbarer Schätzung.
+- **Danach:** wie der Abschluss geprüft oder zurückgemeldet wird.
+- **Alternative:** soweit vorhanden.
+
+Keine Passwörter, Einmalcodes oder Zugangsschlüssel im Chat anfordern. Secrets
+werden nur in der geschützten Oberfläche des jeweiligen Anbieters gespeichert.
+Eine Push-Benachrichtigung wird nur behauptet, wenn ein tatsächlich
+konfigurierter Push-Kanal sie versendet hat; andernfalls bleibt eine
+abrufbare Aufgabenliste sichtbar. Während eine Antwort aussteht, wird mit
+unabhängigen sicheren Arbeiten fortgefahren. Nach der Antwort wird derselbe
+Auftrag fortgesetzt, soweit die Laufzeit dies unterstützt.
+
+Die tatsächliche Funktionsverfügbarkeit pro Sitzung wird geprüft und
+dokumentiert. Eine allgemeine Produktfunktion gilt nicht als in dieser Sitzung
+verbunden, und eine Chat-Rückfrage gilt nicht als native Codex-Freigabe.
+
 ## Entscheidungsprotokoll
 
 Jede automatische Entscheidung wird mit `decision_id`, Input-Referenzen,

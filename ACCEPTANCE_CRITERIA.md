@@ -5,7 +5,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 
 | ID | Kriterium | Nachweis / Test | Gate | Status |
 |---|---|---|---|---|
-| A01 | PWA, API und Control-Plane-Datenfluss | test/api.test.mjs; lokaler HTTP-Smoke; Pages-Deployment und Live-Browser-Smoke | Pflicht | teilweise: Netlify-Production-Deploy `6afb55fca23ea397af718ef7` von Main `3eca5bb33ecfaa8664eb34a5e84da4de6e31a47b` ist `ready`; die HTTPS-Root lädt die PWA. Live-`/healthz` antwortet ehrlich `production_api_disabled`. OAuth, Control-Plane-Datenfluss und GitHub-persistente Jobs fehlen live. Das Projekt bleibt SSO-geschützt. |
+| A01 | PWA, API und Control-Plane-Datenfluss | test/api.test.mjs; lokaler HTTP-Smoke; Pages-Deployment und Live-Browser-Smoke | Pflicht | teilweise: Netlify-Production-Deploy `6afb5a720d006098c323d624` für Main `432010421a15956dbe3495c70a7be3df6a7ece2b` ist `ready`; die öffentliche HTTPS-Root lädt die PWA. Live-`/healthz` antwortet ehrlich `production_api_disabled`. OAuth, Control-Plane-Datenfluss und GitHub-persistente Jobs fehlen live. Deploy-Previews bleiben privat. |
 | A02 | Sichere Authentifizierung | `test/auth.test.mjs`, `test/config.test.mjs`, `test/netlify-blob-stores.test.mjs`; OAuth-Allowlist, verschlüsselte serverseitige Sitzungen, Session-Ablauf und atomarer einmaliger OAuth-State | Pflicht | lokal bestanden; unabhängige Sicherheitsprüfung fand keine Auth-/Session-Sicherheitsbefunde. Live-OAuth-Callback und Provider-Secrets sind nicht eingerichtet. |
 | A03 | Keine Geheimnisse im Browser/GitHub/Log | `scripts/check.mjs`, OAuth-/Payload-Assertions | Pflicht | lokal bestanden |
 | A04 | Zuverlässige Auftragsverarbeitung | `test/runner.test.mjs`, `npm run demo`, echter Executor-Smoke in isoliertem Git-Fixture | Pflicht | lokal bestanden: Am 2026-11-16 führte `PromptHubRunner` mit `ProcessExecutor`, echtem Codex CLI, `MemoryControlPlane` und `GitWorktreeManager` einen Fixture-Auftrag aus. Die Datei wurde von 41 auf 42 geändert, der echte Node-Pflichtcheck bestand, der Job erreichte `succeeded`, der Executor beendete sich mit Exitcode 0, vier Checkpoints wurden aufgezeichnet und danach blieb kein aktiver Lease zurück. Das belegt keine GitHub-Control-Plane-Persistenz oder MacBook-Ausführung |
@@ -17,11 +17,11 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
-| A13 | Kosten-/Ressourcenbegrenzung | 0-€-Zusatzbudget, begrenzte Job-/Retry-/Polling-Werte; frischer Netlify-Free-Kontingentreadback; Fail-Closed-Gate | Pflicht | teilweise: Netlify bestätigt Free mit 300 Credits/Monat und harter Grenze ohne Gebühren bei Erschöpfung; der erste Produktions-Deploy ist erfolgt. Der tatsächliche Kontostand ist nicht lesbar. Ein maschinenlesbarer Team-Readback und eine automatische Vorabpause bei 75 % sind nicht angebunden; Job- und externe Aktionsgates bleiben geschlossen. Kein bezahlter Tarif oder Auto-Recharge wurde aktiviert. |
+| A13 | Kosten-/Ressourcenbegrenzung | 0-€-Zusatzbudget, begrenzte Job-/Retry-/Polling-Werte; frischer Netlify-Free-Kontingentreadback; Fail-Closed-Gate | Pflicht | teilweise: Netlify bestätigt Free mit 300 Credits/Monat und harter Grenze ohne Gebühren bei Erschöpfung. Zwei Production-Deploys zu je 15 Credits sind nachgewiesen; weitere Teamnutzung und der tatsächliche Kontostand sind nicht lesbar. Ein maschinenlesbarer Team-Readback und eine automatische Vorabpause bei 75 % sind nicht angebunden; Job- und externe Aktionsgates bleiben geschlossen. Kein bezahlter Tarif oder Auto-Recharge wurde aktiviert. |
 | A14 | Kontrollierte Eigenupdates | `test/strategy-learning.test.mjs`, `test/pwa-strategy.test.mjs`, `test/api-projects.test.mjs`, `test/auth.test.mjs`; GitHub-PR-/Actions-Evidenz, unabhängiger Review und authentifizierte Freigabe | Pflicht | teilweise: lokale API-/PWA-Gates und Projektwechsel-Regressionen bestanden; allgemeine PR-/CI-Runs sind vorhanden, ersetzen aber keinen echten A14-Übernahmevorgang mit passender unabhängiger Review, authentifizierter Freigabe und produktiver Control-API-Verbindung. Dieser Live-Nachweis fehlt weiterhin |
 | A15 | sichere Wiederherstellung | Backup-Manifest, SHA-256, Approval- und Tamper-Test | Pflicht | lokal bestanden |
-| A16 | Kostenfreies serverloses Control Plane, unabhängig vom statischen PWA-Host | HOSTING_OPTIONS.md; Functions-/OAuth-/Speicher-/Quota-Tests; HTTPS-Live-Smoke und Kosten-/Kontingent-Readback | Pflicht | teilweise, produktiv No-Go: Netlify Free ist mit GitHub `bndkxbqf2g-stack/prompthub-studio` verbunden. Main-Commit `3eca5bb` steht auf Deploy `6afb55fca23ea397af718ef7` auf `ready`; HTTPS-Root liefert die PWA und `/healthz` meldet `production_api_disabled`. Projekt-SSO gilt für alle Deploys. Runtime-Secrets, OAuth-App, Control-Plane-Verbindung und Quota-Readback fehlen; Job-Gate bleibt geschlossen. |
-| A17 | PWA-Installationssymbol und iPhone-Installation | test/api.test.mjs, test/cloudflare-pages.test.mjs, test/pwa-updates.test.mjs, test/pwa-availability.test.mjs; Manifest, Icon, HTTPS, Offline- und Update-Smoke | Pflicht | teilweise: Netlify-HTTPS-Root lädt die PWA in einer authentifizierten Netlify-Sitzung. Manifest, Icon und Service Worker sind implementiert. Die Website verlangt Team-SSO; öffentliche Erreichbarkeit, echte iPhone-Installation, Offline-Verhalten und Update-Smoke auf dem iPhone bleiben offen. |
+| A16 | Kostenfreies serverloses Control Plane, unabhängig vom statischen PWA-Host | HOSTING_OPTIONS.md; Functions-/OAuth-/Speicher-/Quota-Tests; HTTPS-Live-Smoke und Kosten-/Kontingent-Readback | Pflicht | teilweise, Control API produktiv No-Go: Netlify Free ist mit GitHub `bndkxbqf2g-stack/prompthub-studio` verbunden. Main-Commit `4320104` steht auf Deploy `6afb5a720d006098c323d624` auf `ready`; öffentliche HTTPS-Root liefert die PWA und `/healthz` meldet `production_api_disabled`. Deploy-Previews bleiben privat. Runtime-Secrets, OAuth-App, Zugriff auf das private Control-Repository und Quota-Readback fehlen; Job-Gate bleibt geschlossen. |
+| A17 | PWA-Installationssymbol und iPhone-Installation | test/api.test.mjs, test/cloudflare-pages.test.mjs, test/pwa-updates.test.mjs, test/pwa-availability.test.mjs; Manifest, Icon, HTTPS, Offline- und Update-Smoke | Pflicht | teilweise: Die öffentliche Netlify-HTTPS-Root lädt die PWA. Manifest, Icon und Service Worker sind implementiert. Echte iPhone-Installation, Offline-Verhalten und Update-Smoke auf dem iPhone bleiben offen. |
 | A18 | Multi-Projekt-Analyse | `test/projects.test.mjs`: Regeln, README, Skripte, Issues, CI, nur lesende API und Snapshot-Version | Pflicht | lokal bestanden |
 | A19 | Entfernen/Wiederverbinden/Datenlöschung | `test/projects.test.mjs`, `test/api-projects.test.mjs`: Bestätigung, Pause, laufende/stale Sperre, Wiederverbinden, getrennte Datenlöschung; kein Repo-Delete | Pflicht | lokal bestanden |
 | A20 | Prompt-Designer | `test/prompt-designer.test.mjs`, `test/api-projects.test.mjs`, `test/pwa-availability.test.mjs`: Analyse, Einzelfrage, vier Optionen, Skip/Ende, Anforderungen/Annahmen, Version, QA, ausdrückliche Freigabe, begrenzte Textanhänge und Spracheingabe per Betriebssystem-Diktat ohne Browser-Mikrofonzugriff | Pflicht | lokal bestanden; direkte Web-Speech-Erkennung wird nicht verwendet, weil die PWA das Mikrofon absichtlich nicht freigibt; iPhone-Diktat selbst bleibt auf echtem Gerät zu verifizieren |
@@ -35,7 +35,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A28 | Qualitäts-/Fehlerdashboard | `test/research-metrics.test.mjs`, `test/api-projects.test.mjs`, `test/error-learning.test.mjs`: echte fehlgeschlagene Jobs und Stichprobenquote, Fehlerbeobachtungstrend mit Historiengrenze, wiederkehrende Fehler, aktuell belegte Regressionen, offene Hypothesen, CI-Signalzahl; CI nicht als Ursache, fehlende Daten nicht als Schätzung | Pflicht | lokal bestanden; externe GitHub-/CI-Live-Daten offen |
 | A29 | Regressionstest-Prävention aus Fehlerhistorie | `test/regression-test-request.test.mjs`, `test/api.test.mjs`: nur wiederholte Runnerfehler oder menschlich bestätigte Ursachen mit aktuellen Belegen erstellen einen begrenzten, projektbezogenen Testauftrag; Reproduktion und Vorher/Nachher-Nachweis erforderlich; Auftrag bleibt Entwurf bis regulärer Nutzerfreigabe | Pflicht | lokal bestanden; externe Ausführung in angeschlossenem Projekt offen |
 | A30 | Serverless Hosting, Preview-Isolation und Credit-Gate | test/netlify-function.test.mjs, test/netlify-quota-gate.test.mjs, test/pwa-quota-presentation.test.mjs; Fail-Closed und gemessene Usage-Darstellung | Pflicht | lokal bestanden, live unvollständig: Netlify Function ist deployed, doch `/healthz` meldet wegen fehlender Production-Konfiguration `production_api_disabled`. Unbekannte/veraltete/zu hohe Quota sperrt lokal Jobanlage, Freigabe und Prompt-Übergabe. Der maschinenlesbare Team-Credit-Readback fehlt; Cloud-Aufträge werden nicht angenommen. |
-| A31 | Automatische Diensterkennung und mobile Remote-Freigaben | `test/prompt-designer.test.mjs`, `test/pwa-availability.test.mjs`, `test/api-approvals.test.mjs`, `test/project-store.test.mjs`; deterministische Diensterkennung, authentifizierte Nutzerbindung, Ablauf, Idempotenz, Projektisolierung, 0-€-/Quota-/Berechtigungs-Gates, Abbruch, Resume, Lease-Recovery, Belegbindung, unabhängige Verifikation; echte iPhone-/Provider-Live-Abnahme | Pflicht | lokal umgesetzt und mit 175 Tests geprüft; unabhängiger Review der aktuellen Änderung läuft. Produktionsbetrieb bleibt fail-closed: kein OAuth-Secret, keine Production-Konfiguration, kein Netlify-Credit-Readback und kein Provider-Adapter. Das Live-Deployment zeigt die PWA, aber `/healthz` meldet `production_api_disabled`; externe Aktionen und iPhone-Freigaben sind nicht abgenommen. |
+| A31 | Automatische Diensterkennung und mobile Remote-Freigaben | `test/prompt-designer.test.mjs`, `test/pwa-availability.test.mjs`, `test/api-approvals.test.mjs`, `test/project-store.test.mjs`; deterministische Diensterkennung, authentifizierte Nutzerbindung, Ablauf, Idempotenz, Projektisolierung, 0-€-/Quota-/Berechtigungs-Gates, Abbruch, Resume, Lease-Recovery, Belegbindung, unabhängige Verifikation; echte iPhone-/Provider-Live-Abnahme | Pflicht | lokal umgesetzt und mit 175 Tests geprüft; unabhängiger Review des Handoff-Races: keine kritischen, hohen oder mittleren Befunde. PR #49 wurde gemergt; GitHub-CI `43940256313` bestand `test`, `macos-latest` und `macos-15-intel`. Die PWA ist live öffentlich. Produktionsbetrieb bleibt fail-closed: keine Runtime-Secrets/OAuth, kein Netlify-Credit-Readback und kein Provider-Adapter. `/healthz` meldet `production_api_disabled`; externe Aktionen und iPhone-Freigaben sind nicht abgenommen. |
 
 ## Aktuelle Revalidierung – 2026-11-16
 
@@ -94,7 +94,7 @@ ausgewiesen und nicht als bestanden markiert.
 
 ## Aktueller Status
 
-Stand 2026-11-16, Basis `origin/main` `3eca5bb33ecfaa8664eb34a5e84da4de6e31a47b` (PR #48); lokale Feature-Änderungen liegen auf `codex/remote-approval-manager` und sind noch nicht integriert. Die technische Erstabnahme ist nicht bestanden.
+Stand 2026-11-16, Basis `origin/main` `432010421a15956dbe3495c70a7be3df6a7ece2b` (PR #49). Die Remote-Approval- und Handoff-Änderungen sind integriert; die technische Erstabnahme ist weiterhin nicht bestanden.
 
 Externe Nachweise:
 - PR #47 wurde mit geprüftem Head `291112319032882734aa909806841f36978c0bac`
@@ -103,26 +103,30 @@ Externe Nachweise:
 - PR #46/Main- und Pages-Läufe sowie der Live-PWA-Smoke sind oben dokumentiert.
   Der Live-Smoke lud die statische PWA unter `/src/pwa/`, zeigte aber
   „Control API nicht verfügbar“.
+- PR #49 wurde nach erfolgreichem Actions-Run `43940256313` automatisch gemergt.
+  `test`, `macos-latest` und `macos-15-intel` bestanden; Merge-Commit ist
+  `432010421a15956dbe3495c70a7be3df6a7ece2b`.
 - Netlify-Connector-Readback vom 2026-11-16: Free-Team `Booolio`, Projekt
   `prompthub-studio` (`834e2ac8-5324-4b2c-bcb0-9c65a228e43b`), GitHub-Integration
   für `bndkxbqf2g-stack/prompthub-studio`; Production-Deploy
-  `6afb55fca23ea397af718ef7` ist `ready` auf Main `3eca5bb`. Die PWA lädt über
+  `6afb5a720d006098c323d624` ist `ready` auf Main `4320104`. Die PWA lädt über
   `https://prompthub-studio.netlify.app/`; `/healthz` meldet
-  `production_api_disabled`. Team-SSO schützt alle Deploys. Der tatsächliche
+  `production_api_disabled`. Produktionszugriff ist öffentlich; Previews bleiben
+  privat. Netlify-Readback meldet SSO nur für Nicht-Production. Der tatsächliche
   Credit-Stand und Production-Secrets wurden nicht gelesen/gesetzt.
 - Netlify veröffentlicht folgende Credit-Raten: 15 je Produktions-Deployment,
   10 je GB-Stunde Compute, 20 je GB Bandbreite und 2 je 10.000 Requests.
   Diese Metriken teilen denselben Credit-Pool. Bei Erschöpfung pausieren alle
   Team-Sites; der Free-Tarif hat ein Hard Limit. Das Job-Gate bleibt geschlossen,
   bis ein frischer maschinenlesbarer Team-Readback live eingebunden ist.
-- Netlify-Repository-Verbindung, erfolgreicher Production-Deploy und HTTPS-PWA
-  sind nachgewiesen. Runtime-Secrets, OAuth und Live-Control-API fehlen. Der
-  PWA-Zugriff bleibt SSO-geschützt; keine Schutzregel wurde geändert.
+- Netlify-Repository-Verbindung, erfolgreicher Production-Deploy, öffentliche
+  HTTPS-PWA und private Deploy-Previews sind nachgewiesen. Runtime-Secrets,
+  OAuth und Live-Control-API fehlen.
 
 Offene Betriebsnachweise:
-- Öffentlich nutzbarer Zugriff ist wegen Team-SSO noch nicht freigegeben.
-- Runtime-Secrets, OAuth-Login, funktionsfähige HTTPS-Control-API und
-  automatischer Credit-Readback.
+- Runtime-Secrets, OAuth-Login und eng begrenzter Zugriff auf das private
+  Control-Repository; sichere Bestätigung dafür bleibt beim Nutzer.
+- Funktionsfähige HTTPS-Control-API und automatischer Credit-Readback.
 - Verlässliche automatische Jobpause bei Netlify-Nutzung ab 75 %.
 - GitHub branch protection und Sperre direkter Pushes unabhängig auslesen.
 - GitHub-persistente autonome Ausführung, echter MacBook-Runner und

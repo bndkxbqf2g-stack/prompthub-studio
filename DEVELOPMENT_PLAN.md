@@ -192,13 +192,19 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 - Unabhängige Sicherheitsprüfung für Runner, Auth und Freigaben.
 - Revalidierung 2026-11-16: Netlify Free ist mit dem GitHub-Repository
   `bndkxbqf2g-stack/prompthub-studio` und `main` verbunden. Production-Deploy
-  `6afb55fca23ea397af718ef7` (Commit `3eca5bb`) ist `ready`; die HTTPS-Root
-  liefert die PWA. Team-SSO bleibt eingeschaltet. `/healthz` meldet
-  `production_api_disabled`, da Runtime-Secrets und OAuth fehlen. Die
+  `6afb5a720d006098c323d624` (Merge-Commit `4320104`) ist `ready`; die
+  HTTPS-Root liefert die PWA öffentlich, Deploy-Previews bleiben privat.
+  `/healthz` meldet `production_api_disabled`, da Runtime-Secrets und OAuth
+  fehlen. Die
   Connector-API hat keine GitHub-Link-/Deploy-Erstellungsaktion; die
   Repository-Verknüpfung wurde über die angemeldete Netlify-Weboberfläche
   abgeschlossen. Cloud-Umgebung `asenvcfg_base` ist bereit/lauffähig, aber ohne
   Repository. Quoten-Readback und Control-API-Livebetrieb bleiben blockiert.
+- Nutzeraktionen folgen `AUTONOMY_RULES.md`: zuerst autonome Wege prüfen,
+  anschließend iPhone-Codex-Remote, dann iPhone-Browser, Laptop nur bei
+  nachgewiesener technischer Notwendigkeit. Codex Remote steuert den Host;
+  lokale Ausführung erfordert einen verbundenen, wachen und online befindlichen
+  Rechner.
 
 ### Phase 4 – technische Abnahme
 
