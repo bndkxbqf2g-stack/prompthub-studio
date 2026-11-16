@@ -1356,6 +1356,7 @@
   keinen Live-Kontingentnachweis. Netlify-Anmeldung, Free-Tarif, autoritativer
   Readback, OAuth und produktiver API-Betrieb bleiben offen. Keine
   kostenpflichtige Ressource wurde aktiviert.
+
 ## CP-059 – Abnahmestatus nach PR #46 revalidiert
 
 - Datum: 2026-11-16. PR #46 wurde als Main-Commit
