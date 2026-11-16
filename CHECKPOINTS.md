@@ -1212,3 +1212,22 @@
   aktuellen externen HTTP-Smoke oder einen echten iPhone-Test.
 - Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
   97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.
+
+## CP-052 – Netlify-Free-Control-Plane vorbereitet und fail-closed geprüft
+
+- Datum: 2026-11-16. PR-Arbeitsstand basiert auf dem veröffentlichten
+  `main`-Commit `94f4172d7101372922c0815d866eb40a25b723dc`.
+- Implementiert: Netlify Function und statische PWA-Konfiguration, gemeinsame
+  Anwendungsinitialisierung, verschlüsselte serverseitige Sessions,
+  atomarer einmaliger OAuth-State, Production-/Origin-Gates sowie ein
+  fail-closed Credit-Gate für Jobanlage, Freigabe und Prompt-Übergabe.
+- Unabhängige Sicherheitsprüfung: keine Auth-/Session-Sicherheitsbefunde. Der
+  offene operative Befund ist fehlender maschinenlesbarer teamweiter
+  Credit-Readback; bei unbekannter Nutzung bleiben Cloud-Jobs gesperrt.
+- Pflichtprüfungen im lokalen Arbeitsstand: `npm test` 138/138 bestanden;
+  `npm run check` erfolgreich (108 Dateien und Prompt-Library-Synchronisierung);
+  `git diff --check` erfolgreich. GitHub-CI und Live-Deployment sind für
+  diesen Arbeitsstand noch nicht nachgewiesen.
+- Netlify-Konto, Free-Tarif, Secrets, OAuth-Callback und HTTPS-Live-Smoke sind
+  nicht eingerichtet oder geprüft. Kein kostenpflichtiger Dienst wurde
+  aktiviert. Cloudflare bleibt pausiert.

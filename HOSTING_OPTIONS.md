@@ -17,7 +17,7 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
 | Möglichkeit | Nachweister Umfang | Kosten-/Ausfallverhalten | Eignung |
 |---|---|---|---|
 | GitHub Pages allein | Statisches HTML/CSS/JS; keine serverseitige OAuth-Callback- oder API-Ausführung | GitHub-Free-Seite ist für das öffentliche Repo verfügbar | Für PWA-Shell und Dokumente geeignet; kein funktionsfähiger API-/Auth-Host |
-| Netlify Free | Git-Deployments, Node-Functions und Blob-Storage; öffentliche und private Repository-Deployments sind dokumentiert. Der aktuelle Self-Serve-Vertrag untersagt Training auf Customer Content, sofern der Kunde nicht ausdrücklich optiert. | 0 USD/Monat, 300 Credits/Monat mit hartem Limit und ohne Auto-Recharge. Free-Nutzung wird laut Vertrag nicht berechnet; beim Limit pausiert Netlify alle Sites des Teams. | Bevorzugter, noch nicht freigegebener Kandidat. Vertragsbedingungen passen besser zu projektbezogenen Daten als Vercel Hobby; Konto, Datenpfad, Storage und automatischer Quoten-Readback sind ungeprüft. |
+| Netlify Free | Git-Deployments, Node-Functions und Blob-Storage; öffentliche und private Repository-Deployments sind dokumentiert. Der aktuelle Self-Serve-Vertrag untersagt Training auf Customer Content, sofern der Kunde nicht ausdrücklich optiert. | 0 USD/Monat, 300 Credits/Monat mit hartem Limit und ohne Auto-Recharge. Free-Nutzung wird laut Vertrag nicht berechnet; beim Limit pausiert Netlify alle Sites des Teams. | Die Implementierung wurde vom Nutzer am 2026-11-16 freigegeben. Konto, Plan, Repository-Verknüpfung, Datenpfad, Storage und automatischer Quoten-Readback sind live ungeprüft. |
 | Vercel Hobby | Git-Deployments, Functions, Blob und dokumentierte Usage-CLI | 0 USD, aber Hobby nur persönlich/nicht-kommerziell. Die aktuellen Terms gestatten für Hobby die Nutzung von Customer Content zum KI-/ML-Training und zur Weitergabe an Dritte für Modellverbesserung. | Für PromptHub-Daten ausgeschlossen, solange kein ausdrücklich anwendbarer Opt-out die Nutzung sicher ausschließt. Keine Verbindung oder Aktivierung erfolgt. |
 | Render Free | Serverlose Alternative steht hier nicht bereit; Free-Webservice mit dynamischem API-Server und kostenlosem Datenspeicher | Free-Webservices schlafen nach 15 Minuten Inaktivität ein; lokales Dateisystem ist flüchtig, Free-Postgres läuft nach 30 Tagen ab, und Bandbreite/Builds können bei vorhandenem Zahlungsmittel kostenpflichtig werden | Für die dauerhafte Control API und geschützte Sitzungsdaten ungeeignet. |
 | Deno Deploy Free | Edge-Anwendungen mit monatlichen Free-Kontingenten | Free-Anwendungen pausieren bei Quotenüberschreitung; Deno Deploy soll im April 2027 eingestellt werden | Wegen angekündigtem Produktende keine tragfähige Plattformgrundlage. |
@@ -47,12 +47,12 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
   hinweg geteilt und haben keine eingebaute TTL; Preview-Deployments dürfen daher
   keine Produktions-Sitzungen lesen oder verändern.
 - Die Blobs-API bietet bedingte Einzel-Key-Schreibvorgänge (`onlyIfNew`,
-  `onlyIfMatch`); sie ersetzen keine Transaktion über mehrere Keys. Der aktuelle
-  OAuth-State-Store führt `take()` als Lesen plus Löschen aus und ist deshalb
-  kein bereits geprüfter atomarer Consume-Adapter. Netlify müsste dafür einen
-  gezielten Compare-and-set-Adapter mit Race-Regressionstest erhalten. Sitzungs-
-  `expiresAt`-Werte müssen serverseitig erzwungen und abgelaufene Blobs begrenzt
-  bereinigt werden, da site-weite Stores keine automatische TTL haben.
+  `onlyIfMatch`); sie ersetzen keine Transaktion über mehrere Keys. Der
+  implementierte OAuth-State-Store konsumiert States mit einem bedingten
+  ETag-Update; gleichzeitige Rückrufe können denselben State nicht beide
+  verbrauchen. Sitzungen werden anwendungsseitig verschlüsselt, Ablaufzeiten
+  serverseitig geprüft und abgelaufene Blobs begrenzt opportunistisch bereinigt,
+  da site-weite Stores keine automatische TTL haben.
 - Eine GitHub-Integration benötigt die Verknüpfung des Netlify-Kontos mit dem
   persönlichen GitHub-Repository. Die Repository-API weist den Eigentümer als
   persönlichen Account aus; Netlify dokumentiert persönliche öffentliche und
@@ -64,17 +64,17 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
   intern oder künftig keinen unterstützten Endpunkt anbietet. Solange kein
   autoritativer, aktueller Gesamtverbrauch maschinenlesbar vorliegt, kann
   PromptHub die automatische 75-%-Jobpause nicht nachweisen und muss neue
-  Cloud-Jobs bei unbekanntem Verbrauch geschlossen halten.
+  Cloud-Jobs bei unbekanntem Verbrauch geschlossen halten. Dieses fail-closed
+Job-Gate ist jetzt in API-Annahme und Freigabewegen verdrahtet.
 
 ## Ergebnis der Hosting-Sicherheitsprüfung
 
 Der dokumentierte Betriebsstatus ist **No-Go für produktive Aktivierung**.
-Netlify Free ist der bevorzugte, noch nicht verbundene Kandidat: die aktuelle
-Vereinbarung untersagt Modelltraining auf Customer Content ohne ausdrückliches
-Opt-in, und das Free-Kontingent hat eine harte Grenze ohne Auto-Recharge. Konto,
-Projektauswahl, Production-/Preview-Isolation, ein vollständiger maschineller
-Credit-Readback, OAuth-/Sitzungsadapter und Live-Smoke sind nicht geprüft. Ohne
-verlässlichen Gesamtverbrauch bleiben Cloud-Jobs gesperrt. Vercel Hobby ist für
+Netlify Free ist freigegeben und die Repository-Konfiguration ist vorbereitet.
+Konto, Free-Tarif, Repository-Verknüpfung, Production-/Preview-Isolation im
+Dashboard, OAuth-/Sitzungs-Livezugriff und HTTPS-Smoke sind noch nicht geprüft.
+Ein maschinenlesbarer Credit-Gesamtverbrauch ist nicht verfügbar; die
+implementierte API hält Cloud-Jobs deshalb gesperrt. Vercel Hobby ist für
 PromptHub-Daten ausgeschlossen, solange seine aktuellen Terms Hobby-Content für
 Modelltraining freigeben; zusätzlich ist Hobby nur für persönliche,
 nicht-kommerzielle Nutzung erlaubt. Der vollständige autonome Cloud-Betrieb ist
@@ -93,44 +93,39 @@ damit noch nicht abnahmefähig.
   vorbereitet, bis eine aktuelle Vertragsänderung oder ein verifizierter Opt-out
   die Bedingungen für PromptHub-Daten sicher ändert.
 
-## Vor Implementierung erforderliche Freigaben
+## Freigabe und verbleibende Betriebsschritte
 
-1. **Hosting-Anbieter:** Netlify Free würde PromptHub-Quellcode,
-   Funktionsausführung und private Auth-/Sitzungsmetadaten verarbeiten. Vor einer
-   Verknüpfung muss der Nutzer Netlify Free für genau dieses öffentliche
-   Repository und die Verarbeitung durch den Anbieter ausdrücklich freigeben;
-   Konto, Plan und teamweite Nutzung sind danach read-only zu verifizieren.
-2. **Auth-/Sitzungsänderung:** Die gewählte Function braucht persistente
-   serverseitige OAuth-Sitzungen und einmalige OAuth-State-Daten. Eine
-   Netlify-Blobs-SessionStore-Implementierung verändert den
-   vorhandenen Authentifizierungspfad und ist nach `AGENTS.md`/`SECURITY_RULES.md`
-   eine kritische Änderung: zuerst ausdrückliche Freigabe, anschließend
-   unabhängige Sicherheitsprüfung und Regressionstests. Bestehende
-   Berechtigungs- und Session-Invarianten bleiben unverändert.
-3. **Abhängigkeit:** `@netlify/blobs` wäre eine neue Runtime-Abhängigkeit und
-   weicht von der Built-in-only-MVP-Konvention ab. Vor Installation ist eine
-   ausdrückliche, begründete Ausnahme erforderlich; das Paket wird auf eine
-   geprüfte Version gepinnt und nicht in den Browserbund aufgenommen. Alternativ
-   muss ein serverseitiger, verschlüsselter Store im privaten GitHub-Control-
-   Repository mit unabhängiger Sicherheitsprüfung bewertet werden.
-4. **Fail-closed-Konfiguration:** Nur Production bekommt OAuth-/Control-Secrets.
-   Deploy Previews bleiben deaktiviert oder isoliert. Netlify Blobs wird nur mit
-   getesteter starker Konsistenz verwendet. Ablaufzeiten werden serverseitig
-   geprüft; Storage- und Quotenfehler beenden Auth-/Job-Schreibvorgänge mit `503`.
-5. **Kosten-Gate:** Nur Netlify Free mit 300 Credits/Monat, Hard Limit und ohne
-   Auto-Recharge. Keine kostenpflichtige Domain, Zusatzcredits oder Tarifwechsel.
-   Betroffene Jobs müssen spätestens bei 75 % des verifizierten Gesamtverbrauchs
-   pausieren. Ohne vollständigen aktuellen Readback bleiben Cloud-Jobs gesperrt.
-   Dieses Gate ist weder implementiert noch live nachgewiesen.
+1. **Hosting-Anbieter:** Der Nutzer hat Netlify Free für dieses Repository und
+   die serverseitige Verarbeitung am 2026-11-16 freigegeben. Diese Freigabe
+   schließt Tarifwechsel, Zusatzcredits, kostenpflichtige Domains und
+   Auto-Recharge aus. Netlify-Konto und Free-Tarif müssen vor dem Deployment
+   read-only im Dashboard verifiziert werden.
+2. **Auth-/Sitzungsänderung:** `src/auth/netlify-blob-stores.mjs` nutzt
+   AES-256-GCM für Sessiondaten und stark konsistente `onlyIfMatch`-Schreibvorgänge
+   für OAuth-State-Consume. Pflicht-Regressionstests sind implementiert; die unabhängige Sicherheitsprüfung ist abgeschlossen und fand keine Auth-/Session-Sicherheitsbefunde. Der fehlende Credit-Readback bleibt der offene operative Befund. Bestehende Session- und Freigabe-Invarianten bleiben aktiv.
+3. **Abhängigkeit:** `@netlify/blobs@10.7.13` ist exakt gepinnt, unterstützt die
+   vorhandene Node-20-Runtime und wird nur serverseitig gebündelt.
+4. **Fail-closed-Konfiguration:** Die Netlify Function ist auf den Production-
+   Context und die konfigurierte HTTPS-Origin beschränkt. Same-Origin-Schutz ist
+   aktiviert; Produktions-Secrets müssen im Netlify-Dashboard ausschließlich
+   dem Production-Context zugeordnet werden. Preview-Requests erreichen keinen
+   Blob-Store. Ablaufzeiten werden geprüft; Storagefehler blockieren
+   Schreibvorgänge.
+5. **Kosten-Gate:** Netlify Free muss 300 Credits, ein hartes Limit und
+   deaktivierte Auto-Recharge aufweisen. Keine kostenpflichtige Domain,
+   Zusatzcredits oder Tarifwechsel. Bei mindestens 75 % pausiert PromptHub neue
+   Jobs und Freigaben. Ohne frischen, autoritativen Readback bleibt das
+   implementierte Gate `unknown` und geschlossen.
 6. **Verbrauchsmessung:** Teamweite Netlify-Warnungen im Dashboard ersetzen keinen
    API-Readback in PromptHub. Vor Jobfreigabe muss ein verlässlicher, aktueller
    Gesamtverbrauch für das konkrete Team nachgewiesen werden; der dokumentierte
    Build-Status-Endpunkt mit Build-Minuten genügt nicht.
 
-Bis Provider-/Deployment-Freigabe und die nötige Konto-/GitHub-Verknüpfung für
-eine der Optionen vorliegen, bleibt GitHub Pages der statische PWA-Einstieg. Es
-wird keine produktive Control API auf GitHub Pages behauptet und Cloudflare
-bleibt unverändert pausiert.
+Bis das Netlify-Konto read-only geprüft, das GitHub-Repository verbunden, die
+Production-Secrets sicher gesetzt und ein Free-Plan-Deployment tatsächlich
+verifiziert ist, bleibt GitHub Pages der statische PWA-Einstieg. Es wird keine
+produktive Control API auf GitHub Pages behauptet und Cloudflare bleibt
+unverändert pausiert.
 
 ## Quellen (abgerufen am 2026-11-16)
 

@@ -38,18 +38,30 @@ nur an `127.0.0.1`.
   nie als Produktionsmodus laufen.
 - `src/auth/github-oauth.mjs`: OAuth-State, kurzlebige serverseitige Session
   mit expliziter Provider-Kennung, HttpOnly-Cookie und Allowlist.
+- `src/auth/netlify-blob-stores.mjs`: serverseitige Netlify-Blobs-Sessions mit
+  AES-256-GCM-Anwendungsverschlüsselung, Ablaufprüfung und begrenzter
+  Bereinigung; OAuth-States werden per stark konsistentem ETag-CAS einmalig
+  konsumiert.
+- `src/application.mjs`: gemeinsame Service-Erzeugung für lokale Node- und
+  serverlose Netlify-Runtimes.
 - `src/api/server.mjs`: PWA-Auslieferung, JSON-API, Fehler- und Security-Header.
 - `src/api/handler.mjs`: gemeinsame Web-Request-/Response-API für den lokalen
-  Node-Adapter und den Cloudflare Worker; Same-Origin-Schutz kann serverlos
+  Node-Adapter und die Netlify Function; Same-Origin-Schutz kann serverlos
   verpflichtend aktiviert werden.
+- `netlify/functions/prompthub.mjs`: Produktions-API für `/api/*`, `/auth/*`
+  und `/healthz`; verweigert andere Deploy-Kontexte und prüft den Host gegen
+  `PROMPTHUB_PUBLIC_ORIGIN`.
+- `src/hosting/netlify-quota-gate.mjs`: Free-Plan- und Credit-Schwellenprüfung.
+  Ohne frischen, autoritativen Teamverbrauch bleibt die Jobannahme gesperrt.
+- `netlify.toml`: statische PWA aus `src/pwa`, Netlify Functions und ein
+  Build-Gate mit `npm test` und `npm run check`.
 - `src/cloudflare/worker.mjs`: GitHub-Control-Plane, OAuth und API-Routen als
-  Serverless-Worker. `src/cloudflare/kv-session-store.mjs` speichert kurzlebige
-  Sessions und OAuth-State in einem begrenzten Workers-KV-Binding.
+  historische, deaktivierte Serverless-Implementierung. Cloudflare ist kein
+  aktiver Hosting-Pfad.
 - `functions/[[path]].js`: Cloudflare-Pages-Adapter für den bestehenden Worker-
-  Handler. `src/pwa/_routes.json` lässt nur API-, Auth- und Health-Routen durch
-  Functions laufen; statische PWA-Anfragen bleiben auf dem kostenlosen Asset-Pfad.
+  Handler (historisch; nicht für Netlify-Deployments verwendet).
 - `wrangler.toml`: Pages-Build-Ausgabe `src/pwa`; das vorherige Workers-Static-
-  Assets-Profil bleibt in `wrangler.worker.toml` verfügbar.
+  Assets-Profil bleibt in `wrangler.worker.toml` (historische Konfiguration).
 - `src/runner/runner.mjs`: Polling, Claim, Lease, Heartbeats, Checkpoints,
   Resume, sauberes Stoppen und nicht-blockierende Erfassung verifizierter
   Abschlussbelege.
@@ -149,8 +161,11 @@ Wiederaufnahme.
 
 ## Abhängigkeiten und Grenzen
 
-Der MVP verwendet Node-Built-ins. GitHub ist ein erforderlicher externer Dienst
-für den Produktions-Control-Plane-Modus. Eine konkrete Codex-CLI, ein HTTPS-Host
-und GitHub-OAuth-Credentials sind Betriebs-Konfiguration, keine hart codierten
+Der MVP verwendet Node-Built-ins; die Netlify-Runtime hat zusätzlich die
+serverseitige Abhängigkeit `@netlify/blobs` exakt auf `10.7.13` gepinnt, um die
+bestehende Node-20-Kompatibilität zu erhalten. Das Paket wird nicht in die PWA
+gebündelt. GitHub ist ein erforderlicher externer Dienst für den
+Produktions-Control-Plane-Modus. Eine konkrete Codex-CLI, ein HTTPS-Host und
+GitHub-OAuth-Credentials sind Betriebs-Konfiguration, keine hart codierten
 Abhängigkeiten. Fehlen sie, meldet das System `not_configured` statt Erfolg.
 

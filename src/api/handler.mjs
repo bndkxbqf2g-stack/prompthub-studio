@@ -21,6 +21,19 @@ function redirect(location, headers = {}) {
   return new Response(null, { status: 302, headers: { ...SECURITY_HEADERS, Location: location, "Cache-Control": "no-store", ...headers } });
 }
 
+function safeJobAdmissionStatus(status) {
+  const state = ["available", "paused", "unknown", "not_gated"].includes(status?.status) ? status.status : "unknown";
+  return {
+    status: state,
+    allowed: status?.allowed === true,
+    reason: typeof status?.reason === "string" ? status.reason.slice(0, 100) : null,
+    credits_used: Number.isFinite(status?.credits_used) ? status.credits_used : null,
+    credits_limit: Number.isFinite(status?.credits_limit) ? status.credits_limit : null,
+    measured_at: typeof status?.measured_at === "string" && Number.isFinite(Date.parse(status.measured_at)) ? status.measured_at : null,
+    source: status?.source === "netlify_official_team_usage" ? status.source : "unavailable",
+  };
+}
+
 async function bodyJson(request, maxBytes = 100_000) {
   const declaredLength = Number(request.headers.get("content-length") ?? 0);
   if (declaredLength > maxBytes) throw Object.assign(new Error("request body too large"), { statusCode: 413 });
@@ -61,7 +74,7 @@ function jobIdFromPath(pathname) {
   return match ? decodeURIComponent(match[1]) : null;
 }
 
-async function handleDesigner({ request, url, pathname, promptDesigner, actor }) {
+async function handleDesigner({ request, url, pathname, promptDesigner, actor, checkJobAdmission }) {
   if (request.method === "POST" && pathname === "/api/designer/drafts") {
     return json(201, { draft: await promptDesigner.create(await bodyJson(request, 40_000)) });
   }
@@ -81,6 +94,10 @@ async function handleDesigner({ request, url, pathname, promptDesigner, actor })
     return draft ? json(200, { draft }) : json(404, { error: "draft_not_found" });
   }
   if (request.method !== "POST" && !(request.method === "GET" && action === "export")) return json(405, { error: "method_not_allowed" });
+  if (action === "approve" && request.method === "POST") {
+    const paused = await checkJobAdmission(request, { user: { login: actor } }, pathname);
+    if (paused) return paused;
+  }
   const payload = request.method === "GET" ? {} : await bodyJson(request, 40_000);
   const project = payload.project ?? url.searchParams.get("project");
   if (!project) return json(400, { error: "project_required" });
@@ -94,10 +111,31 @@ async function handleDesigner({ request, url, pathname, promptDesigner, actor })
   return json(404, { error: "not_found" });
 }
 
-export function createRequestHandler({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, logger = console, enforceSameOrigin = false, beforeProtectedApi = null } = {}) {
+export function createRequestHandler({ config, controlPlane, auth, projectService = null, promptDesigner = null, promptLibrary = null, errorLearning = null, strategyLearning = null, logger = console, enforceSameOrigin = false, beforeProtectedApi = null, jobAdmissionGate = null } = {}) {
   if (!config || !controlPlane || !auth) throw new Error("config, controlPlane and auth are required");
   let metricCache = null;
   let metricPending = null;
+  async function loadJobAdmissionStatus() {
+    if (!jobAdmissionGate) return safeJobAdmissionStatus({ status: "not_gated", allowed: true });
+    try {
+      return safeJobAdmissionStatus(await jobAdmissionGate.status());
+    } catch {
+      return safeJobAdmissionStatus({ status: "unknown", allowed: false, reason: "quota_status_unavailable" });
+    }
+  }
+  async function checkJobAdmission(request, session, pathname) {
+    if (!jobAdmissionGate) return null;
+    let status;
+    try {
+      status = typeof jobAdmissionGate.check === "function"
+        ? await jobAdmissionGate.check({ request, session, pathname })
+        : await jobAdmissionGate.status();
+    } catch {
+      status = { status: "unknown", allowed: false, reason: "quota_status_unavailable" };
+    }
+    if (status?.allowed === true) return null;
+    return json(503, { error: "job_admission_paused", job_admission: safeJobAdmissionStatus(status) });
+  }
   async function loadMetricSnapshot() {
     const now = Date.now();
     if (metricCache && metricCache.expires_at > now) return { ...metricCache.value, cache_source: "short_cache" };
@@ -155,6 +193,7 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
           runner_inbound_port: false,
           runner_status: "not_observed",
           runner_configured: Boolean(config.runner?.codexExecutable),
+          job_admission: await loadJobAdmissionStatus(),
         });
       }
       if (request.method === "GET" && pathname === "/auth/github/start") {
@@ -253,9 +292,11 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
         return json(200, { jobs: project ? jobs.filter((job) => job.project.toLowerCase() === project.toLowerCase()) : jobs });
       }
       if (request.method === "GET" && pathname === "/api/metrics") {
-        return json(200, await loadMetricSnapshot());
+        return json(200, { ...await loadMetricSnapshot(), job_admission: await loadJobAdmissionStatus() });
       }
       if (request.method === "POST" && pathname === "/api/jobs") {
+        const paused = await checkJobAdmission(request, session, pathname);
+        if (paused) return paused;
         if (projectService && promptDesigner) return json(403, { error: "use_prompt_designer_and_approve_a_prompt_version" });
         const payload = await bodyJson(request);
         if (projectService) {
@@ -272,11 +313,13 @@ export function createRequestHandler({ config, controlPlane, auth, projectServic
         return job ? json(200, { job }) : json(404, { error: "job_not_found" });
       }
       if (jobId && request.method === "POST" && pathname === `/api/jobs/${encodeURIComponent(jobId)}/approve`) {
+        const paused = await checkJobAdmission(request, session, pathname);
+        if (paused) return paused;
         const payload = await bodyJson(request, 10_000);
         return json(200, { job: await controlPlane.approveJob(jobId, session.user.login, payload.decision) });
       }
       if (projectService && promptDesigner && /^\/api\/designer(?:\/|$)/.test(pathname)) {
-        const response = await handleDesigner({ request, url, pathname, promptDesigner, actor: session.user.login });
+        const response = await handleDesigner({ request, url, pathname, promptDesigner, actor: session.user.login, checkJobAdmission });
         if (response) return response;
       }
       if (projectService && promptLibrary && request.method === "GET" && pathname === "/api/prompt-library/reviews") {
