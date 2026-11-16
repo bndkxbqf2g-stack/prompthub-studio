@@ -1270,3 +1270,26 @@
   flüchtigem Memory-Store. Er belegt weder GitHub-Persistenz noch eine für das
   iPhone erreichbare oder produktive Cloud-API. Die technische Erstabnahme
   bleibt offen.
+
+## CP-055 – Pages-PWA und externe Laufzeitverfügbarkeit revalidiert
+
+- Datum: 2026-11-16. GitHub-API-Readback bestätigt `main` auf
+  `4be6b8bb0ff73a14a3670423d6de7c3de3fc6ce1`. CI-Run `43882260206` bestand
+  `test`, `macos-latest` und `macos-15-intel`; Pages-Run `43882257544` war auf
+  demselben Commit erfolgreich.
+- Live-Browser-Smoke der GitHub-Pages-Root-Adresse landete unter `/src/pwa/`.
+  Die PWA lud und zeigte „Control API nicht verfügbar“. Der README-Link wurde
+  auf die Root-Adresse aktualisiert, die zur PWA weiterleitet; die
+  `github.com/...`-Repositoryansicht zeigt weiterhin die README.
+- Die aktuelle Netlify-Browserseite verlangt eine Anmeldung. Netlify-Konto,
+  Free-Tarif, Kontingente, OAuth und Deployment sind dadurch nicht bestätigt;
+  es wurden keine Netlify-Änderungen vorgenommen. Codex-Cloud-Inventar zeigt
+  `asenvcfg_base` als `ready/runnable` ohne verknüpfte Repositories.
+- Codex CLI meldet ChatGPT-Authentifizierung. `codex exec --json --ephemeral`
+  lieferte wegen schreibgeschütztem `CODEX_HOME` vor dem ersten JSONL-Event
+  Exitcode 1; der temporäre CLI-State war nicht verfügbar. Es wurden keine
+  Tokenwerte gemessen.
+- Nach diesem Checkpoint bestanden lokal `npm test` (138/138),
+  `npm run check` (108 Dateien und Prompt-Library-Synchronisierung) und
+  `git diff --check`. Kein kostenpflichtiger Dienst wurde aktiviert. Die
+  technische Erstabnahme bleibt offen.
