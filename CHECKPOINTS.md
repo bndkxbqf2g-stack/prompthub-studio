@@ -1293,3 +1293,17 @@
   `npm run check` (108 Dateien und Prompt-Library-Synchronisierung) und
   `git diff --check`. Kein kostenpflichtiger Dienst wurde aktiviert. Die
   technische Erstabnahme bleibt offen.
+
+## CP-056 – Revalidierung nach PR #42
+
+- Datum: 2026-11-16. PR #42 wurde nach erfolgreichem Pull-Request-CI-Run
+  `43888056302` automatisch gemergt. Der Merge-Commit auf `main` ist
+  `9e34b719ec5cf7e6de128efc4e83b7a01e480c02`.
+- Main-CI `43889567863` bestand `test`, `macos-latest` und `macos-15-intel`;
+  Pages-Deploy `43889567107` war auf demselben Commit erfolgreich.
+- Ein Browser-Smoke nach dem Deploy öffnete die Pages-Root-Adresse, leitete
+  nach `/src/pwa/` weiter und zeigte „Control API nicht verfügbar“.
+- Der PR aktualisierte den App-Link in `README.md` auf die Pages-Root-Adresse
+  und unterscheidet ausdrücklich zwischen GitHub-Repositoryansicht und PWA.
+  Login, API, iPhone-Installation, Offlineverhalten und Updateverhalten sind
+  weiterhin nicht abgenommen. Kein kostenpflichtiger Dienst wurde aktiviert.
