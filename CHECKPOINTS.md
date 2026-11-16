@@ -1036,3 +1036,26 @@
 - PR #28 mit dem Dokumentationscheckpoint wurde nach erfolgreichen Pflichtchecks gemergt. GitHub bestätigte für Head `596260a56dbb28c9f917da751debcc9a6eb0e520` in beiden Actions-Runs `43778439577` und `43778467602` erfolgreiche `macos-latest`-, `macos-15-intel`- und `test`-Jobs.
 - GitHub lehnte das Aktivieren von Auto-Merge für diesen bereits `clean` markierten PR ab. Nach dem vollständigen grünen Readback wurde der geprüfte Head mit SHA-Schutz gemergt; Merge-Commit `4fe86ec1463152d21f6fda2744166da9470a2e65`. Kein Check wurde übersprungen.
 - Der lokale `main` wurde per Fast-Forward auf den Merge-Commit aktualisiert. Cloudflare bleibt pausiert; PR-/Branch-Schutz, Pages-Live-Readback, API-Host, OAuth, iPhone-Installation und echter Runner bleiben offen.
+
+## CP-044 – Spracheingabe an die Mikrofonrichtlinie angepasst
+
+- Datum: 2026-11-16.
+- Die PWA bot zuvor direkte Web-Speech-Erkennung an, während `src/pwa/_headers`
+  den Browser-Mikrofonzugriff über `Permissions-Policy: microphone=()` sperrt.
+  Der direkte Erkennungs-Handler und sein Button wurden entfernt. Das Wunschfeld
+  erklärt nun die optionale Diktierfunktion der Bildschirmtastatur; PromptHub
+  selbst erhält keinen Mikrofonzugriff.
+- Apples Anleitung bestätigt Diktat in Textfeldern auf dem iPhone und weist auf
+  Verfügbarkeit nach Sprache/Region und Geräteeinstellung hin:
+  https://support.apple.com/guide/iphone/dictate-text-iph2c0651d2/27/ios/27
+- WebKit Bug 321436 dokumentiert einen offenen, konkreten Ausfallfall der
+  Web-Speech-Erkennung in Safari und installierten Home-Screen-Web-Apps nach
+  Medienwiedergabe. Das ist ein einzelner offener Fehlerbericht und kein Beleg,
+  dass Web Speech generell auf jedem iPhone ausfällt:
+  https://bugs.webkit.org/show_bug.cgi?id=321436
+- Der neue Regressionstest prüft Hinweistext, Mikrofonrichtlinie und das Fehlen
+  direkter `SpeechRecognition`-Aufrufe. Es wurde kein iPhone-Gerätetest
+  ausgeführt; Verfügbarkeit und Bedienung der OS-Diktierfunktion bleiben dort
+  zu bestätigen.
+- Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
+  97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.

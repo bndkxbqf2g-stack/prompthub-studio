@@ -107,9 +107,9 @@
           <p class="muted">Der kostenfreie strukturierte Assistenzmodus ist aktiv. Er trennt bestätigte Anforderungen, offene Fragen und Vorschläge.</p>
           <form id="designer-form">
             <label for="intent">Dein Wunsch</label>
-            <textarea id="intent" name="intent" rows="4" maxlength="12000" placeholder="Beschreibe frei, was du erreichen möchtest …" required></textarea>
+            <textarea id="intent" name="intent" rows="4" maxlength="12000" aria-describedby="voice-input-help" placeholder="Beschreibe frei, was du erreichen möchtest …" required></textarea>
+            <p id="voice-input-help" class="muted">Spracheingabe: Tippe ins Wunschfeld und nutze die Diktierfunktion deiner Bildschirmtastatur, falls verfügbar (am iPhone über das Mikrofon-Symbol). PromptHub greift selbst nicht auf das Mikrofon zu; die Diktierfunktion steuert dein Betriebssystem.</p>
             <div class="toolbar-row">
-              <button id="voice-input" class="button secondary" type="button">Spracheingabe</button>
               <label class="file-button" for="attachments">Textanhänge</label>
               <input id="attachments" type="file" accept=".txt,.md,.json,.yaml,.yml,.csv,text/plain,text/markdown,application/json" multiple hidden>
               <span id="attachment-label" class="muted">Keine Anhänge</span>
