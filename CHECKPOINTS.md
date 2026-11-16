@@ -1060,6 +1060,27 @@
 - Lokale Pflichtprüfungen: `npm test` 109/109; `npm run check` erfolgreich für
   97 Dateien und Prompt-Library-Synchronisierung; `git diff --check` ohne Befund.
 
+## CP-051 – GitHub-Pages-Root öffnet die PWA
+
+- Datum: 2026-11-16.
+- Vor dem Fix zeigte die GitHub-Pages-Projektwurzel die GitHub-gerenderte
+  README. PR #37 fügte eine relative Root-Weiterleitung auf /src/pwa/ samt
+  sichtbarem Fallback hinzu und verlinkte die App am Anfang der README.
+- PR #37 wurde auf Head
+  bef13024b0f5cec11103198102ec108c8f3208ef nach bestandenem Pflichtcheck
+  test automatisch als cf33e2bf5bb490df66f06ae38a8551366747a222 gemergt.
+  PR-CI-Lauf 43799371583, Main-CI-Lauf 43799474276 und Pages-Deployment
+  43799473633 endeten erfolgreich.
+- Live-Browserprüfung am 2026-11-16: Die Root-Adresse landete auf der PWA
+  unter /src/pwa/. Die PWA meldete weiterhin korrekt, dass keine Control-API
+  erreichbar ist. GitHub Pages stellt nur statische Dateien bereit; API- und
+  Auftragsfunktionen sind damit nicht abgenommen.
+- Pflichtprüfungen lokal: npm test 138/138; npm run check bestanden;
+  git diff --check Exitcode 0. Der erste PR-Lauf beanstandete zusätzliche
+  Leerzeilen am Dateiende; sie wurden entfernt, danach bestand der PR-Lauf.
+- Eine echte iPhone-Installation sowie Offline- und Updateverhalten bleiben
+  ungetestet.
+
 ## CP-050 – Codex-JSONL-Telemetrie sicher erfasst und angezeigt
 
 - Datum: 2026-11-16.
