@@ -79,14 +79,14 @@ Fehlerzustand, ohne Erfolg zu melden. Eine echte iPhone-Prüfung ist das nicht.
 PR #30, Head `8581fdfd19c73b034702834f287e5a0af696b887`, bestand in Actions-
 Runs `43780749466` und `43780772252` jeweils `macos-latest`, `macos-15-intel`
 und `test`; GitHub Auto-Merge integrierte den PR als
-`7058c1c10721ff661f30ccb26891bfca7d3d0982`. Dokumentations-PR #32, Head
-`17ae9eeb9fe60e2ced58643464b9a05e886ceb49`, bestand die Jobs `test`,
-`macos-latest` und `macos-15-intel` in Runs `43782801891` und `43782814917` und
-wurde als `ff90a0ae3d9a89ef44bf77b9cde0a4da35b66186` gemergt. Main-CI-Run
-`43782926429` und GitHub-Pages-Run 32 (`43782925620`) endeten erfolgreich auf
-diesem Commit. Ein direkter HTTP-Smoke nach diesem Deployment war nicht
-verfügbar; der Run bestätigt die erfolgreiche Pages-Veröffentlichung, nicht
-iPhone-Installation oder Offline-/Update-Bedienung.
+`7058c1c10721ff661f30ccb26891bfca7d3d0982`. Dokumentations-PR #33, Head
+`b7eee065c1ff259cab82324abc5c76bd888807b2`, bestand die Jobs `test`,
+`macos-latest` und `macos-15-intel` in Runs `43783867866` und `43783879946` und
+wurde als `792c96e3e8be2db849143b8420baea9c241f8eb2` gemergt. Main-CI-Run 117
+(`43783987471`) und GitHub-Pages-Run 33 (`43783986387`) endeten erfolgreich auf
+diesem Produktcode-Stand. Ein direkter HTTP-Smoke nach diesem Deployment war
+nicht verfügbar; der Run bestätigt die erfolgreiche Pages-Veröffentlichung,
+nicht iPhone-Installation oder Offline-/Update-Bedienung.
 
 Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
 mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
