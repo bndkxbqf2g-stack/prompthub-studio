@@ -17,10 +17,10 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A10 | Worktrees und Branch-Isolation | echter Git-Fixture-Test in `test/worktree.test.mjs` | Pflicht | lokal bestanden |
 | A11 | Fehlerbehandlung | Validierungs-, Executor-, Lease- und Backup-Fehlertests | Pflicht | lokal bestanden |
 | A12 | Wissen und Historie | `test/knowledge-recovery.test.mjs`, versioniertes `knowledge/` | Pflicht | lokal bestanden |
-| A13 | Kosten-/Ressourcenbegrenzung | 0-€-Zusatzbudget, begrenzte Job-/Retry-/Polling-Werte; exakt gepinnte serverseitige Hosting-Abhängigkeit; fail-closed Netlify-Credit-Gate | Pflicht | lokale Pflichtprüfungen bestanden. Das tatsächliche Netlify-Konto, der Free-Tarif, Teamverbrauch und Auto-Recharge-Status sind live nicht verifiziert; kein kostenpflichtiger Dienst wurde aktiviert. |
+| A13 | Kosten-/Ressourcenbegrenzung | 0-€-Zusatzbudget, begrenzte Job-/Retry-/Polling-Werte; Netlify-Free-Hard-Limit; fail-closed Credit-Gate | Pflicht | teilweise: Das Netlify-Dashboard bestätigte den Free-Tarif; der genaue kontobezogene Credit-Stand wird nicht in diesem öffentlichen Repository gespeichert. Es existierte noch kein Netlify-Projekt, daher gibt es keinen App-Verbrauchsnachweis. Free hat ein Hard Limit und pausiert bei Erschöpfung alle Team-Sites. Ein maschinenlesbarer Team-Readback und die automatische 75-%-Auftragsunterbrechung sind nicht nachgewiesen; das Job-Gate bleibt geschlossen. |
 | A14 | Kontrollierte Eigenupdates | `test/strategy-learning.test.mjs`, `test/pwa-strategy.test.mjs`, `test/api-projects.test.mjs`, `test/auth.test.mjs`; GitHub-PR-/Actions-Evidenz, unabhängiger Review und authentifizierte Freigabe | Pflicht | teilweise: lokale API-/PWA-Gates und Projektwechsel-Regressionen bestanden; allgemeine PR-/CI-Runs sind vorhanden, ersetzen aber keinen echten A14-Übernahmevorgang mit passender unabhängiger Review, authentifizierter Freigabe und produktiver Control-API-Verbindung. Dieser Live-Nachweis fehlt weiterhin |
 | A15 | sichere Wiederherstellung | Backup-Manifest, SHA-256, Approval- und Tamper-Test | Pflicht | lokal bestanden |
-| A16 | Kostenfreies serverloses Control Plane, unabhängig vom statischen PWA-Host | HOSTING_OPTIONS.md; Functions-/OAuth-/Speicher-/Quota-Tests; HTTPS-Live-Smoke und Kosten-/Kontingent-Readback | Pflicht | teilweise, produktiv No-Go: Pages liefert die PWA, aber keine API. Netlify Function, Blob-Adapter, OAuth-/Sessionstore, Preview-Isolation und fail-closed Quota-Gate sind lokal getestet. Die Live-PWA zeigte am 2026-11-16 Control API nicht verfügbar. Netlify-Anmeldung ist bis zur Rückkehr des Nutzers an den Desktop verschoben; Konto, Free-Tarif, Runtime-Secrets, OAuth-Callback, Live-API und autoritativer Credit-Readback sind nicht verifiziert. Das Job-Gate bleibt geschlossen. Cloudflare bleibt pausiert; kein bezahlter Dienst wurde aktiviert. |
+| A16 | Kostenfreies serverloses Control Plane, unabhängig vom statischen PWA-Host | HOSTING_OPTIONS.md; Functions-/OAuth-/Speicher-/Quota-Tests; HTTPS-Live-Smoke und Kosten-/Kontingent-Readback | Pflicht | teilweise, produktiv No-Go: GitHub Pages liefert statisch; der Live-Smoke zeigte „Control API nicht verfügbar“. Netlify-Free-Tarif wurde im Dashboard bestätigt, aber es wurde kein Netlify-Projekt, keine Function und kein Runtime-Secret eingerichtet. Ein OAuth-Callback zeigte zunächst „Invalid state key“; ein späterer Callback zeigte „Authorized“, aber Repository-Import und Live-API sind nicht nachgewiesen. Der Netlify-Connector steht in der aktuellen Tool-Sitzung nicht als aufrufbares Tool bereit. Job-Gate bleibt geschlossen. |
 | A17 | PWA-Installationssymbol und iPhone-Installation | test/api.test.mjs, test/cloudflare-pages.test.mjs, test/pwa-updates.test.mjs, test/pwa-availability.test.mjs; Manifest, Icon, HTTPS, Offline- und Update-Smoke | Pflicht | teilweise: Pages-Run 43901742433 deployte Main-Commit 4d4904a1764105fa8ca97412d6160e8488dfa4d4 erfolgreich. Live-Browser lud die PWA unter /src/pwa/. Service Worker v7 und Statusdarstellung sind implementiert; die API-Fehlermeldung ist sichtbar. Echte iPhone-Installation, Offline-Verhalten und ein Update-Smoke auf dem iPhone bleiben offen. |
 | A18 | Multi-Projekt-Analyse | `test/projects.test.mjs`: Regeln, README, Skripte, Issues, CI, nur lesende API und Snapshot-Version | Pflicht | lokal bestanden |
 | A19 | Entfernen/Wiederverbinden/Datenlöschung | `test/projects.test.mjs`, `test/api-projects.test.mjs`: Bestätigung, Pause, laufende/stale Sperre, Wiederverbinden, getrennte Datenlöschung; kein Repo-Delete | Pflicht | lokal bestanden |
@@ -34,7 +34,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A27 | Fehlerprävention und Lernen | `test/error-learning.test.mjs`, `test/projects.test.mjs`, `test/prompt-designer.test.mjs`, `test/api-projects.test.mjs`: Runner-/CI-Symptome, datensparsame Fehlermusterklassifikation, Nutzerberichte, getrennte Hypothesen, projektisolierte Evidenz, menschlich bestätigte Ursachen mit später passendem Check und expliziter Prüfung derselben Korrektur, begrenzte Aufbewahrung, Digest-/Belegprüfung | Pflicht | lokal bestanden; gepaarte externe Commit-/CI-Experimente offen |
 | A28 | Qualitäts-/Fehlerdashboard | `test/research-metrics.test.mjs`, `test/api-projects.test.mjs`, `test/error-learning.test.mjs`: echte fehlgeschlagene Jobs und Stichprobenquote, Fehlerbeobachtungstrend mit Historiengrenze, wiederkehrende Fehler, aktuell belegte Regressionen, offene Hypothesen, CI-Signalzahl; CI nicht als Ursache, fehlende Daten nicht als Schätzung | Pflicht | lokal bestanden; externe GitHub-/CI-Live-Daten offen |
 | A29 | Regressionstest-Prävention aus Fehlerhistorie | `test/regression-test-request.test.mjs`, `test/api.test.mjs`: nur wiederholte Runnerfehler oder menschlich bestätigte Ursachen mit aktuellen Belegen erstellen einen begrenzten, projektbezogenen Testauftrag; Reproduktion und Vorher/Nachher-Nachweis erforderlich; Auftrag bleibt Entwurf bis regulärer Nutzerfreigabe | Pflicht | lokal bestanden; externe Ausführung in angeschlossenem Projekt offen |
-| A30 | Serverless Hosting, Preview-Isolation und Credit-Gate | test/netlify-function.test.mjs, test/netlify-quota-gate.test.mjs, test/pwa-quota-presentation.test.mjs; Fail-Closed und gemessene Usage-Darstellung | Pflicht | lokal bestanden, live unvollständig: unbekannte/veraltete/zu hohe Quota sperrt Jobanlage, Freigabe und Prompt-Übergabe; PR #46 ergänzt die PWA-Anzeige und wurde mit erfolgreichen Pflichtchecks gemergt. Netlify-Konto, Free-Tarif, OAuth, HTTPS-API und autoritativer Team-Credit-Readback sind nicht nachgewiesen. Kein freigegebener Kontingentwert wird behauptet; das Gate bleibt geschlossen. |
+| A30 | Serverless Hosting, Preview-Isolation und Credit-Gate | test/netlify-function.test.mjs, test/netlify-quota-gate.test.mjs, test/pwa-quota-presentation.test.mjs; Fail-Closed und gemessene Usage-Darstellung | Pflicht | lokal bestanden, live unvollständig: unbekannte/veraltete/zu hohe Quota sperrt Jobanlage, Freigabe und Prompt-Übergabe. Netlify-Free-Tarif bestätigt, jedoch kein Netlify-Projekt oder App-Verbrauchsnachweis. Ein maschinenlesbarer Team-Credit-Readback ist nicht angebunden; Gate bleibt geschlossen und Cloud-Aufträge werden nicht angenommen. |
 
 ## Aktuelle Revalidierung – 2026-11-16
 
@@ -94,44 +94,39 @@ ausgewiesen und nicht als bestanden markiert.
 
 ## Aktueller Status
 
-Stand 2026-11-16, Main-Commit 4d4904a1764105fa8ca97412d6160e8488dfa4d4:
-Status: conditional_local_pass. Die technische Erstabnahme ist nicht bestanden.
-
-Lokale Pflichtprüfungen auf diesem Commit: npm test 143/143 bestanden;
-npm run check erfolgreich für 110 Dateien und den Prompt-Library-Abgleich;
-git diff --check ohne Befund. Der lokale Checkout ist auf denselben Main-Commit
-synchronisiert und sauber.
+Stand 2026-11-16, letzter Merge-Commit `d3b1abf2c1fc7a696e8ef90999705cfa2b50b159` (PR #47): `conditional_local_pass`. Die technische Erstabnahme ist nicht bestanden.
 
 Externe Nachweise:
-- PR #46 wurde nach erfolgreichen Pflichtchecks automatisch gemergt.
-  Pull-Request-CI 43901291322 bestand test, macos-latest und macos-15-intel.
-- Main-CI 43901746256 bestand test und beide macOS-Lanes.
-- GitHub-Pages-Run 43901742433 bestand Build, Deploy und Statusbericht.
-- Live-Browser-Smoke am 2026-11-16 lud die veröffentlichte PWA unter
-  /src/pwa/. Sie zeigte Control API nicht verfügbar. Das belegt den statischen
-  Host und das Routing, aber keine serverseitige Control API.
-- PR #46 ergänzte eine sichtbare, fail-closed Quota-Anzeige. Credits werden
-  nur bei gültigen Messwerten aus der gekennzeichneten autoritativen Quelle
-  dargestellt. Da die Live-API nicht verfügbar ist, ist kein Live-Quota-
-  Readback erfolgt; Cloud-Aufträge bleiben gesperrt.
+- PR #47 wurde mit geprüftem Head `291112319032882734aa909806841f36978c0bac`
+  gemergt. Actions-Run `43906291678` bestand `test`,
+  `macos-latest` und `macos-15-intel`.
+- PR #46/Main- und Pages-Läufe sowie der Live-PWA-Smoke sind oben dokumentiert.
+  Der Live-Smoke lud die statische PWA unter `/src/pwa/`, zeigte aber
+  „Control API nicht verfügbar“.
+- Das Netlify-Dashboard bestätigte den Free-Tarif. Der genaue kontobezogene
+  Credit-Stand wird nicht in diesem öffentlichen Repository gespeichert.
+  Zum Zeitpunkt der Prüfung existierte noch kein Netlify-Projekt; dadurch gibt
+  es keinen App-Last- oder Verbrauchsnachweis.
+- Netlify veröffentlicht folgende Credit-Raten: 15 je Produktions-Deployment,
+  10 je GB-Stunde Compute, 20 je GB Bandbreite und 2 je 10.000 Requests.
+  Diese Metriken teilen denselben Credit-Pool. Bei Erschöpfung pausieren alle
+  Team-Sites; der Free-Tarif hat ein Hard Limit. Das Job-Gate bleibt geschlossen,
+  bis ein frischer maschinenlesbarer Team-Readback live eingebunden ist.
+- Ein OAuth-Callback schlug zunächst mit `Invalid state key` fehl; ein
+  späterer Callback zeigte `Authorized`. Repository-Import, Netlify-Projekt,
+  Deployment und Live-API sind nicht nachgewiesen. Ein aufrufbares
+  Netlify-Connector-Tool ist in dieser Codex-Sitzung nicht verfügbar.
 
 Offene Betriebsnachweise:
-- Netlify-Anmeldung und Einrichtung sind vom Nutzer bis zu seiner Rückkehr an
-  den Desktop verschoben. Konto, Free-Tarif, Live-OAuth, Runtime-Secrets,
-  produktive API und autoritativer Team-Credit-Readback sind nicht verifiziert.
-- GitHub branch protection ließ sich aktuell nicht auslesen: GitHub-API
-  antwortete 403 Resource not accessible by integration; die Browser-Sitzung
-  war abgemeldet. PR #46 demonstriert den bestandenen Auto-Merge-Pfad, aber
-  eine direkte Push-Sperre ist derzeit nicht nachgewiesen.
-- Der echte CodexRunner-Smoke lief einmalig unter Windows mit
-  MemoryControlPlane. GitHub-persistente autonome Ausführung, dauerhafter
-  MacBook-Runner und Cloud-Runner sind nicht nachgewiesen.
-- iPhone-Installation, iPhone-Offlinebetrieb und Updateverhalten nach einem
-  Live-Deploy sind nicht geprüft.
-- Gepaarte projektübergreifende Commit-/CI-Experimente für Lernstrategien
-  sind offen.
+- Netlify-GitHub-Repository-Import, Control-API-Projekt, Runtime-Secrets,
+  OAuth-Login, HTTPS-API und automatischer Credit-Readback.
+- Verlässliche automatische Jobpause bei Netlify-Nutzung ab 75 %.
+- GitHub branch protection und Sperre direkter Pushes unabhängig auslesen.
+- GitHub-persistente autonome Ausführung, echter MacBook-Runner und
+  Cloud-Runner.
+- iPhone-Installation, Offlinebetrieb und Updateverhalten nach Live-Deploy.
+- Gepaarte projektübergreifende Commit-/CI-Experimente für Lernstrategien.
 
-Das Quell-Repository ist öffentlich, wie vom Nutzer ausdrücklich angewiesen.
-Cloudflare bleibt pausiert. Kein zusätzlicher kostenpflichtiger Dienst wurde
-aktiviert; Kontostände oder Abrechnungsdaten sind nicht unabhängig geprüft.
-Angebotsküche bleibt bis zur bestandenen PromptHub-Abnahme unangetastet.
+Kein kostenpflichtiger Dienst wurde in dieser Einrichtung aktiviert. Cloudflare
+bleibt pausiert. Angebotsküche bleibt bis zur bestandenen PromptHub-Abnahme
+unangetastet.
