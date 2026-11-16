@@ -75,12 +75,13 @@ npm run demo
 
 Die frühere Cloudflare-Variante und ihr pausierter Status sind in
 `CLOUDFLARE_OPERATIONS.md` dokumentiert. Cloudflare-Deployments bleiben pausiert.
-Netlify Free ist als Alternative geprüft, aber noch nicht verbunden oder
-freigegeben. Die unabhängige Prüfung empfiehlt vor produktiver Aktivierung
-No-Go: OAuth-/Session-Integration, isolierte Previews und ein verlässlicher
-maschineller Quoten-Readback fehlen. Bis die 75-%-Quotenkontrolle verifiziert
-ist, bleiben Cloud-Jobs gesperrt. Details stehen in `HOSTING_OPTIONS.md`.
-Ein Codex-Cloud-Runner ist nicht konfiguriert.
+Netlify Free und die OAuth-/Sitzungsintegration wurden am 2026-11-16 zur
+Umsetzung freigegeben und vorbereitet. Ein Deployment ist noch nicht aktiviert:
+Netlify-Konto, Free-Tarif, GitHub-Verknüpfung und Provider-Secrets sind nicht
+verbunden. Die unabhängige Prüfung fand keine Auth-/Session-Sicherheitsbefunde;
+der teamweite Credit-Readback fehlt, deshalb bleiben Cloud-Jobs fail-closed
+gesperrt. Details stehen in `HOSTING_OPTIONS.md`. Ein Codex-Cloud-Runner ist
+nicht konfiguriert.
 
 Das separate private GitHub-Control-Repository existiert und enthält die
 verifizierte leere Lease-Datei. Es ist noch nicht mit PromptHub verbunden. Für

@@ -107,8 +107,9 @@ export class GitHubOAuth {
   }
 
   async start({ returnTo = "/" } = {}) {
-    const state = randomBase64Url(24);
-    const pending = { returnTo: safeLocalRedirectPath(returnTo, this.publicOrigin), createdAt: this.now().toISOString() };
+    const createdAt = this.now();
+    const state = `${createdAt.getTime().toString(36)}.${randomBase64Url(24)}`;
+    const pending = { returnTo: safeLocalRedirectPath(returnTo, this.publicOrigin), createdAt: createdAt.toISOString() };
     if (this.stateStore) await this.stateStore.put(state, pending, 600);
     else this.states.set(state, pending);
     const url = new URL("https://github.com/login/oauth/authorize");

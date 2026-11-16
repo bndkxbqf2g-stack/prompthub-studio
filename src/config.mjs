@@ -73,6 +73,7 @@ export function readConfig(env = process.env) {
   const npmExecutable = env.PROMPTHUB_NPM_EXECUTABLE ?? (process.platform === "win32" ? "npm.cmd" : "npm");
   const requiredCommands = jsonCommandListValue(env.PROMPTHUB_REQUIRED_CHECKS_JSON, "PROMPTHUB_REQUIRED_CHECKS_JSON", [[npmExecutable, "test"], [npmExecutable, "run", "check"]]);
   const sessionSecret = env.SESSION_SECRET ?? "development-only-session-secret-change-me";
+  const publicOrigin = env.PROMPTHUB_PUBLIC_ORIGIN ?? `http://${host}:${port}`;
 
   if (!new Set(["memory", "github"]).has(mode)) {
     throw new Error("PROMPTHUB_MODE must be memory or github");
@@ -86,8 +87,16 @@ export function readConfig(env = process.env) {
   if (nodeEnv === "production" && sessionSecret.length < 32) {
     throw new Error("SESSION_SECRET must contain at least 32 characters in production");
   }
-  if (nodeEnv === "production" && !String(env.PROMPTHUB_PUBLIC_ORIGIN ?? "").startsWith("https://")) {
-    throw new Error("PROMPTHUB_PUBLIC_ORIGIN must use HTTPS in production");
+  if (nodeEnv === "production") {
+    let parsedOrigin;
+    try {
+      parsedOrigin = new URL(publicOrigin);
+    } catch {
+      throw new Error("PROMPTHUB_PUBLIC_ORIGIN must be a valid HTTPS origin in production");
+    }
+    if (parsedOrigin.protocol !== "https:" || parsedOrigin.pathname !== "/" || parsedOrigin.search || parsedOrigin.hash || parsedOrigin.username || parsedOrigin.password) {
+      throw new Error("PROMPTHUB_PUBLIC_ORIGIN must be an HTTPS origin without a path in production");
+    }
   }
   if (nodeEnv === "production" && authMode === "github" && listValue(env.GITHUB_ALLOWED_LOGINS).length === 0) {
     throw new Error("GITHUB_ALLOWED_LOGINS must contain at least one login in production");
@@ -111,7 +120,7 @@ export function readConfig(env = process.env) {
     authMode,
     host,
     port,
-    publicOrigin: env.PROMPTHUB_PUBLIC_ORIGIN ?? `http://${host}:${port}`,
+    publicOrigin: nodeEnv === "production" ? new URL(publicOrigin).origin : publicOrigin,
     sessionSecret,
     github: Object.freeze({
       apiUrl: env.GITHUB_API_URL ?? "https://api.github.com",

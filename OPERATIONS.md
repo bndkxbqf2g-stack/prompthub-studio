@@ -203,6 +203,58 @@ Das separate private GitHub-Control-Repository ist angelegt. Auf seinem
 `{"version":1,"leases":[]}`. Es ist noch nicht mit der Anwendung verbunden:
 GitHub-OAuth-App, Runtime-Token/-Secrets und serverloser API-Host fehlen.
 
+## Netlify-Free-Deployment (vorbereitet, noch nicht verbunden)
+
+`netlify.toml` konfiguriert `main` als Produktionsquelle, `src/pwa` als
+statisches Veröffentlichungsverzeichnis und `netlify/functions` als
+Functions-Verzeichnis. Jeder Netlify-Build führt zuerst `npm test` und
+`npm run check` aus. Die PWA und die API nutzen danach dieselbe HTTPS-Origin.
+
+Vor dem Verbinden muss im Netlify-Dashboard der Free-Tarif für genau dieses
+Repository read-only bestätigt werden. Keinen Tarifwechsel, Zusatzcredits,
+kostenpflichtige Domain oder Auto-Recharge aktivieren. Das Konto und sein
+teamweiter Verbrauch sind in dieser Sitzung nicht verifiziert. Netlify Free
+hat laut Anbieter ein festes monatliches Credit-Limit und pausiert Sites am
+Limit; das ersetzt PromptHubs eigenes Job-Gate nicht.
+
+Netlify Production-Context erhält die folgenden Variablen ausschließlich über
+die verschlüsselte Environment-Variable-Verwaltung des Anbieters:
+
+- `NODE_ENV=production`, `PROMPTHUB_MODE=github`, `AUTH_MODE=github`
+- `PROMPTHUB_PUBLIC_ORIGIN=https://<production-host>` ohne Pfad
+- `SESSION_SECRET` mit mindestens 32 zufälligen Zeichen
+- `GITHUB_TOKEN` mit minimal nötigen Rechten auf das private Control-Repository
+- `GITHUB_REPOSITORY=<owner>/<private-control-repository>` und
+  `GITHUB_BRANCH=main`, `GITHUB_REQUIRE_PRIVATE=true`
+- `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET`,
+  `GITHUB_ALLOWED_LOGINS=<freigegebener-login>` und
+  `GITHUB_OAUTH_SCOPES=read:user`
+
+Die OAuth-App benötigt als Callback
+`https://<production-host>/auth/github/callback`. Die Anwendung prüft die
+Allowlist, bindet schreibende API-Anfragen an denselben Origin und setzt in
+Production `Secure`, `HttpOnly` und `SameSite=Lax` Cookies. GitHub-Sitzungen
+werden serverseitig in Netlify Blobs mit AES-256-GCM verschlüsselt. OAuth-State
+wird per stark konsistentem ETag-CAS einmalig konsumiert. Vorschau- und
+Branch-Deployments liefern für API-, OAuth- und Health-Routen `404` und öffnen
+keinen Produktions-Blobs-Store; Produktions-Secrets dürfen deshalb nur dem
+Production-Context zugewiesen werden.
+
+Das Netlify-Free-Credit-Readback ist noch nicht in PromptHub angebunden. Der
+öffentliche Zustand `/healthz` und `/api/metrics` weist die Jobannahme deshalb
+als `unknown` aus; `POST /api/jobs`, Jobfreigaben und Prompt-Übergaben antworten
+mit `503 job_admission_paused`. Es gibt keinen manuellen Environment-Override,
+der diese Sperre öffnen kann. Erst ein frischer, maschinenlesbarer Readback des
+richtigen Free-Teams unter 75 % der 300 Credits kann die Prüfung bestehen.
+
+Nach einer erfolgreichen Konto- und Integrationsprüfung löst jeder erfolgreiche
+Push/Merge auf `main` einen Netlify-Build aus. Ein fehlgeschlagener Test oder
+Check verhindert den Build. Der veröffentlichte Zustand muss anschließend mit
+`GET /healthz`, `GET /api/me`, OAuth-Login und einem durch das Job-Gate
+abgelehnten Auftrag geprüft werden. In diesem Workspace fehlen Netlify-CLI,
+Netlify-Konto-Token und die nötigen Netlify/GitHub-Runtime-Secrets; es wurde
+deshalb weder ein Projekt angelegt noch ein Deployment ausgelöst.
+
 ## Monitoring
 
 Überwacht werden letzter Heartbeat, Lease-Alter, GitHub-Sync, Prozess-Exit-Code,
@@ -227,8 +279,10 @@ Offline- und Updateverhalten, steht noch aus.
 
 ## Ressourcen und Kosten
 
-Keine Produktions-Dependencies und keine automatisch aktivierten kostenpflichtigen
-oder KI-Dienste. Das Budget zusätzlicher laufender Dienste beträgt 0 €. Polling,
+Keine kostenpflichtigen oder KI-Dienste. Die einzige neue serverseitige
+Hosting-Abhängigkeit `@netlify/blobs@10.7.13` ist gepinnt, kostenlos nutzbar und
+wird nicht in den Browser gebündelt. Das Budget zusätzlicher laufender Dienste
+bleibt 0 €. Polling,
 Retry-Anzahl, Payload-Größen und Jobzahl sind konfiguriert und
 begrenzt. Rate-Limit- oder Kostenwarnungen führen zu `paused`, nicht zu einer
 stillen Erhöhung von Limits.

@@ -23,6 +23,8 @@ test("production configuration requires HTTPS and an explicit login allowlist", 
   assert.equal(readConfig(productionEnv()).runner.maxActiveJobs, MAX_ACTIVE_JOBS);
   assert.throws(() => readConfig(productionEnv({ GITHUB_ALLOWED_LOGINS: "" })), /ALLOW/);
   assert.throws(() => readConfig(productionEnv({ PROMPTHUB_PUBLIC_ORIGIN: "http://control.example" })), /HTTPS/);
+  assert.throws(() => readConfig(productionEnv({ PROMPTHUB_PUBLIC_ORIGIN: "https://control.example/base" })), /without a path/);
+  assert.equal(readConfig(productionEnv({ PROMPTHUB_PUBLIC_ORIGIN: "https://control.example/" })).publicOrigin, "https://control.example");
 });
 
 test("Codex JSONL telemetry is enabled in the default runner arguments", () => {
