@@ -897,18 +897,6 @@ el("#attachments").addEventListener("change", async (event) => {
   }
 });
 
-el("#voice-input").addEventListener("click", () => {
-  const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!Speech) return notice("Spracheingabe wird von diesem Browser nicht unterstützt.");
-  const recognition = new Speech();
-  recognition.lang = "de-DE";
-  recognition.interimResults = false;
-  recognition.maxAlternatives = 1;
-  recognition.onresult = (event) => { elements.intent.value = `${elements.intent.value}${elements.intent.value ? " " : ""}${event.results[0][0].transcript}`; };
-  recognition.onerror = () => notice("Spracheingabe konnte nicht abgeschlossen werden.", "error");
-  recognition.start();
-});
-
 el("#library-search").addEventListener("input", renderLibrary);
 el("#library-category").addEventListener("change", renderLibrary);
 el("#refresh").addEventListener("click", async () => {
@@ -947,7 +935,6 @@ async function boot() {
   }
 }
 
-if (!(window.SpeechRecognition || window.webkitSpeechRecognition)) el("#voice-input").disabled = true;
 elements.incidentReportForm.addEventListener("submit", async (event) => {
   event.preventDefault();
   if (!state.selectedProject) return notice("Wähle zuerst ein verbundenes Projekt.", "error");
