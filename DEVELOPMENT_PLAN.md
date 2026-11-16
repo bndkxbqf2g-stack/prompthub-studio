@@ -123,14 +123,13 @@ wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
   `36ba10a4166bb365e6fcc8d06b443a2d77118d35` erfolgreich; Pflichtjob `test`
   bestand und PR #2 wurde mit Merge-Commit
   `c3d479a7676a143ebf4c6ad8448651e162bb9ea3` in `main` integriert.
-- Merge-Gate: Nach der ausdrücklichen Freigabe von `test` und der autorisierten
-  Veröffentlichung des Quell-Repositories wurde `main` mit erforderlichem
-  Check `test`, `strict=true` und Admin-Enforcement geschützt. API-Readback
-  bestätigt die Werte. Eine erneute Prüfung in GitHub Settings am 2026-11-15
-  zeigte: Die Regel verlangt keinen PR; direkte Commits auf `main` sind weiterhin
-  möglich. `allow_auto_merge=true` ist aktiviert. Der Nutzer hat zukünftige
-  automatische Merges autorisiert. Die ausdrückliche Entscheidung, zusätzlich
-  eine PR-Pflicht zu setzen, steht aus. Es wurde kein kostenpflichtiger Plan
+- Merge-Gate: Der authentifizierte Branch-API-Readback vom 2026-11-16 bestätigt
+  für `main` den Pflichtcheck `test` von GitHub Actions (`app_id=15368`),
+  `strict=true`, `enforce_admins=true`, Force-Push und Löschen deaktiviert.
+  Die Regel verlangt keinen PR und keine Review; PR-freie Schreibwege bleiben
+  damit möglich. Auto-Merge ist vom Nutzer autorisiert und wurde für PR #30 bis
+  #33 nach bestandenen Checks ausgeführt. Die zusätzliche PR-Pflicht ist
+  angefragt und noch nicht bestätigt. Es wurde kein kostenpflichtiger Plan
   aktiviert. Remote-Control- und Runner-Integrationschecks bleiben offen.
 - Repository-/Branch-Allowlist und Worktree-Verhalten gegen echte Fixtures prüfen.
 - Projektpfade müssen je Runner explizit zugeordnet sein; kein Fallback auf das
