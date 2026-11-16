@@ -30,13 +30,20 @@
 - Für eine PWA direkt nutzbare, nachweislich kostenlose Codex-LLM-API ist kein
   verfügbarer Zugang nachgewiesen. Prompt-Designer verwendet deshalb bis zu
   einer belegten Integration einen klar markierten strukturierten Fallback.
-- Netlify Free ist nach aktueller offizieller Dokumentation ein möglicher
-  0-€-Serverless-Kandidat mit 300 Credits/Monat, Hard Limit und ohne Auto-
-  Recharge. Der Free-Vertrag untersagt KI-/ML-Training auf Customer Content ohne
-  ausdrückliches Opt-in. Die öffentliche API-Referenz dokumentiert Build-Minuten,
-  aber keinen vollständigen teamweiten Credit-Readback. Das konkrete Konto, der
-  Teamverbrauch und die automatische 75-%-Jobpause sind nicht verifiziert;
-  Cloud-Jobs bleiben bei unbekanntem Verbrauch gesperrt.
+- Netlify Free ist laut aktueller offizieller Dokumentation ein möglicher
+  0-€-Serverless-Kandidat mit 300 Credits je Abrechnungszeitraum, Hard Limit
+  und ohne Auto-Recharge. Bei Erschöpfung pausiert Netlify alle Team-Sites.
+  Der Free-Tarif wurde im Dashboard bestätigt; kontobezogene Salden werden
+  nicht in diesem öffentlichen Repository gespeichert. Es existierte zum
+  Dashboard-Readback noch kein Netlify-Projekt, also kein App-Verbrauchsnachweis.
+  Aktuelle Raten: 15 Credits je Produktions-Deploy, 10 je GB-Stunde Compute,
+  20 je GB Bandbreite und 2 je 10.000 Requests; alle Meter teilen den
+  Guthabenpool. Kein dokumentierter öffentlicher API-Endpunkt liefert den
+  vollständigen Team-Credit-Readback. Cloud-Jobs bleiben bei unbekanntem
+  Verbrauch gesperrt.
+- Ein aufrufbares Netlify-Connector-Tool ist in der aktuellen Codex-Tool-Sitzung
+  nicht verfügbar. Netlify-Projekt, Runtime-Secrets und Deployment sind deshalb
+  nicht eingerichtet; die vorhandene Job-Sperre bleibt aktiv.
 - Vercel Hobby wird für PromptHub-Daten nicht als Kandidat geführt: die aktuellen
   Terms beschränken Hobby auf persönliche, nicht-kommerzielle Nutzung und
   erlauben Training/Weitergabe von Hobby-Customer-Content für KI-/ML-Modelle.
@@ -157,6 +164,12 @@
   (abgerufen am 2026-11-16; § 6.2).
 - [Netlify API-Referenz mit Build-Status-Endpunkt](https://open-api.netlify.com/)
   (abgerufen am 2026-11-16; kein vollständiger teamweiter Credit-Endpunkt in der öffentlichen Referenz gefunden).
+- [Netlify Credit-Verbrauch und Hard Limit](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/how-credits-work/)
+  (abgerufen am 2026-11-16; Produktions-Deploy, Compute, Bandbreite, Requests und Pause bei erschöpftem Guthaben).
+- [Netlify Functions: Usage and Billing](https://docs.netlify.com/build/functions/usage-and-billing/)
+  (abgerufen am 2026-11-16; Default-RAM und GB-Stunden-Abrechnung).
+- [Netlify Credit-Raten aktualisiert im April 2026](https://www.netlify.com/changelog/2026-04-14-pricing-updates-april-2026/)
+  (abgerufen am 2026-11-16).
 - [Vercel Terms of Service: Hobby und Customer Content/AI-Training](https://vercel.com/legal/terms)
   (abgerufen am 2026-11-16; Terms zuletzt geändert am 2026-10-19).
 - [Vercel Hobby Plan, Limits und Überschreitungsverhalten](https://vercel.com/docs/plans/hobby)
@@ -166,4 +179,3 @@
 - [Vercel Blob Hobby-Kontingente](https://vercel.com/docs/vercel-blob/usage-and-pricing)
   und [private Blob-Speicherung](https://vercel.com/docs/vercel-blob/private-storage)
   (abgerufen am 2026-11-16).
-

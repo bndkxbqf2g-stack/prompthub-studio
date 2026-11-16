@@ -1375,3 +1375,26 @@
   aktuellen Status auf Commit `4d4904a`. Netlify-Anmeldung und Einrichtung
   bleiben wie vom Nutzer gewünscht bis zur Rückkehr an den Desktop offen.
 - Es wurde kein kostenpflichtiger Dienst aktiviert; Cloudflare bleibt pausiert.
+
+## CP-060 – Netlify-Free-Kontingent und Deploymentstatus revalidiert
+
+- Datum: 2026-11-16. PR #47 wurde mit Head
+  `291112319032882734aa909806841f36978c0bac` nach bestandenem Actions-Run
+  `43906291678` (test, macos-latest, macos-15-intel) als
+  `d3b1abf2c1fc7a696e8ef90999705cfa2b50b159` gemergt.
+- Das Netlify-Dashboard bestätigte den Free-Tarif. Der kontobezogene
+  Credit-Saldo wird nicht in diesem öffentlichen Repository gespeichert.
+  Zum Zeitpunkt der Prüfung existierte kein Netlify-Projekt, also kein
+  App-Verbrauchsnachweis.
+- Öffentliche Netlify-Raten: 15 Credits je Produktions-Deployment,
+  10 je GB-Stunde Compute, 20 je GB Bandbreite und 2 je 10.000 Requests.
+  Free hat ein Hard Limit; bei Erschöpfung pausieren alle Team-Sites. Das
+  75-%-Job-Gate bleibt geschlossen, solange kein frischer maschinenlesbarer
+  Teamverbrauch angebunden ist.
+- Ein OAuth-Callback zeigte zunächst `Invalid state key`; ein späterer
+  Callback zeigte `Authorized`. Repository-Import, Netlify-Projekt und
+  Deployment sind nicht nachgewiesen. In der aktuellen Codex-Sitzung ist kein
+  aufrufbares Netlify-Connector-Tool verfügbar. Keine Runtime-Secrets oder
+  kostenpflichtigen Ressourcen wurden eingerichtet.
+- Technische Erstabnahme bleibt offen. Keine Kriterien oder Kostenregeln wurden
+  abgeschwächt.
