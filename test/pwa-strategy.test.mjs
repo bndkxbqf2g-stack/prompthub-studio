@@ -77,7 +77,7 @@ test("PWA submits evidence references only and precaches the strategy module", a
   assert.match(app, /ADOPT STRATEGY \$\{strategy\.id\}/);
   assert.match(app, /body: JSON\.stringify\(\{ confirmation: expected \}\)/);
   assert.doesNotMatch(app, /authenticatedGithub:\s*true|approvedBy\s*:/);
-  assert.match(worker, /prompthub-static-v7/);
+  assert.match(worker, /prompthub-static-v8/);
   assert.match(worker, /"strategy-presentation\.mjs"/);
   assert.match(worker, /"quota-presentation\.mjs"/);
 });

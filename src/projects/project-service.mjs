@@ -8,6 +8,7 @@ const BLOCKING_STATUSES = new Set(["running", "stale"]);
 const PAUSABLE_STATUSES = new Set(["queued", "awaiting_approval"]);
 const MAX_VERIFIED_OUTCOMES = 200;
 const MAX_STRATEGY_EVIDENCE_PAGES = 5;
+const MAX_PROMPT_HANDOFFS_PER_PROJECT = 2;
 const NONCRITICAL_STRATEGY_PATHS = [
   /^src\/pwa\/styles\.css$/i,
   /^src\/pwa\/assets\/[A-Za-z0-9._/-]+$/i,
@@ -171,36 +172,121 @@ export class ProjectService {
     if (!metadata?.full_name || metadata.permissions?.pull === false) throw new Error("repository must be readable by the configured GitHub identity");
     const repository = safeRepoSummary(metadata);
     repository.analysis = await this.analyze(repository);
-    const existing = await this.store.get(repository.id);
-    const project = {
-      ...(existing ?? {}),
-      ...repository,
-      status: "connected",
-      connected_at: existing?.connected_at ?? this.now().toISOString(),
-      reconnected_at: existing?.status === "removed" ? this.now().toISOString() : (existing?.reconnected_at ?? null),
-      removed_at: null,
-      last_actor: actor,
-    };
-    await this.store.save(project);
-    return project;
+    return this.updateProject(repository.id, (existing) => {
+      const now = this.now().toISOString();
+      return {
+        ...(existing ?? {}),
+        ...repository,
+        status: "connected",
+        connected_at: existing?.connected_at ?? now,
+        reconnected_at: existing?.status === "removed" ? now : (existing?.reconnected_at ?? null),
+        removed_at: null,
+        last_actor: actor,
+      };
+    });
   }
 
   async remove(input, { confirmation, actor = "user" } = {}) {
     const id = normalizeRepository(input);
     if (confirmation !== `REMOVE ${id}`) throw Object.assign(new Error(`type REMOVE ${id} to confirm`), { statusCode: 400 });
-    const project = await this.store.get(id);
-    if (!project || project.status !== "connected") throw new Error("project is not connected");
+    let handoffBlockers = [];
+    await this.updateProject(id, (project) => {
+      handoffBlockers = [];
+      if (!project || project.status !== "connected") throw Object.assign(new Error("project is not connected"), { statusCode: 409 });
+      if (project.prompt_handoff_claims !== undefined && !Array.isArray(project.prompt_handoff_claims)) {
+        throw Object.assign(new Error("project_handoff_state_is_invalid"), { statusCode: 409 });
+      }
+      handoffBlockers = (project.prompt_handoff_claims ?? []).map((claim) => ({
+        job_id: claim.job_id,
+        status: claim.status === "pending" ? "handoff_pending" : claim.status === "unknown" ? "handoff_unknown" : "handoff_state_invalid",
+      }));
+      if (handoffBlockers.length) return project;
+      return { ...project, status: "removing", removal_started_at: this.now().toISOString(), last_actor: actor };
+    });
+    if (handoffBlockers.length) return { removed: false, blocked_by: handoffBlockers };
+
+    const projectData = await this.store.getProjectData(id);
     const jobs = (await this.controlPlane.listJobs()).filter((job) => job.project.toLowerCase() === id);
+    const jobIds = new Set(jobs.map((job) => job.id));
+    const unresolvedHandoffs = (projectData.drafts ?? []).filter((draft) =>
+      ["handoff_pending", "handoff_unknown", "submitted"].includes(draft.stage) && draft.job_id && !jobIds.has(draft.job_id));
+    if (unresolvedHandoffs.length) {
+      await this.updateProject(id, (current) => current?.status === "removing"
+        ? { ...current, status: "connected", removal_started_at: null, last_actor: actor }
+        : current);
+      return {
+        removed: false,
+        blocked_by: unresolvedHandoffs.map((draft) => ({
+          job_id: draft.job_id,
+          status: draft.stage === "submitted" ? "handoff_submitted" : draft.stage,
+        })),
+      };
+    }
+
     const blocking = jobs.filter((job) => BLOCKING_STATUSES.has(job.status));
     for (const job of jobs.filter((item) => PAUSABLE_STATUSES.has(item.status))) {
       await this.controlPlane.pauseJob(job.id, actor, "Project unlink requested");
     }
     if (blocking.length) {
+      await this.updateProject(id, (current) => current?.status === "removing"
+        ? { ...current, status: "connected", removal_started_at: null, last_actor: actor }
+        : current);
       return { removed: false, blocked_by: blocking.map(({ id: jobId, status }) => ({ job_id: jobId, status })) };
     }
-    const next = { ...project, status: "removed", removed_at: this.now().toISOString(), last_actor: actor };
-    await this.store.save(next);
+    const next = await this.updateProject(id, (current) => {
+      if (!current || current.status !== "removing" || (current.prompt_handoff_claims ?? []).length) {
+        throw Object.assign(new Error("project_removal_state_changed"), { statusCode: 409 });
+      }
+      return { ...current, status: "removed", removed_at: this.now().toISOString(), removal_started_at: null, last_actor: actor };
+    });
     return { removed: true, project: next, paused_jobs: jobs.filter((job) => PAUSABLE_STATUSES.has(job.status)).map((job) => job.id) };
+  }
+
+  async claimPromptHandoff(input, { draftId, jobId, actor, leaseExpiresAt } = {}) {
+    const id = normalizeRepository(input);
+    if (typeof draftId !== "string" || !/^draft_[0-9a-f-]{36}$/i.test(draftId) || jobId !== `job_${draftId}`
+      || typeof actor !== "string" || actor.trim().length === 0 || actor.length > 100
+      || !Number.isFinite(Date.parse(leaseExpiresAt ?? ""))) {
+      throw Object.assign(new Error("prompt_handoff_claim_is_invalid"), { statusCode: 400 });
+    }
+    const claimedAt = this.now().toISOString();
+    let created = false;
+    const project = await this.updateProject(id, (current) => {
+      created = false;
+      if (!current || current.status !== "connected") throw Object.assign(new Error("project_not_connected_for_prompt_handoff"), { statusCode: 409 });
+      const claims = Array.isArray(current.prompt_handoff_claims) ? current.prompt_handoff_claims : [];
+      if (current.prompt_handoff_claims !== undefined && !Array.isArray(current.prompt_handoff_claims)) throw Object.assign(new Error("project_handoff_state_is_invalid"), { statusCode: 409 });
+      const existing = claims.find((claim) => claim.job_id === jobId);
+      if (existing) {
+        if (existing.draft_id !== draftId || existing.actor !== actor) throw Object.assign(new Error("prompt_handoff_claim_conflict"), { statusCode: 409 });
+        return current;
+      }
+      if (claims.length >= MAX_PROMPT_HANDOFFS_PER_PROJECT) throw Object.assign(new Error("project_prompt_handoff_capacity_reached"), { statusCode: 409 });
+      created = true;
+      return {
+        ...current,
+        prompt_handoff_claims: [...claims, { draft_id: draftId, job_id: jobId, actor, status: "pending", claimed_at: claimedAt, lease_expires_at: new Date(Date.parse(leaseExpiresAt)).toISOString() }],
+      };
+    });
+    return { project, created };
+  }
+
+  async completePromptHandoff(input, jobId, { unknown = false } = {}) {
+    const id = normalizeRepository(input);
+    return this.updateProject(id, (project) => {
+      if (!project) throw Object.assign(new Error("project_not_found"), { statusCode: 404 });
+      const claims = Array.isArray(project.prompt_handoff_claims) ? project.prompt_handoff_claims : [];
+      if (project.prompt_handoff_claims !== undefined && !Array.isArray(project.prompt_handoff_claims)) throw Object.assign(new Error("project_handoff_state_is_invalid"), { statusCode: 409 });
+      const matching = claims.find((claim) => claim.job_id === jobId);
+      if (!matching) return project;
+      if (unknown) {
+        return {
+          ...project,
+          prompt_handoff_claims: claims.map((claim) => claim.job_id === jobId ? { ...claim, status: "unknown", lease_expires_at: null, updated_at: this.now().toISOString() } : claim),
+        };
+      }
+      return { ...project, prompt_handoff_claims: claims.filter((claim) => claim.job_id !== jobId) };
+    });
   }
 
   async deleteProjectData(input, { confirmation, actor = "user" } = {}) {
@@ -211,9 +297,17 @@ export class ProjectService {
     const active = (await this.controlPlane.listJobs()).filter((job) => job.project.toLowerCase() === id && BLOCKING_STATUSES.has(job.status));
     if (active.length) throw Object.assign(new Error("running or unclear jobs block project data deletion"), { statusCode: 409 });
     await this.store.deleteProjectData(id);
-    const updated = { ...project, saved_data_deleted_at: this.now().toISOString(), last_actor: actor };
-    await this.store.save(updated);
+    const updated = await this.updateProject(project.id, (current) => {
+      if (!current || current.status !== "removed") throw Object.assign(new Error("project_state_changed_during_data_deletion"), { statusCode: 409 });
+      return { ...current, saved_data_deleted_at: this.now().toISOString(), last_actor: actor };
+    });
     return { deleted: true, project: updated, historical_versions_may_remain: true };
+  }
+
+  async updateProject(id, updater) {
+    const projectId = normalizeRepository(id);
+    if (typeof this.store.updateProject !== "function") throw new Error("project store does not support atomic project updates");
+    return this.store.updateProject(projectId, updater);
   }
 
   async getProjectData(id) {

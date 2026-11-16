@@ -203,22 +203,31 @@ Das separate private GitHub-Control-Repository ist angelegt. Auf seinem
 `{"version":1,"leases":[]}`. Es ist noch nicht mit der Anwendung verbunden:
 GitHub-OAuth-App, Runtime-Token/-Secrets und serverloser API-Host fehlen.
 
-## Netlify-Free-Deployment (vorbereitet, nicht live verbunden)
+## Netlify-Free-Deployment (GitHub verbunden, PWA deployed)
 
 `netlify.toml` konfiguriert `main` als Produktionsquelle, `src/pwa` als
 statisches Veröffentlichungsverzeichnis und `netlify/functions` als
 Functions-Verzeichnis. Jeder Netlify-Build führt zuerst `npm test` und
 `npm run check` aus. Die PWA und die API nutzen danach dieselbe HTTPS-Origin.
 
-Das Netlify-Dashboard bestätigte den Free-Tarif. Der kontobezogene
-Credit-Stand wird nicht in diesem öffentlichen Repository gespeichert. Zum
-Zeitpunkt der Prüfung existierte noch kein Netlify-Projekt, deshalb ist kein
-PromptHub-App-Verbrauch bekannt. Netlify Free hat ein Hard Limit und pausiert
-bei Erschöpfung alle Team-Sites; das ersetzt PromptHubs eigenes Job-Gate nicht.
-Aktuelle öffentliche Raten: 15 Credits je Produktions-Deployment, 10 je
-GB-Stunde Compute, 20 je GB Bandbreite und 2 je 10.000 Requests. Alle Meter
-teilen denselben Pool. Keine Zusatzcredits, kostenpflichtige Domain,
-Tarifänderung oder kostenpflichtige Funktion aktivieren.
+Am 2026-11-16 bestätigte der Netlify-Connector das Free-Team `Booolio`
+(`bndkxbqf2g-stack`) und das Projekt `prompthub-studio`
+(`834e2ac8-5324-4b2c-bcb0-9c65a228e43b`). Das Repository
+`bndkxbqf2g-stack/prompthub-studio` ist mit Produktionsbranch `main` verbunden.
+Deploy `6afb55fca23ea397af718ef7` für Commit `3eca5bb33ecfaa8664eb34a5e84da4de6e31a47b`
+steht auf `ready`. `https://prompthub-studio.netlify.app/` liefert die PWA.
+Das Projekt verlangt weiterhin Team-SSO für alle Deploys; ein öffentlicher
+Zugriff wurde nicht freigeschaltet.
+
+Die Live-Route `/healthz` antwortet mit `production_api_disabled`; die
+Netlify-Function ist vorhanden, aber es gibt noch keine Production-Umgebungs-
+variablen. GitHub-OAuth, Control-Repository-Anbindung und Live-Control-API sind
+damit nicht betriebsbereit. Der tatsächliche Credit-Kontostand wurde nicht
+unabhängig ausgelesen. Die offizielle Free-Planbeschreibung nennt 300 Credits
+pro Monat mit hartem Limit ohne gebührenpflichtige Überschreitung; bei
+Erschöpfung pausieren Sites. Ein Produktions-Deploy kostet 15 Credits. Das
+Netlify-Limit ersetzt PromptHubs eigenes Job-Gate nicht. Keine Zusatzcredits,
+kostenpflichtige Domain, Tarifänderung oder kostenpflichtige Funktion aktivieren.
 
 Netlify Production-Context erhält die folgenden Variablen ausschließlich über
 die verschlüsselte Environment-Variable-Verwaltung des Anbieters:
@@ -243,7 +252,9 @@ Branch-Deployments liefern für API-, OAuth- und Health-Routen `404` und öffnen
 keinen Produktions-Blobs-Store; Produktions-Secrets dürfen deshalb nur dem
 Production-Context zugewiesen werden.
 
-Das Netlify-Free-Credit-Readback ist nicht in PromptHub angebunden.
+Das Netlify-Free-Credit-Readback ist nicht in PromptHub angebunden. Der
+Netlify-Connector in der Codex-Sitzung ist kein Connector der veröffentlichten
+PWA und überträgt weder Sitzung noch Berechtigungen an die Function.
 Der öffentliche Zustand `/healthz` und `/api/metrics` weist die Jobannahme
 deshalb als `unknown` aus; `POST /api/jobs`, Jobfreigaben und Prompt-Übergaben
 antworten mit `503 job_admission_paused`. Es gibt keinen manuellen
@@ -252,14 +263,28 @@ Netlify-API-Referenz dokumentiert keinen vollständigen teamweiten
 Credit-Readback. Erst ein frischer, maschinenlesbarer Readback des richtigen
 Free-Teams unter 75 % des 300-Credit-Monatslimits kann die Prüfung bestehen.
 
-Nach einer erfolgreichen Konto- und Integrationsprüfung löst jeder erfolgreiche
-Push/Merge auf `main` einen Netlify-Build aus. Ein fehlgeschlagener Test oder
-Check verhindert den Build. Der veröffentlichte Zustand muss anschließend mit
-`GET /healthz`, `GET /api/me`, OAuth-Login und einem durch das Job-Gate
-abgelehnten Auftrag geprüft werden. In diesem Workspace fehlen Netlify-CLI, Netlify-Konto-Token und die nötigen Netlify/GitHub-Runtime-Secrets; es wurde
-deshalb weder ein Projekt angelegt noch ein Deployment ausgelöst. Ein
-aufrufbares Netlify-Connector-Tool steht in der aktuellen Codex-Sitzung nicht
-zur Verfügung; Projektimport und Deployment bleiben offen.
+Der Netlify-Connector bietet in dieser Sitzung Lese-/Projektverwaltungs-,
+Umgebungsvariablen- und Deployment-Leseaktionen, aber keine GitHub-Link- oder
+Deploy-Erstellungsaktion. Die Repository-Verknüpfung wurde deshalb über die
+angemeldete Netlify-Weboberfläche abgeschlossen. `gh`, Wrangler und Netlify CLI
+sind nicht vorhanden. Es wurden keine Runtime-Umgebungsvariablen geschrieben;
+GitHub-OAuth, Live-Control-API und Quoten-Readback sind folglich nicht aktiv.
+Netlify zeigt als Quelle `main`; automatische Deployments bei künftigen
+Commits sind konfiguriert, aber noch nicht durch einen Folge-Commit live
+nachgeprüft.
+
+Vor dem Öffnen der Control API sind Production-Secrets, OAuth-Callback und eine
+geprüfte 0-€-Quota-Anbindung erforderlich. Der Zugriffsschutz des Projekts ist
+Team-SSO für alle Deploys und wurde nicht geändert. Keine kostenpflichtigen
+Ressourcen aktivieren. Der Free-Tarif hat ein hartes Limit und pausiert bei
+Erschöpfung; der tatsächliche Kontostand muss im Netlify-Dashboard geprüft
+werden. Quellen: [Netlify Free Pricing](https://www.netlify.com/pricing/) und
+[Credit-basierte Pläne](https://docs.netlify.com/manage/accounts-and-billing/billing/billing-for-credit-based-plans/credit-based-pricing-plans/).
+
+Die unabhängige Funktions-/Fähigkeitsaufnahme steht in
+[`REMOTE_OPERATIONS.md`](REMOTE_OPERATIONS.md). Remote-Freigaben, Statuswerte,
+Kosten-Gates und aktuell nicht konfigurierte Ausführungsadapter sind dort
+dokumentiert.
 
 ## Monitoring
 

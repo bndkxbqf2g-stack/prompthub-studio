@@ -9,6 +9,7 @@ import { PromptDesigner } from "./designer/prompt-designer.mjs";
 import { loadPromptLibrary } from "./research/load-prompt-library.mjs";
 import { LocalAuth, GitHubOAuth } from "./auth/github-oauth.mjs";
 import { createRequestHandler } from "./api/handler.mjs";
+import { ApprovalManager } from "./automation/approval-manager.mjs";
 
 export async function createApplication({
   env = process.env,
@@ -35,6 +36,7 @@ export async function createApplication({
   const errorLearning = projectService ? new ErrorLearningEngine({ projectService }) : null;
   const strategyLearning = projectService ? new StrategyLearningEngine({ projectService }) : null;
   const promptDesigner = projectService ? new PromptDesigner({ projectService, controlPlane, promptLibrary, errorLearning }) : null;
+  const approvalManager = projectService ? new ApprovalManager({ projectService }) : null;
   const auth = config.authMode === "github"
     ? new GitHubOAuth({
         clientId: config.github.clientId,
@@ -58,10 +60,11 @@ export async function createApplication({
     promptLibrary,
     errorLearning,
     strategyLearning,
+    approvalManager,
     logger,
     enforceSameOrigin,
     jobAdmissionGate,
   });
 
-  return { config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, strategyLearning, handler };
+  return { config, controlPlane, auth, projectService, promptDesigner, promptLibrary, errorLearning, strategyLearning, approvalManager, handler };
 }

@@ -102,6 +102,27 @@ textarea:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .strategy-form textarea { min-height: 84px; }
 .strategy-evidence-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 0 12px; }
 .strategy-list { display: grid; gap: 10px; margin-top: 14px; }
+.automation-status-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-bottom: 12px; }
+.approval-form { margin: 16px 0 22px; padding: 16px; border: 1px solid rgba(43, 59, 91, .7); border-radius: 15px; background: rgba(5, 11, 22, .24); }
+.approval-form h3, .approval-list-heading h3 { margin: 0; font-size: .97rem; }
+.approval-form textarea { min-height: 70px; }
+.approval-list-heading { align-items: center; margin: 22px 0 12px; }
+.approval-list-heading .button { min-height: 40px; padding: 0 12px; font-size: .76rem; }
+.approval-list { display: grid; gap: 10px; }
+.approval-card { min-width: 0; padding: 15px; border: 1px solid rgba(43, 59, 91, .72); border-radius: 15px; background: rgba(5, 11, 22, .28); }
+.approval-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 9px; }
+.approval-card h4 { margin: 0; font-size: .9rem; line-height: 1.4; overflow-wrap: anywhere; }
+.approval-card p { margin: 8px 0; font-size: .8rem; overflow-wrap: anywhere; }
+.approval-meta { color: var(--accent); }
+.approval-description { color: var(--text); white-space: pre-wrap; }
+.approval-cost.safe { color: var(--success); }
+.approval-cost.blocked { color: var(--warning); }
+.approval-actions { flex-wrap: wrap; }
+.approval-actions .button { min-height: 40px; padding: 0 11px; font-size: .75rem; }
+.approval-card details { margin-top: 12px; padding-top: 10px; border-top: 1px solid rgba(43, 59, 91, .65); color: var(--muted); font-size: .77rem; }
+.approval-card summary { cursor: pointer; }
+.approval-card ul { padding-left: 18px; }
+.approval-card li { margin: 6px 0; overflow-wrap: anywhere; }
 .strategy-card { min-width: 0; padding: 14px; border: 1px solid rgba(43, 59, 91, .65); border-radius: 13px; background: rgba(17, 27, 46, .65); }
 .strategy-card header { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; }
 .strategy-card h4 { margin: 0; font-size: .9rem; overflow-wrap: anywhere; }
@@ -148,3 +169,4 @@ textarea:focus, input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px
 .list-heading { margin-top: 34px; }
 @media (max-width: 430px) { .shell { width: min(100% - 24px, 720px); padding-top: 20px; } .card { padding: 18px; } .form-grid { grid-template-columns: 1fr; gap: 0; } }
 @media (max-width: 480px) { .metrics-grid { grid-template-columns: 1fr; } .inline-form { grid-template-columns: 1fr; } .inline-form label { grid-column: 1; } .strategy-evidence-fields { grid-template-columns: 1fr; } .interview-answer { grid-template-columns: 1fr; } .interview-answer .button { grid-column: 1; } .toolbar-row .button, .file-button { flex: 0 0 auto; } }
+@media (max-width: 480px) { .automation-status-grid { grid-template-columns: 1fr; } .approval-list-heading { align-items: flex-start; flex-direction: column; } .approval-actions .button { flex: 1 1 42%; } }
