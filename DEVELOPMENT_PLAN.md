@@ -38,8 +38,9 @@ Audit-/Betriebsabgleich:
   Cloudflare Pages/Functions + D1 ist der priorisierte Zielpfad. Der Feature-
   Branch ersetzt den unsicheren KV-Adapter durch D1 mit verschlüsselten
   Sitzungstokens und atomarem Single-use-OAuth-State. 216 lokale Tests,
-  statische Prüfung und unabhängiger Read-only-Review sind bestanden. D1-
-  Ressource/Binding, Secrets, Live-D1- und Quota-Readback fehlen. Kein Deploy
+  statische Prüfung, unabhängiger Read-only-Review und GitHub Actions Run
+  `44010358173` mit `test`, `macos-latest` und `macos-15-intel` sind bestanden.
+  D1-Ressource/Binding, Secrets, Live-D1- und Quota-Readback fehlen. Kein Deploy
   oder Providerwechsel erfolgte.
 - **Runner/E2E:** Der lokale Fixture-Smoke belegt keine dauerhafte Mac-Ausführung,
   GitHub-gebundene Runner-Recovery oder iPhone→GitHub→Runner→PWA-Kette.

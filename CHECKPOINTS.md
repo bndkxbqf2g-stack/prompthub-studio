@@ -1483,3 +1483,29 @@
   `npm run check` erfolgreich (114 Dateien und Prompt-Library-Abgleich);
   `git diff --check` erfolgreich. Diese Dokumentationsänderung aktiviert keine
   Produktivfunktion; die technische Erstabnahme bleibt offen.
+
+## CP-064 – D1-Authspeicher abgesichert und unabhängig geprüft
+
+- Datum: 2026-11-17. Commit `97000bf9f047d0df49a35cdf4d5d88e48854d511` auf
+  `codex/control-plane-integrity` ersetzt den historischen unsicheren
+  Cloudflare-KV-Authadapter durch D1 `AUTH_DB`. GitHub-Sessiontokens werden
+  mit AES-256-GCM verschlüsselt; HKDF leitet zweckgetrennte Schlüssel ab.
+  OAuth-States werden gehasht und verschlüsselt. Der State wird erst nach
+  erfolgreicher Entschlüsselung/Validierung per bedingtem
+  `DELETE … RETURNING` mit Hash, exaktem Ciphertext, Ablaufzeit und frischem
+  Zeitstempel atomar einmalig verbraucht. Eingaben sind begrenzt; fehlt D1,
+  gibt es keinen KV-Fallback und der Worker bleibt geschlossen.
+- Unabhängiger Read-only-Review fand nach Behebung der Hinweise zu
+  Validierungsreihenfolge und Ablaufzeit keine offenen Sicherheitsbefunde.
+- Lokale Pflichtprüfungen: `npm test` 216/216; `npm run check` erfolgreich
+  (116 Dateien und Prompt-Library-Abgleich); `git diff --check` erfolgreich.
+  Migration und `INSERT/DELETE … RETURNING` wurden zusätzlich mit Node-SQLite
+  geprüft. Dieser lokale SQL-Smoke ist ausdrücklich kein Cloudflare-D1-
+  Integrationsnachweis.
+- GitHub Actions Run `44010358173` für denselben Commit bestand `test`,
+  `macos-latest` und `macos-15-intel`; die gepushte Patch-Whitespace-Prüfung
+  war erfolgreich.
+- Keine D1-Datenbank, Cloudflare-Bindung, Secrets, Migration oder Deployment
+  wurden angelegt/ausgeführt. Cloudflare-Konto-/Projektzustand und Quoten wurden
+  nicht live erneut geprüft. Es gibt keinen PR oder Merge; Produktions-Control-
+  API und Jobannahme bleiben geschlossen.
