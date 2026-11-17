@@ -14,6 +14,21 @@ function jobInput(prompt) {
   return validateJobInput({ prompt, project: "demo" }, { allowedProjects: ["demo"] });
 }
 
+test("runner instances receive distinct lease identities for the same configured host", () => {
+  const dependencies = {
+    controlPlane: {},
+    executor: {},
+    worktrees: {},
+    config: config(),
+    runnerId: "mac-runner",
+  };
+  const first = new PromptHubRunner({ ...dependencies, runnerInstanceId: "process-one" });
+  const second = new PromptHubRunner({ ...dependencies, runnerInstanceId: "process-two" });
+
+  assert.equal(first.runnerId, "mac-runner:process-one");
+  assert.notEqual(first.runnerId, second.runnerId);
+});
+
 test("runner writes checkpoints and only succeeds after required checks", async () => {
   const control = new MemoryControlPlane({ maxActiveJobs: 2 });
   const created = await control.createJob(jobInput("run the task"));

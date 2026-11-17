@@ -91,6 +91,50 @@ test("GitHub client addresses PR, review, file, workflow and job evidence endpoi
   ]);
 });
 
+test("GitHub tree directory fallback enumerates one path completely and rejects truncated responses", async () => {
+  const calls = [];
+  let truncateJobs = false;
+  let omitJobsTruncation = false;
+  const fetchImpl = async (url) => {
+    const parsed = new URL(url);
+    calls.push(parsed.pathname);
+    const responses = {
+      "/repos/owner/control/commits/main": { sha: "commit-sha" },
+      "/repos/owner/control/git/commits/commit-sha": { tree: { sha: "root-tree" } },
+      "/repos/owner/control/git/trees/root-tree": { truncated: false, tree: [{ path: ".prompthub", type: "tree", sha: "control-tree" }] },
+      "/repos/owner/control/git/trees/control-tree": { truncated: false, tree: [{ path: "jobs", type: "tree", sha: "jobs-tree" }] },
+      "/repos/owner/control/git/trees/jobs-tree": truncateJobs
+        ? { truncated: true, tree: [] }
+        : omitJobsTruncation
+          ? { tree: [{ path: "job_abc.json", type: "blob", sha: "job-blob" }] }
+          : { truncated: false, tree: [{ path: "job_abc.json", type: "blob", sha: "job-blob" }] },
+    };
+    return new Response(JSON.stringify(responses[parsed.pathname] ?? {}), { status: 200 });
+  };
+  const client = new GitHubClient({ token: "fixture-token", fetchImpl });
+
+  assert.deepEqual(await client.listTreeDirectory("owner/control", ".prompthub/jobs", "main"), {
+    ref: "commit-sha",
+    entries: [{ type: "file", name: "job_abc.json", path: ".prompthub/jobs/job_abc.json" }],
+  });
+  assert.deepEqual(calls.slice(0, 5), [
+    "/repos/owner/control/commits/main",
+    "/repos/owner/control/git/commits/commit-sha",
+    "/repos/owner/control/git/trees/root-tree",
+    "/repos/owner/control/git/trees/control-tree",
+    "/repos/owner/control/git/trees/jobs-tree",
+  ]);
+
+  calls.length = 0;
+  truncateJobs = true;
+  await assert.rejects(() => client.listTreeDirectory("owner/control", ".prompthub/jobs", "main"), /tree listing is incomplete/);
+
+  calls.length = 0;
+  truncateJobs = false;
+  omitJobsTruncation = true;
+  await assert.rejects(() => client.listTreeDirectory("owner/control", ".prompthub/jobs", "main"), /tree listing is incomplete/);
+});
+
 test("merged same-head PR and passing test CI evidence are verified and protected paths are classified", async () => {
   const reviewer = approvalReview();
   const { projectService } = await createEngine({ paths: ["src/security/headers.mjs"], reviews: [reviewer] });

@@ -100,6 +100,39 @@ export class GitHubClient {
     return this.request(`/repos/${repository}/contents/${encodePath(path)}${ref}`);
   }
 
+  async listTreeDirectory(repository, path, branch) {
+    if (typeof path !== "string" || path.length === 0 || path.split("/").some((part) => !part || part === "." || part === "..")
+      || typeof branch !== "string" || branch.length === 0) {
+      throw new Error("GitHub tree directory request is invalid");
+    }
+    const commit = await this.request(`/repos/${repository}/commits/${encodeURIComponent(branch)}`);
+    if (typeof commit?.sha !== "string" || commit.sha.length === 0) throw new Error("GitHub branch commit is unavailable");
+    const gitCommit = await this.request(`/repos/${repository}/git/commits/${encodeURIComponent(commit.sha)}`);
+    let treeSha = gitCommit?.tree?.sha;
+    if (typeof treeSha !== "string" || treeSha.length === 0) throw new Error("GitHub commit tree is unavailable");
+
+    for (const segment of path.split("/")) {
+      const tree = await this.request(`/repos/${repository}/git/trees/${encodeURIComponent(treeSha)}`);
+      if (tree?.truncated !== false) throw new Error("GitHub tree listing is incomplete; refusing to operate");
+      if (!Array.isArray(tree?.tree)) throw new Error("GitHub tree listing is invalid; refusing to operate");
+      const entry = tree.tree.find((item) => item.path === segment && item.type === "tree");
+      if (!entry) return { ref: commit.sha, entries: [] };
+      if (typeof entry.sha !== "string" || entry.sha.length === 0) throw new Error("GitHub tree entry is invalid; refusing to operate");
+      treeSha = entry.sha;
+    }
+
+    const directory = await this.request(`/repos/${repository}/git/trees/${encodeURIComponent(treeSha)}`);
+    if (directory?.truncated !== false) throw new Error("GitHub tree listing is incomplete; refusing to operate");
+    if (!Array.isArray(directory?.tree)) throw new Error("GitHub tree listing is invalid; refusing to operate");
+    const entries = directory.tree.map((entry) => {
+      if (!entry || typeof entry.path !== "string" || !["blob", "tree", "commit"].includes(entry.type)) {
+        throw new Error("GitHub tree entry is invalid; refusing to operate");
+      }
+      return { type: entry.type === "blob" ? "file" : entry.type, name: entry.path, path: `${path}/${entry.path}` };
+    });
+    return { ref: commit.sha, entries };
+  }
+
   listWorkflowRuns(repository, perPage = 5) {
     return this.request(`/repos/${repository}/actions/runs?per_page=${perPage}`);
   }

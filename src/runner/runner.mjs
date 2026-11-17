@@ -1,6 +1,7 @@
 import { runRequiredChecks } from "./checks.mjs";
 import { normalizeTokenUsage } from "../metrics/token-usage.mjs";
 import { classifyFailurePatterns, FAILURE_PATTERN_NAMES } from "../knowledge/failure-classifier.mjs";
+import { randomUUID } from "node:crypto";
 
 function wait(ms, signal) {
   return new Promise((resolve) => {
@@ -10,7 +11,7 @@ function wait(ms, signal) {
 }
 
 export class PromptHubRunner {
-  constructor({ controlPlane, executor, worktrees, checkRunner = runRequiredChecks, outcomeRecorder = null, config, runnerId = config?.runner?.id ?? "runner", clock = () => new Date(), logger = console } = {}) {
+  constructor({ controlPlane, executor, worktrees, checkRunner = runRequiredChecks, outcomeRecorder = null, config, runnerId = config?.runner?.id ?? "runner", runnerInstanceId = randomUUID(), clock = () => new Date(), logger = console } = {}) {
     if (!controlPlane || !executor || !worktrees || !config) throw new Error("controlPlane, executor, worktrees and config are required");
     this.controlPlane = controlPlane;
     this.executor = executor;
@@ -18,7 +19,7 @@ export class PromptHubRunner {
     this.checkRunner = checkRunner;
     this.outcomeRecorder = outcomeRecorder;
     this.config = config;
-    this.runnerId = runnerId;
+    this.runnerId = `${runnerId}:${runnerInstanceId}`;
     this.clock = clock;
     this.logger = logger;
     this.stopController = new AbortController();
@@ -59,6 +60,7 @@ export class PromptHubRunner {
 
   async processClaimed(job) {
     const startedAt = this.clock().getTime();
+    const leaseGeneration = job.lease_generation ?? null;
     const controller = new AbortController();
     this.current = { jobId: job.id, controller };
     let heartbeatTimer;
@@ -69,7 +71,7 @@ export class PromptHubRunner {
     const markFailed = async (summary, phase = "runner", failureInfo = null) => {
       if (terminal) return;
       try {
-        await this.controlPlane.checkpoint(job.id, this.runnerId, { phase, summary });
+        await this.controlPlane.checkpoint(job.id, this.runnerId, { phase, summary }, leaseGeneration);
         await this.controlPlane.completeJob(job.id, this.runnerId, "failed", {
           requiredChecks: {
             passed: false,
@@ -79,7 +81,7 @@ export class PromptHubRunner {
               : classifyFailurePatterns(failureInfo?.outputTail),
           },
           resourceMetrics: { runtime_ms: Math.max(0, this.clock().getTime() - startedAt), executor_invocations: executorInvocations, retries, ...executionMetrics },
-        });
+        }, leaseGeneration);
         terminal = true;
         if (heartbeatTimer) clearInterval(heartbeatTimer);
         await this.recordOutcome(job.id);
@@ -89,14 +91,14 @@ export class PromptHubRunner {
     };
     try {
       heartbeatTimer = setInterval(() => {
-        this.controlPlane.heartbeat(job.id, this.runnerId).catch((error) => {
+        this.controlPlane.heartbeat(job.id, this.runnerId, "running", leaseGeneration).catch((error) => {
           this.logger.error?.({ event: "heartbeat_failed", job_id: job.id, error_class: error?.name ?? "Error" });
           controller.abort();
         });
       }, this.config.runner.heartbeatMs);
-      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: "claimed", summary: "Job claimed; preparing isolated worktree" });
+      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: "claimed", summary: "Job claimed; preparing isolated worktree" }, leaseGeneration);
       const worktree = await this.worktrees.prepare(job);
-      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: worktree.resumed ? "resume" : "worktree", summary: worktree.resumed ? "Resuming from existing worktree" : "Isolated worktree prepared", ref: worktree.path });
+      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: worktree.resumed ? "resume" : "worktree", summary: worktree.resumed ? "Resuming from existing worktree" : "Isolated worktree prepared", ref: worktree.path }, leaseGeneration);
       executorInvocations += 1;
       const execution = await this.executor.run({ prompt: job.prompt, worktree: worktree.path, jobId: job.id, signal: controller.signal });
       executionMetrics = {
@@ -107,13 +109,13 @@ export class PromptHubRunner {
         await markFailed(`Executor ended without success (exit ${execution.exitCode ?? "unknown"})`, "execute", { outputTail: execution.outputTail });
         return { jobId: job.id, status: "failed" };
       }
-      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: "checks", summary: "Executor completed; running required checks" });
+      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: "checks", summary: "Executor completed; running required checks" }, leaseGeneration);
       const checks = await this.checkRunner({ worktree: worktree.path, job, commands: this.config.runner.requiredCommands, signal: controller.signal, logger: this.logger });
       if (checks.passed !== true) {
         await markFailed(`Required check failed: ${checks.failed ?? "unknown"}`, "checks", checks);
         return { jobId: job.id, status: "failed" };
       }
-      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: "result", summary: "All required checks passed", ref: checks.names.join(",") });
+      await this.controlPlane.checkpoint(job.id, this.runnerId, { phase: "result", summary: "All required checks passed", ref: checks.names.join(",") }, leaseGeneration);
       await this.controlPlane.completeJob(job.id, this.runnerId, "succeeded", {
         requiredChecks: { passed: true, names: checks.names },
         resourceMetrics: {
@@ -122,7 +124,7 @@ export class PromptHubRunner {
           retries,
           ...executionMetrics,
         },
-      });
+      }, leaseGeneration);
       terminal = true;
       if (heartbeatTimer) clearInterval(heartbeatTimer);
       await this.recordOutcome(job.id);

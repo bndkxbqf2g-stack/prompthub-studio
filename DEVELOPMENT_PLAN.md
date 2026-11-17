@@ -8,6 +8,38 @@ vorhanden sind. Das Quell-Repository existiert; zwei verifizierte Worker
 und getrennte, verlässliche Arbeitsbereiche sind nicht nachgewiesen. Bis dahin
 wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
+## Audit-Abgleich und nächste überprüfbare Schritte – 2026-11-16
+
+Auditbasis `b6d95e53de15fbd8fd7e929ccd09677586fa4019` und aktueller
+`origin/main` `1cd6204556de6d63b627c2f0cd2879c712b2e717` haben denselben
+Dateibaum. Die Befunde zu getrennten Status-/Lease-/Event-Writes gelten daher
+weiter. Der lokale Fix ist ein per Job versionierter GitHub-CAS-Ledger mit
+Fencing-Generationen, fail-closed Initialisierungsmarker und commitgebundener
+Tree-Aufzählung. Lokal bestanden 206 Tests und der statische Check; die
+unabhängige Prüfung fand keine kritischen oder hohen Befunde. GitHub-CI für den
+Branch ist noch nicht gelaufen.
+
+Priorisierte Reihenfolge:
+
+1. CAS-Ledger, globale Lease-Grenze, Recovery und Projektionsreparatur sind
+   lokal getestet und unabhängig geprüft. Die CI läuft auf dem isolierten
+   Branch; Merge und Produktion bleiben davon getrennte Freigabeschritte.
+2. Netlify Free gegen Cloudflare Pages/Workers/D1 anhand aktueller Kontingente,
+   Transaktionsfähigkeit und bestehender Live-PWA vergleichen. Bis zu einer
+   ausdrücklichen Provider-/Sicherheitsfreigabe keine Migration oder Aktivierung.
+3. OAuth, eng begrenzte private Control-Repo-Berechtigung und frische
+   Kontingentmessung einrichten; API geschlossen lassen, solange ein Gate fehlt.
+4. Tatsächlichen Mac-Runner, Heartbeat/Recovery und den iPhone → GitHub → Runner
+   → PWA-Ende-zu-Ende-Nachweis herstellen.
+5. Erst danach gemessene Dauer, CI, Ressourcennutzung und echte Tokenwerte
+   ausweisen sowie belegte CI-Whitespace-Reibung bearbeiten.
+
+Abnahmeschwellen: keine aktive Sicherheitslücke im Control-Plane-Review;
+`npm test`, `npm run check` und `git diff --check` erfolgreich; in realen
+GitHub-Tests höchstens zwei aktive Leases; verspätete Generationen können
+keinen kanonischen Status ändern; keine Produktionseinrichtung ohne separate
+Freigabe und überprüfte Kosten-/Authentifizierungs-Gates.
+
 ## Phasen
 
 ### Phase 0 – Inventar und Schutzrahmen (erledigt)

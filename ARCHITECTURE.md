@@ -30,10 +30,15 @@ nur an `127.0.0.1`.
 - `src/domain/job.mjs`: Zustandsmaschine, normalisierte Aufträge und
   geheimnisfreie Ereignisse.
 - `src/control/github-client.mjs`: minimale GitHub-REST-Transport-Schicht,
-  Token bleibt serverseitig.
-- `src/control/github-control-plane.mjs`: Issues als durable Job-Datensätze,
-  Kommentare als Append-only-Ereignisse, Contents API als Lease-/Checkpoint-
-  Speicher mit Compare-and-Swap.
+  Token bleibt serverseitig; vollständige Job-State-Aufzählung nutzt bei der
+  Contents-API-Grenze eine Git-Tree-Pfadabfrage.
+- `src/control/github-control-plane.mjs`: GitHub-Issues als Status- und
+  Ereignisprojektion; der versionierte CAS-Jobledger ist die maßgebliche Quelle.
+- `src/control/github-job-state-store.mjs`: pro Job ein versionierter
+  Statusdatensatz in `.prompthub/jobs/`, mit GitHub-Blob-SHA-CAS,
+  monotoner Revision und Runner-Fencing-Generation.
+- `src/control/github-lease-store.mjs`: globale Lease-Datei mit CAS und fester
+  Obergrenze von zwei aktiven Jobs.
 - `src/control/memory-control-plane.mjs`: deterministischer Testadapter; er darf
   nie als Produktionsmodus laufen.
 - `src/auth/github-oauth.mjs`: OAuth-State, kurzlebige serverseitige Session
@@ -121,39 +126,84 @@ geprüft; persistiert werden Kategorien, Job-IDs und Checknamen, niemals Rohlogs
 
 ## Durable Control Plane
 
-Ein Auftrag ist ein GitHub Issue im konfigurierten Control-Repository. Das Issue
-enthält nur Titel, Beschreibung und nicht-sensitive Metadaten. Labels sind
-`prompthub:queued`, `prompthub:running`, `prompthub:awaiting-approval`,
-`prompthub:succeeded`, `prompthub:failed`, `prompthub:paused` und
-`prompthub:stale`. Kommentare tragen strukturierte, geheimnisfreie Ereignisse.
+Jeder Auftrag hat ein GitHub Issue im privaten Control-Repository und einen
+kanonischen Datensatz `.prompthub/jobs/<job-id>.json`. Das Issue enthält keine
+Secrets. Labels und Kommentare sind eine reparierbare Anzeige-/Auditprojektion;
+Abfrage, Claim, Pause, Resume, Recovery und Abschluss lesen und ändern den
+kanonischen Datensatz. Ein kaputter oder veralteter Issue-Status kann deshalb
+keinen Auftrag claimbar machen.
 
-Die Datei `.prompthub/active-jobs.json` wird über die GitHub Contents API mit
-dem zuletzt gelesenen Blob-SHA aktualisiert. Ein konkurrierendes Update mit
-demselben SHA muss von GitHub abgelehnt und neu bewertet werden. Damit gilt die
-Grenze von zwei aktiven Jobs unabhängig von einer einzelnen KI-Entscheidung.
-Lease-Ablauf macht einen Runner-Ausfall sichtbar und erlaubt kontrollierte
-Wiederaufnahme.
+Der Datensatz wird per GitHub Contents API mit dem zuletzt gelesenen Blob-SHA
+geschrieben. Konflikte werden gegen den neuen Inhalt neu ausgewertet. Jede
+erfolgreiche Änderung erhöht `revision`; Statuswechsel erhöhen zusätzlich
+`status_revision`. Claims vergeben eine monotone `generation`, an die Runner-ID,
+Leaseablauf, Heartbeat, Checkpoints und Abschluss gebunden sind. Eine ältere
+Generation kann nach Lease-Verlust, Recovery und Resume keinen neuen Zustand
+überschreiben. Wiederholte Abschlüsse derselben Generation sind idempotent.
+
+`.prompthub/active-jobs.json` bleibt der globale CAS-Lease-Index. Er erzwingt
+höchstens zwei aktive Jobs. Ein beschädigter, überfüllter oder fehlender
+Lease-Index bei laufenden Ledger-Jobs sperrt Claim und Recovery, statt einen
+Zustand zu erraten. Ein Legacy-Issue ohne Ledger wird als `stale` importiert und
+benötigt menschliche Prüfung und Resume-Freigabe.
+
+Der Lease-Datensatz enthält außerdem `jobs_initialized`. Vor dem ersten
+kanonischen Jobzustand wird dieses Feld per CAS gesetzt. Fehlt das
+Job-State-Verzeichnis danach, wird es als Datenverlust/unklarer Zustand behandelt
+und Claim sowie Recovery stoppen. Nur ein noch nie initialisiertes, leeres
+System darf ein fehlendes Verzeichnis als leer lesen. Nichtleere v1-Leases
+werden nicht automatisch mit erfundenen Fencing-Generationen migriert.
+
+Die GitHub-Contents-API begrenzt Verzeichnislisten auf 1.000 Dateien. Bei genau
+dieser Antwortgröße wird der vollständige Pfad über die Git-Trees-API
+aufgelöst; die gelisteten Statusdateien werden anschließend an derselben
+Commit-SHA gelesen. Ungültige oder als `truncated` markierte Trees sperren
+Claim und Recovery. Ein Schema-v1-Lease kann keine kanonische laufende
+Generation sicher fencen: Heartbeat und Abschluss werden abgelehnt; Recovery
+und neue Claims stoppen, bis der Zustand geprüft wurde. Ein leeres v1-Ledger
+kann beim ersten neuen Claim sicher nach v2 migrieren.
+
+Issue-Patches und Kommentare unterstützen keine gemeinsame Transaktion mit dem
+Ledger. Sie werden nach dem kanonischen Commit geschrieben und im Runner-Recovery-
+Zyklus anhand der Ledger-Revision nachgezogen. Bis zur Reparatur zeigt die PWA
+den Ledger-Status; Issue-Labels werden nie für Ausführungsentscheidungen
+verwendet. GitHub dokumentiert, dass parallele Änderungen an denselben
+Contents-Dateien Konflikte liefern, während bedingte `PATCH`-Requests für
+Issue-Projektionen nicht unterstützt werden. Ein älterer Projektionsschreiber
+kann daher vorübergehend ein neueres Issue-Label überschreiben; Recovery stellt
+den kanonischen Status wieder her. Ereigniskommentare können wiederholt
+geschrieben werden: identische IDs werden beim Lesen dedupliziert,
+gleichzeitige Schreiber können aber doppelte Kommentare hinterlassen. Daher
+bleiben Ledger und dessen Completion-Datensatz die maßgebliche Quelle für
+Status und Ergebnis.
 
 ## Job- und Runner-Fluss
 
 1. PWA sendet eine Aufgabe an `POST /api/jobs`.
-2. API validiert Session, Eingabegröße und erlaubtes Projekt und legt das Issue
-   mit `prompthub:queued` an.
-3. Runner listet nur queued Issues, versucht atomar eine Lease zu erwerben und
-   markiert den Job running.
-4. Runner erstellt einen isolierten Worktree, schreibt `started` und sendet
-   Heartbeats. Der tatsächliche Executor ist explizit konfiguriert.
+2. API validiert Session, Eingabegröße und erlaubtes Projekt und initialisiert
+   Issue plus kanonischen Ledger.
+3. Runner listet Ledger-Status `queued`, reserviert zuerst eine globale Lease
+   per CAS und wechselt dann den Job mit einem fencing-gebundenen CAS auf
+   `running`.
+4. Runner erstellt einen isolierten Worktree und schreibt Heartbeats sowie
+   Checkpoints mit derselben Generation. Der Executor ist explizit konfiguriert.
 5. Checkpoints enthalten nur Phase, Commit/Worktree-Referenz, Zeit und Ergebnis-
    Zusammenfassung. Secrets und vollständige Prozessumgebungen bleiben lokal.
-6. Pflichtprüfungen müssen erfolgreich sein. Erst danach wird `succeeded`
-   gesetzt; sonst `failed` oder `awaiting_approval`.
-7. Bei Prozessabbruch bleibt der letzte Checkpoint erhalten. Ein neuer Runner
-   darf nach Lease-Ablauf genau ab diesem Zustand fortsetzen.
+6. Pflichtprüfungen müssen erfolgreich sein. Ein CAS schreibt den terminalen
+   Ledger-Zustand zuerst; anschließend werden Lease, Issue und Ereignisprojektion
+   aktualisiert.
+7. Bei Prozessabbruch bleibt der letzte Ledger-Checkpoint erhalten. Recovery
+   markiert fehlende oder abgelaufene Leases als `stale`; Weiterarbeit erfordert
+   explizite menschliche Resume-Freigabe.
 
 ## Zustandsinvarianten
 
 - `succeeded` ist nur mit `required_checks.passed = true` gültig.
-- `running` braucht einen aktiven Lease und frischen Heartbeat.
+- `running` braucht übereinstimmende Runner-ID, Generation und nicht abgelaufene
+  Ledger-/Lease-Zeitstempel.
+- Statusentscheidungen werden per GitHub-Blob-SHA-CAS geschrieben; Issue-Labels
+  und Kommentare sind nie Autorität für Claim oder Abschluss.
+- Der Completion-Datensatz bindet Runner-ID, Generation und Pflichtcheckresultat.
 - Ein Job kann nur aus `queued`, abgelaufenen `running`-Leases oder einem
   dokumentierten Resume-Zustand gestartet werden.
 - Ein unklarer Lease-/Commit-Zustand wird `stale` und wartet auf Freigabe.

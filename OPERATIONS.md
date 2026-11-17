@@ -198,10 +198,35 @@ Umgebung eingespeist. Wichtige Variablen: `GITHUB_TOKEN`, `GITHUB_REPOSITORY`,
 `PROMPTHUB_PROJECT_ROOT`, `CODEX_EXECUTABLE`, `PROMPTHUB_PUBLIC_ORIGIN` und
 `PROMPTHUB_MODE`.
 
-Das separate private GitHub-Control-Repository ist angelegt. Auf seinem
-`main`-Branch liegt `.prompthub/active-jobs.json` mit dem leeren Schema
-`{"version":1,"leases":[]}`. Es ist noch nicht mit der Anwendung verbunden:
-GitHub-OAuth-App, Runtime-Token/-Secrets und serverloser API-Host fehlen.
+Das separate private GitHub-Control-Repository
+`bndkxbqf2g-stack/prompthub-studio-control` ist vorhanden. Der aktuelle Readback
+vom `main`-Branch zeigt `.prompthub/active-jobs.json` mit
+`{"version":1,"leases":[]}` und ohne aktive Jobs. Das ist das Legacy-Schema;
+der erste neue Auftrag schreibt Schema v2 mit `jobs_initialized` und dem
+monotonen `next_generation`-Zähler. Pro Auftrag wird der neue CAS-Datensatz unter
+`.prompthub/jobs/<job-id>.json` geführt.
+
+Die Contents-API liefert höchstens 1.000 Einträge pro Verzeichnis. Bei einer
+Liste dieser Größe enumeriert der Runner `.prompthub/jobs` über die Git-Trees-
+API und liest alle Statusdateien an der SHA desselben Commits. Bei fehlender,
+ungültiger oder `truncated` Tree-Antwort bleiben Claims und Recovery
+geschlossen. `active-jobs.json` setzt vor dem ersten kanonischen Jobzustand per
+CAS `jobs_initialized=true`; fehlt das Job-State-Verzeichnis danach, wird kein
+leerer Zustand angenommen. Das aktuell verifizierte Control-Repository hat ein
+leeres Schema-v1-Lease-Ledger. Dieses kann ohne aktive Leases zu v2 migrieren.
+Nichtleere v1-Leases erhalten keine synthetischen Fencing-Generationen:
+Heartbeat, Abschluss, Claim, Initialisierung und automatische Recovery bleiben
+gesperrt, bis alte Writer gestoppt und Leases manuell abgeglichen sind.
+
+Vor einer ersten Produktivaktivierung müssen alte Runner/Control-Plane-Writer
+nachweislich gestoppt sein. Legacy-Issues ohne Ledger werden vorsichtshalber als
+`stale` importiert und können erst nach menschlicher Prüfung wieder gestartet
+werden. Bei fehlendem Lease-Index trotz laufender Ledger-Jobs, ungültigem
+Datensatz, widersprüchlicher Generation oder mehr als zwei aktiven Leases stoppt
+Claim/Recovery; Dateien nicht manuell überschreiben. Issue-Labels und Kommentare
+sind nur Projektionen. Der Runner gleicht sie auf Basis von
+`status_revision` nach, während API und Runner ausschließlich den kanonischen
+Ledger auswerten.
 
 ## Netlify-Free-Deployment (GitHub verbunden, PWA deployed)
 
