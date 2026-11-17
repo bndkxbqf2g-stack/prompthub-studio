@@ -2,17 +2,8 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import worker from "../src/cloudflare/worker.mjs";
 import { hmacBase64Url } from "../src/security/web-crypto.mjs";
-import { CloudflareKVSessionStore } from "../src/cloudflare/kv-session-store.mjs";
-
-function memoryKv() {
-  const values = new Map();
-  return {
-    values,
-    async put(key, value) { values.set(key, value); },
-    async get(key) { return values.get(key) ?? null; },
-    async delete(key) { values.delete(key); },
-  };
-}
+import { CloudflareD1SessionStore } from "../src/cloudflare/d1-session-store.mjs";
+import { MemoryD1Database } from "./helpers/memory-d1.mjs";
 
 function configuredEnv({ fetchImpl = async () => new Response(JSON.stringify({ private: true }), { status: 200 }) } = {}) {
   return {
@@ -22,16 +13,15 @@ function configuredEnv({ fetchImpl = async () => new Response(JSON.stringify({ p
     GITHUB_CLIENT_SECRET: "oauth-secret",
     SESSION_SECRET: "0123456789abcdef0123456789abcdef",
     GITHUB_ALLOWED_LOGINS: "allowed-user",
-    SESSIONS: memoryKv(),
+    AUTH_DB: new MemoryD1Database(),
     GITHUB_FETCH_IMPL: fetchImpl,
     ASSETS: { async fetch() { return new Response("PWA asset", { status: 200 }); } },
   };
 }
 
 async function sessionCookie(env) {
-  const id = "test-session";
-  const session = { id, user: { login: "allowed-user", id: 7 }, token: "private-user-token", provider: "github", createdAt: new Date().toISOString(), expiresAt: new Date(Date.now() + 60_000).toISOString() };
-  await env.SESSIONS.put(`prompthub:session:${id}`, JSON.stringify(session), { expirationTtl: 60 });
+  const sessions = new CloudflareD1SessionStore({ database: env.AUTH_DB, sessionSecret: env.SESSION_SECRET });
+  const id = await sessions.create({ user: { login: "allowed-user", id: 7 }, token: "private-user-token", provider: "github" });
   return `prompthub_session=${id}.${await hmacBase64Url(id, env.SESSION_SECRET)}`;
 }
 
@@ -77,11 +67,18 @@ test("Cloudflare Worker fails closed when the control repository is public", asy
   assert.deepEqual(await response.json(), { error: "control_repository_not_private" });
 });
 
-test("free KV quota errors fail closed with a retryable service-unavailable status", async () => {
-  const store = new CloudflareKVSessionStore({ namespace: {
-    async put() { throw new Error("quota exceeded"); },
-    async get() { throw new Error("quota exceeded"); },
-    async delete() { throw new Error("quota exceeded"); },
-  } });
-  await assert.rejects(store.create({ user: { login: "alice" }, token: "secret" }), (error) => error.statusCode === 503 && error.message === "free_serverless_storage_unavailable");
+test("D1 quota errors fail closed with a retryable service-unavailable status", async () => {
+  const database = new MemoryD1Database();
+  database.failNext = true;
+  const store = new CloudflareD1SessionStore({ database, sessionSecret: "0123456789abcdef0123456789abcdef" });
+  await assert.rejects(store.create({ user: { login: "alice", id: 1 }, token: "secret" }), (error) => error.statusCode === 503 && error.message === "free_serverless_storage_unavailable");
+});
+
+test("Cloudflare Worker does not accept the legacy KV binding as auth storage", async () => {
+  const env = configuredEnv();
+  delete env.AUTH_DB;
+  env.SESSIONS = { async get() { return null; } };
+  const response = await worker.fetch(new Request("https://prompthub.example/api/me"), env);
+  assert.equal(response.status, 503);
+  assert.deepEqual(await response.json(), { error: "cloud_control_plane_not_configured" });
 });

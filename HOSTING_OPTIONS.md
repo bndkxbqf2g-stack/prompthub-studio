@@ -21,7 +21,7 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
 | Möglichkeit | Nachweister Umfang | Kosten-/Ausfallverhalten | Eignung |
 |---|---|---|---|
 | GitHub Pages allein | Statisches HTML/CSS/JS; keine serverseitige OAuth-Callback- oder API-Ausführung | GitHub-Free-Seite ist für das öffentliche Repo verfügbar | Für PWA-Shell und Dokumente geeignet; kein funktionsfähiger API-/Auth-Host |
-| Cloudflare Pages + Functions + D1 | Pages liefert statische Dateien; Functions teilen sich das Workers-Free-Kontingent; Pages Functions unterstützen D1-Bindings. D1-Batches sind transaktional. | Workers Free: 100.000 Requests/Tag und 10 ms CPU je Invocation. D1 Free: 5 Mio. gelesene und 100.000 geschriebene Zeilen/Tag, 500 MB je Datenbank und 5 GB gesamt. Überschrittene Free-Limits schlagen fehl; kein kostenpflichtiger Fallback. | Bevorzugter kostenloser Zielkandidat, aber noch nicht produktionsbereit: das Projekt war zuletzt am 2026-11-15 als pausiert dokumentiert; aktueller Account-/Projektzustand ist nicht verifiziert. Der KV-Session-Adapter speichert OAuth-Zugriffstokens unverschlüsselt und konsumiert OAuth-State mit getrenntem Read/Delete. Ein transaktionaler, verschlüsselter Adapter, unabhängige Prüfung und Live-Quota-Readback fehlen. |
+| Cloudflare Pages + Functions + D1 | Pages liefert statische Dateien; Functions teilen sich das Workers-Free-Kontingent; Pages Functions unterstützen D1-Bindings. | Workers Free: 100.000 Requests/Tag und 10 ms CPU je Invocation. D1 Free: 5 Mio. gelesene und 100.000 geschriebene Zeilen/Tag, 500 MB je Datenbank und 5 GB gesamt. Überschrittene Free-Limits schlagen fehl; kein kostenpflichtiger Fallback. | Bevorzugter kostenloser Zielkandidat. Der Feature-Branch enthält einen D1-Adapter mit AES-GCM-verschlüsselten Sitzungen und atomarem Single-use-OAuth-State per bedingtem `DELETE … RETURNING`; gezielte Tests, vollständige lokale Pflichtprüfungen und unabhängiger Read-only-Review sind bestanden. Live-D1-/Quota-Nachweise stehen noch aus. Es wurde keine D1-Ressource oder Cloudflare-Bindung angelegt; das Projekt war zuletzt am 2026-11-15 als pausiert dokumentiert, der aktuelle Cloudflare-Zustand ist nicht verifiziert. |
 | Netlify Free | Git-Deployments, Node-Functions und Blob-Storage; öffentliche und private Repository-Deployments sind dokumentiert. Der aktuelle Self-Serve-Vertrag untersagt Training auf Customer Content, sofern der Kunde nicht ausdrücklich optiert. | 0 USD/Monat, 300 Credits/Monat mit hartem Limit und ohne Auto-Recharge. Free-Nutzung wird laut Vertrag nicht berechnet; beim Limit pausiert Netlify alle Sites des Teams. | Bestehender verifizierter Live-Host mit vorbereitetem API-/Blob-Adapter. Team Free, Production-Deploy `ready`, Produktion öffentlich und Preview-SSO bestätigt. Der Credit-Stand ist nicht abrufbar; Cloud-Jobs bleiben fail-closed. |
 | Vercel Hobby | Git-Deployments, Functions, Blob und dokumentierte Usage-CLI | 0 USD, aber Hobby nur persönlich/nicht-kommerziell. Die aktuellen Terms gestatten für Hobby die Nutzung von Customer Content zum KI-/ML-Training und zur Weitergabe an Dritte für Modellverbesserung. | Für PromptHub-Daten ausgeschlossen, solange kein ausdrücklich anwendbarer Opt-out die Nutzung sicher ausschließt. Keine Verbindung oder Aktivierung erfolgt. |
 | Render Free | Serverlose Alternative steht hier nicht bereit; Free-Webservice mit dynamischem API-Server und kostenlosem Datenspeicher | Free-Webservices schlafen nach 15 Minuten Inaktivität ein; lokales Dateisystem ist flüchtig, Free-Postgres läuft nach 30 Tagen ab, und Bandbreite/Builds können bei vorhandenem Zahlungsmittel kostenpflichtig werden | Für die dauerhafte Control API und geschützte Sitzungsdaten ungeeignet. |
@@ -38,10 +38,11 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
   `production_api_disabled`. Der Credit-Kontostand wurde nicht ausgelesen.
 - Cloudflare dokumentiert unbegrenzte, kostenlose Pages-Static-Asset-Requests
   und ein Workers-Free-Kontingent von 100.000 Requests pro Tag für Pages
-  Functions. D1-Bindings werden von Pages Functions unterstützt; `batch()`
-  führt SQL transaktional aus. Das ist grundsätzlich geeigneter als KV für
-  einmalig konsumierbare OAuth-States, ersetzt aber weder Authentifizierung
-  noch Verschlüsselung sensibler Sessiondaten.
+  Functions. D1-Bindings werden von Pages Functions unterstützt. Der Feature-
+  Branch enthält eine verschlüsselte D1-Sessionablage und einen einzelnen
+  bedingten `DELETE … RETURNING`-Schritt für OAuth-State-Verbrauch. Das ist
+  bisher durch lokale Tests und SQLite-Syntax-Smoke, nicht durch ein Live-D1,
+  geprüft. Es ersetzt weder Authentifizierung noch Quotenüberwachung.
 - D1-Analytics sind über GraphQL abrufbar; die offizielle Anleitung verlangt
   dafür `Account Analytics Read`. Weder diese Berechtigung noch ein Token oder
   Live-Readback ist eingerichtet. Worker-Metriken können adaptiv/gesampelt
@@ -50,12 +51,14 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
 - Lokal sind `wrangler`, `gh` und ein Cloudflare-Connector nicht vorhanden.
   Die historische Pages-Konfiguration beweist keinen aktuellen Account-Zugriff
   und keinen aktiven Deploymentpfad.
-- **Empfehlung:** Cloudflare Pages + Functions + D1 ist der priorisierte
-  kostenlose Zielpfad unter den Bedingungen, dass der Auth-/Sessionpfad
-  transaktional, verschlüsselt und unabhängig geprüft wird. Netlify bleibt bis
-  dahin der bestehende öffentliche statische Host; seine Control API ist
-  geschlossen und darf mangels Credit-Readback keine Cloud-Jobs annehmen. Kein
-  Provider wurde durch diesen Readback geändert.
+- **Empfehlung:** Cloudflare Pages + Functions + D1 bleibt der priorisierte
+  kostenlose Zielpfad. Der Auth-/Sessionadapter ist lokal vorbereitet; vor
+  jeder Live-Aktivierung fehlen unabhängige Prüfung, D1-Ressource und Binding,
+  Secrets, zuverlässiger Quoten-Readback sowie eine gesonderte Freigabe für
+  externe Änderungen und Deployment. Netlify bleibt bis dahin der bestehende
+  öffentliche statische Host; seine Control API ist geschlossen und darf
+  mangels Credit-Readback keine Cloud-Jobs annehmen. Kein Provider wurde durch
+  diesen Readback geändert.
 
 Quellen (Cloudflare-Dokumentation, abgerufen am 2026-11-17):
 
@@ -64,6 +67,7 @@ Quellen (Cloudflare-Dokumentation, abgerufen am 2026-11-17):
 - [D1 Free-Quoten](https://developers.cloudflare.com/d1/platform/pricing/)
 - [D1 als Pages Functions Binding](https://developers.cloudflare.com/pages/functions/bindings/)
 - [D1 `batch()`-Transaktionen](https://developers.cloudflare.com/d1/worker-api/d1-database/)
+- [D1-Migrationen und Fehler-Rollback](https://developers.cloudflare.com/d1/reference/migrations/)
 - [D1 Analytics und Quotenmetriken](https://developers.cloudflare.com/d1/observability/metrics-analytics/)
 
 ## Netlify-Kandidat: Kosten- und Betriebsgrenzen

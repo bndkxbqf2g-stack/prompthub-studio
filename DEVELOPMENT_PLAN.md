@@ -35,10 +35,12 @@ Audit-/Betriebsabgleich:
   `production_api_disabled`; es gibt keine Live-Control-API.
 - **0-€-Pfad:** Die aktuelle Anweisung priorisiert Cloudflare, wenn es sicher
   geeignet ist. Offizielle Free-Limits und vorhandener Code wurden geprüft.
-  Cloudflare Pages/Functions + D1 ist ein technischer Kandidat; der bestehende
-  KV-Auth-Adapter speichert Tokens unverschlüsselt und konsumiert OAuth-States
-  nicht atomar. D1, ein Cloudflare-Analytics-Token und Live-Quota-Readback
-  fehlen. Kein Deploy oder Providerwechsel erfolgte.
+  Cloudflare Pages/Functions + D1 ist der priorisierte Zielpfad. Der Feature-
+  Branch ersetzt den unsicheren KV-Adapter durch D1 mit verschlüsselten
+  Sitzungstokens und atomarem Single-use-OAuth-State. 216 lokale Tests,
+  statische Prüfung und unabhängiger Read-only-Review sind bestanden. D1-
+  Ressource/Binding, Secrets, Live-D1- und Quota-Readback fehlen. Kein Deploy
+  oder Providerwechsel erfolgte.
 - **Runner/E2E:** Der lokale Fixture-Smoke belegt keine dauerhafte Mac-Ausführung,
   GitHub-gebundene Runner-Recovery oder iPhone→GitHub→Runner→PWA-Kette.
 - **Metriken/CI:** Tokenmessung ist implementiert, aber es gibt keinen echten
@@ -52,12 +54,14 @@ Priorisierte Reihenfolge mit überprüfbaren Abnahmeschwellen:
    den geprüften CAS-Code; verspätete Runner können nach einem
    Generationenwechsel den kanonischen Auftrag nicht überschreiben; die globale
    Lease-Grenze bleibt zwei.
-2. **Hosting-/Auth-Sicherheitsblock:** Cloudflare D1-basierte Sitzungs- und
-   OAuth-State-Speicherung nur nach ausdrücklicher Freigabe dieser
-   Auth-Änderung implementieren und unabhängig prüfen. Secrets bleiben
+2. **Hosting-/Auth-Sicherheitsblock:** Die ausdrücklich freigegebene D1-
+   Authänderung ist im Feature-Branch implementiert; unabhängiger Read-only-
+   Review fand keine offenen Sicherheitsbefunde, und lokale Pflichtprüfungen
+   bestanden. Secrets bleiben
    serverseitig. Abnahme: OAuth-State ist atomar single-use, Sessiontokens sind
    verschlüsselt, Preview-/Production-Isolation ist nachgewiesen und alle
-   Fehler-/Quota-Wege bleiben geschlossen.
+   Fehler-/Quota-Wege bleiben geschlossen. D1-Ressource, Binding, Secrets,
+   Live-Quota-Readback und Deployment benötigen separate Schritte/Freigaben.
 3. **Kosten-/Quotengate:** Free-Tarif und 0-€-Grenzen read-only bestätigen;
    frischen, verlässlichen Usage-Readback mit konservativer Schwelle verbinden.
    Abnahme: unbekannte, alte, unvollständige oder ab 75 % ausgelastete Werte
@@ -188,8 +192,9 @@ Freigabe und überprüfte Kosten-/Authentifizierungs-Gates.
 - Offene Wissensarbeit: kontrollierte, explizit geprüfte projektübergreifende
   Übertragung und gepaarte Strategieexperimente mit Commit-/CI-Vergleich.
 - Web-API-Handler ist zwischen Node-Adapter und Cloudflare Worker geteilt;
-  Cloudflare Static Assets, same-origin API-Gate, KV-Sessionstore und
-  Free-Quota-Fail-Closed-Tests sind implementiert.
+  Cloudflare Static Assets, same-origin API-Gate, D1-Sessionstore und
+  Free-Quota-Fail-Closed-Tests sind auf dem Feature-Branch vorbereitet. Das
+  echte D1-Binding ist noch nicht eingerichtet.
 - Die aktive PWA liegt unter
   `https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/`. Main-Commit
   `bf5a15c1b8a4fc0f832e55aefcdc84bfa440c5a5` bestand Main-CI-Run 81
@@ -249,10 +254,12 @@ Freigabe und überprüfte Kosten-/Authentifizierungs-Gates.
   API-Ausfall keinen Erfolg. Ohne API bleiben Projektansicht, Anmeldung und
   Aufträge verborgen. Die echte iPhone-Installation und Live-Offline-/Update-
   prüfung sind noch offen.
-- OAuth-App, KV-Binding, Runtime-Secrets, Session-/Backup-Verfahren und
-  Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
-- Hosting-Alternative nach Abwahl Cloudflare prüfen: `HOSTING_OPTIONS.md` bewertet
-  Netlify Free als bevorzugten, nicht aktivierten Kandidaten. Der Vertrag
+- OAuth-App, D1-Binding `AUTH_DB`, Runtime-Secrets, Session-/Backup-Verfahren
+  und Rate-Limits prüfen; bis dahin bleibt die Control API sicher geschlossen.
+- Der frühere Hosting-Readback bewertete nach zwischenzeitlicher Abwahl
+  Cloudflare Netlify Free als Kandidaten. Die neuere Nutzeranweisung priorisiert
+  Cloudflare erneut, sofern der kostenlose Betrieb und die Quoten sicher
+  nachweisbar sind. Der Vertrag
   untersagt KI-Training auf Customer Content ohne ausdrückliches Opt-in; Free
   hat ein hartes 300-Credit-Limit ohne Auto-Recharge. Die öffentliche API weist
   aber keinen vollständigen teamweiten Credit-Readback aus. Providerfreigabe,

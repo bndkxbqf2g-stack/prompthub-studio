@@ -60,12 +60,21 @@ nur an `127.0.0.1`.
   Ohne frischen, autoritativen Teamverbrauch bleibt die Jobannahme gesperrt.
 - `netlify.toml`: statische PWA aus `src/pwa`, Netlify Functions und ein
   Build-Gate mit `npm test` und `npm run check`.
-- `src/cloudflare/worker.mjs`: GitHub-Control-Plane, OAuth und API-Routen als
-  historische, deaktivierte Serverless-Implementierung. Cloudflare ist kein
-  aktiver Hosting-Pfad.
+- `src/cloudflare/worker.mjs`: eigenständige Pages-Functions-Control-Plane mit
+  GitHub-OAuth und gemeinsamer API. Sie bleibt fail-closed und ist nicht live
+  aktiviert; aktuelle Hosting-Priorität ist Cloudflare, vorbehaltlich aller
+  Sicherheits-, Quoten- und Produktionsfreigaben.
+- `src/cloudflare/d1-session-store.mjs` und
+  `migrations/0001_auth_store.sql`: D1-Authspeicher mit HKDF-getrennten
+  AES-256-GCM-Schlüsseln, verschlüsselten GitHub-Sitzungen, gehashten und
+  verschlüsselten OAuth-States sowie atomarem bedingtem
+  `DELETE … RETURNING`. Der Adapter existiert auf dem Feature-Branch. Wrangler-
+  D1-Binding, Datenbank, Secrets und Live-D1-Nachweis fehlen; ein KV-Fallback
+  ist absichtlich nicht vorhanden.
 - `functions/[[path]].js`: Cloudflare-Pages-Adapter für den bestehenden Worker-
   Handler (historisch; nicht für Netlify-Deployments verwendet).
-- `wrangler.toml`: Pages-Build-Ausgabe `src/pwa`; das vorherige Workers-Static-
+- `wrangler.toml`: Pages-Build-Ausgabe `src/pwa`; ein `AUTH_DB`-Binding ist
+  noch nicht konfiguriert. Das vorherige Workers-Static-
   Assets-Profil bleibt in `wrangler.worker.toml` (historische Konfiguration).
 - `src/runner/runner.mjs`: Polling, Claim, Lease, Heartbeats, Checkpoints,
   Resume, sauberes Stoppen und nicht-blockierende Erfassung verifizierter

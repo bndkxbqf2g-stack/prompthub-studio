@@ -146,23 +146,23 @@ Dokumentations-PR #34, Head `8ba96a8fcbac80f722208914535dfff39460cc1c`, bestand
 direkter HTTPS-Smoke nach diesem Merge wurden in der aktuellen Prüfung nicht
 unabhängig ausgelesen.
 
-Cloudflare wird nicht mehr als Host verwendet. Das Pages-Projekt ist weiterhin
-mit dem öffentlichen Quell-Repository verbunden, aber pausiert; die letzte
-veröffentlichte Version unter https://prompthub-studio.pages.dev bleibt
-erreichbar. Das Projekt ist nicht gelöscht. Der Nutzer hat seine Entfernung
-angefragt; die gesonderte Bestätigung für die irreversible Projektlöschung
-steht noch aus. `wrangler.toml` enthält weiterhin historische Pages-
-Konfiguration; das Workers-Static-Assets-Profil liegt in
-`wrangler.worker.toml`.
+Der letzte Cloudflare-Dashboard-Readback vom 2026-11-15 zeigte das Pages-Projekt
+`prompthub-studio` als pausiert und nicht gelöscht. Die Nutzeranweisung vom
+2026-11-17 priorisiert Cloudflare wieder als 0-€-Kandidaten, wenn es sicher
+geeignet ist; das autorisiert keine Wiederaufnahme von Deployments oder andere
+Cloudflare-Mutationen. Der heutige Konto-/Projektzustand und die Preview-
+Einstellung wurden nicht erneut ausgelesen. Netlify ist der zuletzt
+nachgewiesene öffentliche PWA-Host; der letzte Live-`/healthz`-Readback meldete
+`production_api_disabled`.
 
-Die statische PWA-Hülle ist erreichbar. Die Control API antwortet mit HTTP 503,
-bis ein Production-KV-Binding `SESSIONS`, die GitHub-OAuth-App, eine Login-
-Allowlist und die dokumentierten serverseitigen Variablen/Secrets eingerichtet
-sind. Der Pages-Runtime-Schalter `Fail closed` ist gespeichert und verifiziert.
-Preview-Bereitstellungen wurden im Dashboard auf `None` gesetzt; nach dem
-Browserausfall konnte diese Einstellung nicht erneut ausgelesen werden. Bei
-einer späteren Aktivierung wären Preview-Adressen öffentlich; dafür keine
-Preview-Secrets setzen und zuvor Cloudflare Access konfigurieren.
+Der Cloudflare-Worker bleibt fail-closed. Auf dem Feature-Branch setzt er ein
+Production-D1-Binding `AUTH_DB`, GitHub-OAuth-App, Login-Allowlist und
+serverseitige Variablen/Secrets voraus. D1, Binding, Migration und Secrets
+wurden nicht eingerichtet. Der frühere KV-Authspeicher wurde entfernt; es gibt
+keinen KV-Fallback. Beim letzten Dashboard-Readback war `Fail closed` aktiv;
+die aktuelle Einstellung ist nicht unabhängig verifiziert. Preview-Builds
+waren zuletzt auf `None`; vor einer späteren Aktivierung sind Access-Schutz und
+ein separater Preview-Secret-Satz erforderlich.
 
 Der authentifizierte Branch-Schutz-Readback vom 2026-11-16 bestätigt für `main`
 den erforderlichen Check `test` von GitHub Actions (`app_id=15368`) mit

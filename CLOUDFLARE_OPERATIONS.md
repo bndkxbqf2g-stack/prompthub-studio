@@ -1,8 +1,8 @@
 # PromptHub Studio – Cloudflare Pages Betrieb
 
-## Aktueller Status – zuletzt geprüft am 2026-11-15
+## Letzter Cloudflare-Readback – 2026-11-15; Arbeitsstatus – 2026-11-17
 
-- Cloudflare ist als Hosting-Ziel abgewählt. Das Pages-Projekt `prompthub-studio`
+- Der letzte Dashboard-Readback zeigte das Pages-Projekt `prompthub-studio`
   ist pausiert, bleibt mit `bndkxbqf2g-stack/prompthub-studio` verbunden und
   wurde nicht gelöscht. Die letzte im Dashboard beobachtete erfolgreiche
   Veröffentlichung hatte die Deployment-ID
@@ -13,18 +13,20 @@
   auf `None` gesetzt; diese Einstellung konnte nach dem Browserausfall nicht
   erneut ausgelesen werden. Es wurden bei der letzten Prüfung keine
   Cloudflare-Einstellungen verändert.
-- Die Nutzeranweisung lautet, Cloudflare nicht weiter zu verwenden. Eine
-  endgültige Projektlöschung wurde separat zur Bestätigung vorgelegt und ist
-  noch nicht bestätigt. Das Projekt bleibt daher pausiert und erhalten.
-- Die aktive statische PWA liegt auf GitHub Pages unter
-  https://bndkxbqf2g-stack.github.io/prompthub-studio/src/pwa/. Main-Commit
-  `50eda91e4211b89c9da178cc235e0bc2c67f68b5` bestand Main-CI-Run 72 und Pages-
-  Run 18. GitHub Pages hostet keine Control API; der Browser zeigt dafür einen
-  klaren Verfügbarkeitsfehler.
-- Die frühere Cloudflare-API war nicht konfiguriert: OAuth-App, Runtime-Secrets
-  und KV-Binding fehlten. Ihr letzter dokumentierter Status für `/api/me` und
-  `/healthz` war HTTP 503 (`cloud_control_plane_not_configured`). Kein
-  produktiver Cloud-Control-Plane-Betrieb ist nachgewiesen.
+- Die neuere Nutzeranweisung vom 2026-11-17 priorisiert Cloudflare erneut,
+  sofern es sicher und innerhalb des 0-€-Budgets geeignet ist. Das gilt für
+  Prüfung und Vorbereitung; es autorisiert weder Deployment-Wiederaufnahme,
+  D1-Anlage, Secret-Änderung noch sonstige Cloudflare-Mutationen. Der aktuelle
+  Konto-/Projektzustand wurde seit dem Readback vom 2026-11-15 nicht erneut
+  ausgelesen.
+- Netlify ist der zuletzt verifizierte öffentliche PWA-Host. Der Readback vom
+  2026-11-16 zeigte Production `ready`; `/healthz` meldete
+  `production_api_disabled`. GitHub Pages liefert ebenfalls nur statische
+  Dateien, keine Control API.
+- Der frühere Cloudflare-Worker war nicht konfiguriert. Der Feature-Branch
+  verwendet jetzt D1 `AUTH_DB` und verschlüsselte Sitzungen. D1-Datenbank,
+  Binding und Secrets fehlen weiterhin; ein aktueller Live-API-Status ist nicht
+  geprüft. Produktiver Control-Plane-Betrieb ist nicht nachgewiesen.
 - Eine schreibgeschützte Dashboard-Prüfung zeigte `Workers Free`. Die
   Abrechnungsansicht lieferte keinen vollständigen accountweiten Kosten- oder
   Verbrauchsnachweis; daher wird keine vollständige 0-€-Abrechnung behauptet.
@@ -36,10 +38,10 @@
 
 ## Historische Cloudflare-Konfiguration
 
-Die folgenden Abschnitte dokumentieren die frühere Pages-Einrichtung und
-Wiederherstellungsoptionen. Sie beschreiben keinen aktiven Host und erteilen
-keine Freigabe, Cloudflare fortzusetzen, neue Ressourcen anzulegen oder die
-Projektlöschung auszuführen.
+Die folgenden Abschnitte dokumentieren die frühere Pages-Einrichtung und den
+vorbereiteten D1-Code. Sie beschreiben keinen aktiven Host und erteilen keine
+Freigabe, Deployments wiederaufzunehmen, Ressourcen anzulegen oder das Projekt
+zu löschen.
 
 ## Historische Pages-Konfiguration
 
@@ -59,10 +61,20 @@ Projektlöschung auszuführen.
 
 Die statischen Dateien benötigen keinen Bundler. Pages bündelt die Functions
 aus dem functions/-Verzeichnis. Der Build-Befehl muss vor dem Upload erfolgreich
-enden; Cloudflare bewertet ihn anhand seines Exitcodes. wrangler.toml enthält
-keine Tokens oder namespace-IDs. Das KV-Binding `SESSIONS` ist noch nicht
-angelegt; bei späterer Freigabe darf es ausschließlich an Production gebunden
-werden und muss innerhalb des Free-Kontingents betrieben werden.
+enden; Cloudflare bewertet ihn anhand seines Exitcodes. `wrangler.toml` enthält
+keine Tokens, D1-Datenbank-ID oder `AUTH_DB`-Binding. Der Feature-Branch enthält
+`migrations/0001_auth_store.sql` und `CloudflareD1SessionStore`: GitHub-Sitzungen
+werden mit AES-256-GCM verschlüsselt; OAuth-States werden gehasht und
+verschlüsselt und durch genau ein bedingtes `DELETE … RETURNING` konsumiert.
+Das frühere `SESSIONS`-KV-Verfahren wurde entfernt und darf nicht wieder
+gebunden werden. Vor Live-Betrieb sind freigegebene D1-Anlage/Binding und
+Secret-Konfiguration, Migration, Quoten-Readback und Deployment-Abnahme
+erforderlich. Der unabhängige Read-only-Review des aktuellen Feature-Branch-
+Authcodes wurde ohne offene Sicherheitsbefunde abgeschlossen; das ersetzt
+keinen Live-D1-Test oder die Prüfung späterer Konfigurationsänderungen. Laut
+Wrangler-Dokumentation wird eine fehlgeschlagene Migration zurückgerollt und
+nach erfolgreicher Anwendung ein Backup erfasst. Wrangler war nicht verfügbar;
+die Migration wurde nicht ausgeführt.
 
 ## Deployment-Wege und Berechtigungen
 
@@ -77,7 +89,7 @@ ES-Modul aus der versionierten JSON-Quelle; danach bestanden der Pages-Build
 und GitHub Actions Run 6. Der Build führt `npm test` und `npm run check` aus.
 
 Die Pages-Git-Integration ist nicht die Anmeldung der Nutzer in PromptHub. Für
-die Control API fehlen weiterhin das `SESSIONS`-KV-Binding und die folgenden
+die Control API fehlen weiterhin das D1-Binding `AUTH_DB` und die folgenden
 Production-Secrets/-Variablen. Secrets ausschließlich in Cloudflare Pages
 Production Settings setzen, niemals in Git, Frontend oder Logs:
 
@@ -88,12 +100,14 @@ Production Settings setzen, niemals in Git, Frontend oder Logs:
   Repositories.
 - `GITHUB_CLIENT_ID` und `GITHUB_CLIENT_SECRET`: GitHub-OAuth-App zur
   PromptHub-Anmeldung.
-- `SESSION_SECRET`: kryptografisch zufälliger Wert mit mindestens 32 Zeichen.
-- `SESSIONS`: KV-Binding, kein Text-Secret.
+- `SESSION_SECRET`: kryptografisch zufälliger Wert mit mindestens 32 Zeichen;
+  daraus werden Cookie-HMAC- und getrennte AES-GCM-Schlüssel abgeleitet.
+- `AUTH_DB`: D1-Binding, kein Text-Secret. Vor Aktivierung muss
+  `migrations/0001_auth_store.sql` auf der zugeordneten Datenbank angewendet sein.
 
 Die OAuth-Callback-URL lautet
 `https://prompthub-studio.pages.dev/auth/github/callback`. Vor der Aktivierung
-müssen OAuth-Scopes, Allowlist, Tokenumfang und KV-Free-Kontingent geprüft
+OAuth-Scopes, Allowlist, Tokenumfang und D1-/Workers-Free-Kontingente müssen geprüft
 werden. Ohne diese Konfiguration bleiben `/api/*`, `/auth/*` und `/healthz`
 geschlossen (`503`); kein eingeloggter Verwaltungsbereich wird vorgetäuscht.
 Der Branch-Control-Dialog bestätigt `None` für Preview-Builds und deaktivierte
@@ -141,10 +155,11 @@ werden niemals im Chat angefordert oder ausgegeben. Cloudflare-Permissions:
 [Pages API](https://developers.cloudflare.com/api/resources/pages/subresources/projects/methods/create/), [Tokenrechte](https://developers.cloudflare.com/workers/authorization/workers/) und [Wrangler-Rechte](https://developers.cloudflare.com/workers/authorization/).
 
 Die vollständige Control-Plane setzt OAuth, privates Control-Repository,
-begrenzten GitHub-Token, Production-KV-Binding und vollständige Secrets voraus.
-Ohne diese Werte liefert `/api/me` 503; Frontend und Administrationsbereich
-bleiben verborgen. Dieser sichere Fail-Closed-Zustand ersetzt keinen
-funktionsfähigen Control-Plane-Betrieb.
+begrenzten GitHub-Token, Production-D1-Binding `AUTH_DB` und vollständige
+Secrets voraus. Das Binding ist kein Secret; `SESSION_SECRET`, GitHub-Token
+und OAuth-Secret sind es. Ohne diese Werte liefert `/api/me` 503; Frontend und
+Administrationsbereich bleiben verborgen. Dieser sichere Fail-Closed-Zustand
+ersetzt keinen funktionsfähigen Control-Plane-Betrieb.
 
 Die GitHub-Control-Plane benötigt Schreibzugriff auf ihr privates Control-
 Repository. Der aktuelle Runtime-Client verwendet denselben serverseitigen
@@ -167,8 +182,10 @@ gebunden.
   Builds.
 - Free-Pages-Assets sind auf 20.000 Dateien je Site und 25 MiB pro Datei
   begrenzt. Das PWA-Icon liegt unter dem Dateilimit.
-- Workers KV Free: 100.000 Reads, 1.000 Writes und 1.000 Deletes pro Tag sowie
-  1 GB Speicher. Quotenfehler führen im vorhandenen KV-Sessionstore zu 503.
+- D1 Free: bis zu 5 Mio. gelesene und 100.000 geschriebene Zeilen pro Tag,
+  500 MB je Datenbank und 5 GB je Account. D1-/Workers-Nutzung wird nicht live
+  überwacht; Speicherfehler führen im Worker zu 503. Es gibt keinen bezahlten
+  Fallback und keine automatische Aufrüstung.
 - Diese Limits sind Produktlimits, kein Nachweis über den Tarif oder die
   Abrechnungseinstellungen des konkreten Nutzerkontos.
 
@@ -202,4 +219,5 @@ gebunden.
 - [GitHub-App-Zugriff einschränken](https://developers.cloudflare.com/pages/configuration/git-integration/github-integration/)
 - [Pages Build Watch Paths](https://developers.cloudflare.com/pages/configuration/build-watch-paths/)
 - [Pages Wrangler Configuration](https://developers.cloudflare.com/pages/functions/wrangler-configuration/)
+- [D1-Migrationen und Fehler-Rollback](https://developers.cloudflare.com/d1/reference/migrations/)
 

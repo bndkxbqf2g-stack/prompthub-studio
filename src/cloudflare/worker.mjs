@@ -8,7 +8,7 @@ import { StrategyLearningEngine } from "../knowledge/strategy-learning.mjs";
 import { ProjectService } from "../projects/project-service.mjs";
 import { GitHubProjectStore } from "../projects/project-store.mjs";
 import { PromptLibrary } from "../research/prompt-library.mjs";
-import { CloudflareKVSessionStore } from "./kv-session-store.mjs";
+import { CloudflareD1SessionStore } from "./d1-session-store.mjs";
 
 const runtimes = new WeakMap();
 const REQUIRED_BINDINGS = ["GITHUB_TOKEN", "GITHUB_REPOSITORY", "GITHUB_CLIENT_ID", "GITHUB_CLIENT_SECRET", "SESSION_SECRET", "GITHUB_ALLOWED_LOGINS"];
@@ -39,7 +39,9 @@ function failure(status, error) {
 }
 
 function requiredMissing(env) {
-  return REQUIRED_BINDINGS.filter((name) => typeof env[name] !== "string" || env[name].trim() === "");
+  const missing = REQUIRED_BINDINGS.filter((name) => typeof env[name] !== "string" || env[name].trim() === "");
+  if (!env.AUTH_DB || typeof env.AUTH_DB.prepare !== "function") missing.push("AUTH_DB");
+  return missing;
 }
 
 function createRuntime(env, origin) {
@@ -48,7 +50,7 @@ function createRuntime(env, origin) {
   if (allowedLogins.length === 0 || !/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(env.GITHUB_REPOSITORY)) {
     throw Object.assign(new Error("cloud_configuration_invalid"), { statusCode: 503 });
   }
-  if (!env.SESSIONS) throw Object.assign(new Error("free_serverless_storage_unavailable"), { statusCode: 503 });
+  if (!env.AUTH_DB || typeof env.AUTH_DB.prepare !== "function") throw Object.assign(new Error("free_serverless_storage_unavailable"), { statusCode: 503 });
 
   const config = {
     mode: "github",
@@ -89,7 +91,7 @@ function createRuntime(env, origin) {
   const errorLearning = new ErrorLearningEngine({ projectService });
   const strategyLearning = new StrategyLearningEngine({ projectService });
   const promptDesigner = new PromptDesigner({ projectService, controlPlane, promptLibrary, errorLearning });
-  const sessions = new CloudflareKVSessionStore({ namespace: env.SESSIONS });
+  const sessions = new CloudflareD1SessionStore({ database: env.AUTH_DB, sessionSecret: env.SESSION_SECRET });
   const auth = new GitHubOAuth({
     clientId: config.github.clientId,
     clientSecret: config.github.clientSecret,
