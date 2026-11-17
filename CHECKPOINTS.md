@@ -1454,3 +1454,32 @@
   bereitgestellt. Die technische Erstabnahme bleibt offen, insbesondere
   produktive OAuth/Secrets/Quoten, Live-Control-API, echter Runner und
   iPhone-End-to-End-Nachweis.
+
+## CP-063 – Audit- und Hostingpfad gegen aktuelle Nachweise abgeglichen
+
+- Datum: 2026-11-17. GitHub-Readback bestätigt `main` weiterhin auf
+  `1cd6204556de6d63b627c2f0cd2879c712b2e717`, identisch im Dateibaum mit der
+  Auditbasis `b6d95e53de15fbd8fd7e929ccd09677586fa4019`. Der geprüfte CAS-Fix
+  liegt auf `codex/control-plane-integrity`; keine PR-, Merge- oder
+  Produktionsaktion wurde ausgeführt.
+- Netlify-Connector bestätigte Team `Booolio` als `Free`, Production-Deploy
+  `6afb604fa30e844824f72af5` als `ready`, öffentliche Production, SSO nur für
+  Nicht-Production und keine Site-Environment-Variablen. Der Credit-Saldo blieb
+  nicht verfügbar; der letzte Live-Health-Nachweis lautet
+  `production_api_disabled`.
+- Offizielle Cloudflare-Dokumentation wurde erneut geprüft: kostenlose
+  Static-Asset-Anfragen auf Pages; Workers-Free-Limit 100.000 Requests/Tag;
+  D1 Free mit 5 Mio. gelesenen und 100.000 geschriebenen Zeilen/Tag, 500 MB je
+  Datenbank und transaktionalem `batch()`. D1 Analytics erfordert
+  `Account Analytics Read`. URLs/Details stehen in `HOSTING_OPTIONS.md`.
+- Technische Grenze: Die historische Cloudflare-KV-Sessionablage speichert
+  OAuth-Tokens unverschlüsselt und konsumiert OAuth-States nicht atomar. Sie
+  bleibt bis zu einer ausdrücklich freigegebenen, unabhängig geprüften
+  Auth-Änderung deaktiviert. Kein D1, Token oder Deployment wurde erstellt.
+- Umgebungsreadback: `gh`, `wrangler` und Cloudflare-Connector fehlen lokal/in
+  dieser Sitzung. Netlify-Connector wurde read-only für den Projektzustand
+  verwendet.
+- Lokale Pflichtprüfungen nach den Plan-/Hosting-Dokumenten: `npm test` 206/206;
+  `npm run check` erfolgreich (114 Dateien und Prompt-Library-Abgleich);
+  `git diff --check` erfolgreich. Diese Dokumentationsänderung aktiviert keine
+  Produktivfunktion; die technische Erstabnahme bleibt offen.

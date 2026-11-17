@@ -8,31 +8,72 @@ vorhanden sind. Das Quell-Repository existiert; zwei verifizierte Worker
 und getrennte, verlässliche Arbeitsbereiche sind nicht nachgewiesen. Bis dahin
 wird sequenziell gearbeitet. Der globale Job-Cap bleibt immer zwei.
 
-## Audit-Abgleich und nächste überprüfbare Schritte – 2026-11-16
+## Audit-Abgleich und nächste überprüfbare Schritte – 2026-11-17
 
-Auditbasis `b6d95e53de15fbd8fd7e929ccd09677586fa4019` und aktueller
-`origin/main` `1cd6204556de6d63b627c2f0cd2879c712b2e717` haben denselben
-Dateibaum. Die Befunde zu getrennten Status-/Lease-/Event-Writes gelten daher
-weiter. Der lokale Fix ist ein per Job versionierter GitHub-CAS-Ledger mit
-Fencing-Generationen, fail-closed Initialisierungsmarker und commitgebundener
-Tree-Aufzählung. Lokal bestanden 206 Tests und der statische Check; die
-unabhängige Prüfung fand keine kritischen oder hohen Befunde. GitHub-CI für den
-Branch ist noch nicht gelaufen.
+Die unabhängige Auditbasis `b6d95e53de15fbd8fd7e929ccd09677586fa4019` hat
+denselben Dateibaum wie `main` `1cd6204556de6d63b627c2f0cd2879c712b2e717`;
+GitHub bestätigte `main` erneut am 2026-11-17. Die getrennten Status-/Lease-
+Writes wurden auf `codex/control-plane-integrity` mit einem per Job
+versionierten CAS-Ledger, Runner-Generationen, fail-closed
+Initialisierungsmarkern und commitgebundener Tree-Aufzählung abgesichert.
+Commit `88118344af1e0cb3d4bae0b14845117ba7946fb8` bestand 206 lokale Tests,
+`npm run check`, `git diff --check`, unabhängigen Read-only-Review und alle drei
+GitHub-CI-Lanes (Run `44004250028`). Die Checkpoint-Dokumentation wurde in
+`05a1c217a8ee5085ab7f28cddeb80a2505491b4c` nachgeführt; auch dessen CI-Run
+`44004759521` bestand alle drei Lanes. Der Fix ist noch nicht in `main` und
+nicht produktiv. Merge und Produktionsbetrieb bleiben getrennte, ausdrücklich
+freizugebende Schritte.
 
-Priorisierte Reihenfolge:
+Audit-/Betriebsabgleich:
 
-1. CAS-Ledger, globale Lease-Grenze, Recovery und Projektionsreparatur sind
-   lokal getestet und unabhängig geprüft. Die CI läuft auf dem isolierten
-   Branch; Merge und Produktion bleiben davon getrennte Freigabeschritte.
-2. Netlify Free gegen Cloudflare Pages/Workers/D1 anhand aktueller Kontingente,
-   Transaktionsfähigkeit und bestehender Live-PWA vergleichen. Bis zu einer
-   ausdrücklichen Provider-/Sicherheitsfreigabe keine Migration oder Aktivierung.
-3. OAuth, eng begrenzte private Control-Repo-Berechtigung und frische
-   Kontingentmessung einrichten; API geschlossen lassen, solange ein Gate fehlt.
-4. Tatsächlichen Mac-Runner, Heartbeat/Recovery und den iPhone → GitHub → Runner
-   → PWA-Ende-zu-Ende-Nachweis herstellen.
-5. Erst danach gemessene Dauer, CI, Ressourcennutzung und echte Tokenwerte
-   ausweisen sowie belegte CI-Whitespace-Reibung bearbeiten.
+- **Control-Plane-Integrität:** CAS/Fencing sind im Feature-Branch geprüft;
+  `main` bleibt bis zur Freigabe unverändert. Issue-Projektionen sind reparierbar,
+  aber nicht atomar und nicht maßgeblich.
+- **PWA/Hosting:** Netlify-Connector bestätigt Free-Team, ein `ready`
+  Production-Deploy auf `main`, öffentlichen Produktionszugriff und SSO nur
+  für Previews. Der Site-Environment-Readback ist leer. `/healthz` meldet
+  `production_api_disabled`; es gibt keine Live-Control-API.
+- **0-€-Pfad:** Die aktuelle Anweisung priorisiert Cloudflare, wenn es sicher
+  geeignet ist. Offizielle Free-Limits und vorhandener Code wurden geprüft.
+  Cloudflare Pages/Functions + D1 ist ein technischer Kandidat; der bestehende
+  KV-Auth-Adapter speichert Tokens unverschlüsselt und konsumiert OAuth-States
+  nicht atomar. D1, ein Cloudflare-Analytics-Token und Live-Quota-Readback
+  fehlen. Kein Deploy oder Providerwechsel erfolgte.
+- **Runner/E2E:** Der lokale Fixture-Smoke belegt keine dauerhafte Mac-Ausführung,
+  GitHub-gebundene Runner-Recovery oder iPhone→GitHub→Runner→PWA-Kette.
+- **Metriken/CI:** Tokenmessung ist implementiert, aber es gibt keinen echten
+  Live-Codex-Verbrauchswert. Die aktuellen `git diff --check`-Prüfungen bestehen;
+  ein wiederkehrender Whitespace-Fehler ist für diesen Branch nicht belegt.
+
+Priorisierte Reihenfolge mit überprüfbaren Abnahmeschwellen:
+
+1. **CAS integrieren:** Pflichtchecks und unabhängigen Review nachweisen; danach
+   separate menschliche Freigabe für PR/Merge einholen. Abnahme: `main` enthält
+   den geprüften CAS-Code; verspätete Runner können nach einem
+   Generationenwechsel den kanonischen Auftrag nicht überschreiben; die globale
+   Lease-Grenze bleibt zwei.
+2. **Hosting-/Auth-Sicherheitsblock:** Cloudflare D1-basierte Sitzungs- und
+   OAuth-State-Speicherung nur nach ausdrücklicher Freigabe dieser
+   Auth-Änderung implementieren und unabhängig prüfen. Secrets bleiben
+   serverseitig. Abnahme: OAuth-State ist atomar single-use, Sessiontokens sind
+   verschlüsselt, Preview-/Production-Isolation ist nachgewiesen und alle
+   Fehler-/Quota-Wege bleiben geschlossen.
+3. **Kosten-/Quotengate:** Free-Tarif und 0-€-Grenzen read-only bestätigen;
+   frischen, verlässlichen Usage-Readback mit konservativer Schwelle verbinden.
+   Abnahme: unbekannte, alte, unvollständige oder ab 75 % ausgelastete Werte
+   blockieren Jobannahme und Freigabe; keine kostenpflichtige Option ist aktiv.
+4. **Produktive Control API:** OAuth-Allowlist, eng begrenzten privaten
+   Control-Repo-Zugriff, Secret-Management und Rate-Limits konfigurieren; API
+   erst nach unabhängiger Prüfung und ausdrücklicher Produktionsfreigabe
+   aktivieren.
+5. **Echter Runner und E2E:** einen wachen, ausgehenden Mac-Runner mit Heartbeat,
+   Checkpoints, Stale-Recovery und Generationenschutz anbinden. Abnahme: ein
+   freigegebener iPhone-Auftrag läuft über GitHub/Runner und liefert echte
+   Check-/Ergebnisnachweise an die PWA zurück; offline gilt als `unavailable`.
+6. **Messwerte und CI-Reibung:** nach echtem Betrieb Laufzeit, CI,
+   Worker-Ressourcen und tatsächliche Tokenwerte messen. Whitespace-/CI-
+   Änderungen nur gegen konkrete Logs reproduzieren; keine Pflichtprüfung
+   entfernen.
 
 Abnahmeschwellen: keine aktive Sicherheitslücke im Control-Plane-Review;
 `npm test`, `npm run check` und `git diff --check` erfolgreich; in realen

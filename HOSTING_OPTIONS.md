@@ -2,11 +2,13 @@
 
 ## Anlass und Ausgangslage
 
-Der Nutzer hat Cloudflare als aktiven Hosting-Weg abgewählt. GitHub Pages ist
-unter `https://bndkxbqf2g-stack.github.io/prompthub-studio/` erreichbar; die PWA
-lädt dort unter `/src/pwa/` mit den korrigierten Unterpfad-Assets. Der Live-Test
-zeigt jedoch `Die Control API ist derzeit nicht erreichbar.` GitHub Pages liefert
-statische Dateien und führt keine serverseitige PromptHub-Control-API aus.
+Cloudflare wurde zuvor als Hosting-Weg abgewählt und das vorhandene
+Pages-Projekt pausiert. Die aktuelle Nutzeranweisung vom 2026-11-17 verlangt
+eine erneute technische Bewertung und priorisiert Cloudflare, falls es sicher
+und kostenfrei geeignet ist. Sie autorisiert keine Wiederaufnahme von
+Deployments oder produktive Änderungen. Netlify stellt derzeit die öffentliche
+statische PWA bereit; GitHub Pages ist ebenfalls erreichbar. Keine dieser
+statischen Oberflächen hat eine aktive Control API.
 
 Ziel bleibt ein serverseitiger OAuth-/API-Pfad ohne laufende Zusatzkosten. Die
 Control-Daten und Jobs bleiben in GitHub. Der Runner bleibt unabhängig vom
@@ -17,10 +19,50 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
 | Möglichkeit | Nachweister Umfang | Kosten-/Ausfallverhalten | Eignung |
 |---|---|---|---|
 | GitHub Pages allein | Statisches HTML/CSS/JS; keine serverseitige OAuth-Callback- oder API-Ausführung | GitHub-Free-Seite ist für das öffentliche Repo verfügbar | Für PWA-Shell und Dokumente geeignet; kein funktionsfähiger API-/Auth-Host |
-| Netlify Free | Git-Deployments, Node-Functions und Blob-Storage; öffentliche und private Repository-Deployments sind dokumentiert. Der aktuelle Self-Serve-Vertrag untersagt Training auf Customer Content, sofern der Kunde nicht ausdrücklich optiert. | 0 USD/Monat, 300 Credits/Monat mit hartem Limit und ohne Auto-Recharge. Free-Nutzung wird laut Vertrag nicht berechnet; beim Limit pausiert Netlify alle Sites des Teams. | Die Implementierung wurde vom Nutzer am 2026-11-16 freigegeben. Konto, Plan, Repository-Verknüpfung, Datenpfad, Storage und automatischer Quoten-Readback sind live ungeprüft. |
+| Cloudflare Pages + Functions + D1 | Pages liefert statische Dateien; Functions teilen sich das Workers-Free-Kontingent; Pages Functions unterstützen D1-Bindings. D1-Batches sind transaktional. | Workers Free: 100.000 Requests/Tag und 10 ms CPU je Invocation. D1 Free: 5 Mio. gelesene und 100.000 geschriebene Zeilen/Tag, 500 MB je Datenbank und 5 GB gesamt. Überschrittene Free-Limits schlagen fehl; kein kostenpflichtiger Fallback. | Bevorzugter kostenloser Zielkandidat, aber noch nicht produktionsbereit: das vorhandene Projekt ist pausiert; der KV-Session-Adapter speichert OAuth-Zugriffstokens unverschlüsselt und konsumiert OAuth-State mit getrenntem Read/Delete. Ein transaktionaler, verschlüsselter Adapter, unabhängige Prüfung und Live-Quota-Readback fehlen. |
+| Netlify Free | Git-Deployments, Node-Functions und Blob-Storage; öffentliche und private Repository-Deployments sind dokumentiert. Der aktuelle Self-Serve-Vertrag untersagt Training auf Customer Content, sofern der Kunde nicht ausdrücklich optiert. | 0 USD/Monat, 300 Credits/Monat mit hartem Limit und ohne Auto-Recharge. Free-Nutzung wird laut Vertrag nicht berechnet; beim Limit pausiert Netlify alle Sites des Teams. | Bestehender verifizierter Live-Host mit vorbereitetem API-/Blob-Adapter. Team Free, Production-Deploy `ready`, Produktion öffentlich und Preview-SSO bestätigt. Der Credit-Stand ist nicht abrufbar; Cloud-Jobs bleiben fail-closed. |
 | Vercel Hobby | Git-Deployments, Functions, Blob und dokumentierte Usage-CLI | 0 USD, aber Hobby nur persönlich/nicht-kommerziell. Die aktuellen Terms gestatten für Hobby die Nutzung von Customer Content zum KI-/ML-Training und zur Weitergabe an Dritte für Modellverbesserung. | Für PromptHub-Daten ausgeschlossen, solange kein ausdrücklich anwendbarer Opt-out die Nutzung sicher ausschließt. Keine Verbindung oder Aktivierung erfolgt. |
 | Render Free | Serverlose Alternative steht hier nicht bereit; Free-Webservice mit dynamischem API-Server und kostenlosem Datenspeicher | Free-Webservices schlafen nach 15 Minuten Inaktivität ein; lokales Dateisystem ist flüchtig, Free-Postgres läuft nach 30 Tagen ab, und Bandbreite/Builds können bei vorhandenem Zahlungsmittel kostenpflichtig werden | Für die dauerhafte Control API und geschützte Sitzungsdaten ungeeignet. |
 | Deno Deploy Free | Edge-Anwendungen mit monatlichen Free-Kontingenten | Free-Anwendungen pausieren bei Quotenüberschreitung; Deno Deploy soll im April 2027 eingestellt werden | Wegen angekündigtem Produktende keine tragfähige Plattformgrundlage. |
+
+## Aktueller Readback und Empfehlung – 2026-11-17
+
+- Netlify-Connector bestätigt Team `Booolio` als `Free` und das Projekt
+  `prompthub-studio` mit Production-Deployment
+  `6afb604fa30e844824f72af5` als `ready` auf Main
+  `1cd6204556de6d63b627c2f0cd2879c712b2e717`. Production ist öffentlich; SSO
+  gilt nur für Nicht-Production. Der Site-Environment-Readback lieferte keine
+  Variablen. `/healthz` meldet im letzten Live-Nachweis
+  `production_api_disabled`. Der Credit-Kontostand wurde nicht ausgelesen.
+- Cloudflare dokumentiert unbegrenzte, kostenlose Pages-Static-Asset-Requests
+  und ein Workers-Free-Kontingent von 100.000 Requests pro Tag für Pages
+  Functions. D1-Bindings werden von Pages Functions unterstützt; `batch()`
+  führt SQL transaktional aus. Das ist grundsätzlich geeigneter als KV für
+  einmalig konsumierbare OAuth-States, ersetzt aber weder Authentifizierung
+  noch Verschlüsselung sensibler Sessiondaten.
+- D1-Analytics sind über GraphQL abrufbar; die offizielle Anleitung verlangt
+  dafür `Account Analytics Read`. Weder diese Berechtigung noch ein Token oder
+  Live-Readback ist eingerichtet. Worker-Metriken können adaptiv/gesampelt
+  sein; die Genauigkeit eines 75-%-Quota-Gates muss deshalb für die konkrete
+  Nutzung nachgewiesen werden. Sonst bleiben Jobs geschlossen.
+- Lokal sind `wrangler`, `gh` und ein Cloudflare-Connector nicht vorhanden.
+  Die historische Pages-Konfiguration beweist keinen aktuellen Account-Zugriff
+  und keinen aktiven Deploymentpfad.
+- **Empfehlung:** Cloudflare Pages + Functions + D1 ist der priorisierte
+  kostenlose Zielpfad unter den Bedingungen, dass der Auth-/Sessionpfad
+  transaktional, verschlüsselt und unabhängig geprüft wird. Netlify bleibt bis
+  dahin der bestehende öffentliche statische Host; seine Control API ist
+  geschlossen und darf mangels Credit-Readback keine Cloud-Jobs annehmen. Kein
+  Provider wurde durch diesen Readback geändert.
+
+Quellen (Cloudflare-Dokumentation, abgerufen am 2026-11-17):
+
+- [Pages Functions Free-Kontingent](https://developers.cloudflare.com/pages/functions/pricing/)
+- [Workers Free-Quoten und KV/Durable Objects](https://developers.cloudflare.com/workers/platform/pricing/)
+- [D1 Free-Quoten](https://developers.cloudflare.com/d1/platform/pricing/)
+- [D1 als Pages Functions Binding](https://developers.cloudflare.com/pages/functions/bindings/)
+- [D1 `batch()`-Transaktionen](https://developers.cloudflare.com/d1/worker-api/d1-database/)
+- [D1 Analytics und Quotenmetriken](https://developers.cloudflare.com/d1/observability/metrics-analytics/)
 
 ## Netlify-Kandidat: Kosten- und Betriebsgrenzen
 
@@ -95,11 +137,12 @@ damit noch nicht abnahmefähig.
 
 ## Freigabe und verbleibende Betriebsschritte
 
-1. **Hosting-Anbieter:** Der Nutzer hat Netlify Free für dieses Repository und
+1. **Hosting-Anbieter:** Der Nutzer hat zuvor Netlify Free für dieses Repository und
    die serverseitige Verarbeitung am 2026-11-16 freigegeben. Diese Freigabe
    schließt Tarifwechsel, Zusatzcredits, kostenpflichtige Domains und
-   Auto-Recharge aus. Netlify-Konto und Free-Tarif müssen vor dem Deployment
-   read-only im Dashboard verifiziert werden.
+   Auto-Recharge aus. Die neueste Anweisung bevorzugt Cloudflare, wenn es
+   technisch geeignet ist. Die Wiederaufnahme des pausierten Cloudflare-Projekts
+   oder ein Deployment ist damit noch nicht freigegeben.
 2. **Auth-/Sitzungsänderung:** `src/auth/netlify-blob-stores.mjs` nutzt
    AES-256-GCM für Sessiondaten und stark konsistente `onlyIfMatch`-Schreibvorgänge
    für OAuth-State-Consume. Pflicht-Regressionstests sind implementiert; die unabhängige Sicherheitsprüfung ist abgeschlossen und fand keine Auth-/Session-Sicherheitsbefunde. Der fehlende Credit-Readback bleibt der offene operative Befund. Bestehende Session- und Freigabe-Invarianten bleiben aktiv.
