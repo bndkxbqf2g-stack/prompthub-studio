@@ -36,7 +36,7 @@ ausführbare Tests, Logs oder GitHub-API-Antworten mit Zeit und Commit referenzi
 | A29 | Regressionstest-Prävention aus Fehlerhistorie | `test/regression-test-request.test.mjs`, `test/api.test.mjs`: nur wiederholte Runnerfehler oder menschlich bestätigte Ursachen mit aktuellen Belegen erstellen einen begrenzten, projektbezogenen Testauftrag; Reproduktion und Vorher/Nachher-Nachweis erforderlich; Auftrag bleibt Entwurf bis regulärer Nutzerfreigabe | Pflicht | lokal bestanden; externe Ausführung in angeschlossenem Projekt offen |
 | A30 | Serverless Hosting, Preview-Isolation und Credit-Gate | test/netlify-function.test.mjs, test/netlify-quota-gate.test.mjs, test/pwa-quota-presentation.test.mjs; Fail-Closed und gemessene Usage-Darstellung | Pflicht | lokal bestanden, live unvollständig: Netlify Function ist deployed, doch `/healthz` meldet wegen fehlender Production-Konfiguration `production_api_disabled`. Unbekannte/veraltete/zu hohe Quota sperrt lokal Jobanlage, Freigabe und Prompt-Übergabe. Der maschinenlesbare Team-Credit-Readback fehlt; Cloud-Aufträge werden nicht angenommen. |
 | A31 | Automatische Diensterkennung und mobile Remote-Freigaben | `test/prompt-designer.test.mjs`, `test/pwa-availability.test.mjs`, `test/api-approvals.test.mjs`, `test/project-store.test.mjs`; deterministische Diensterkennung, authentifizierte Nutzerbindung, Ablauf, Idempotenz, Projektisolierung, 0-€-/Quota-/Berechtigungs-Gates, Abbruch, Resume, Lease-Recovery, Belegbindung, unabhängige Verifikation; echte iPhone-/Provider-Live-Abnahme | Pflicht | lokal umgesetzt und mit 175 Tests geprüft; unabhängiger Review des Handoff-Races: keine kritischen, hohen oder mittleren Befunde. PR #49 wurde gemergt; GitHub-CI `43940256313` bestand `test`, `macos-latest` und `macos-15-intel`. Die PWA ist live öffentlich. Produktionsbetrieb bleibt fail-closed: keine Runtime-Secrets/OAuth, kein Netlify-Credit-Readback und kein Provider-Adapter. `/healthz` meldet `production_api_disabled`; externe Aktionen und iPhone-Freigaben sind nicht abgenommen. |
-| A32 | CAS-Statusledger und Runner-Fencing | `test/github-control-plane.test.mjs`, `test/lease-store.test.mjs`, `test/strategy-learning.test.mjs`: konkurrierender Claim/Pause/Resume, Ablauf → Stale → Resume → neue Generation, verspäteter Completion, fehlender Lease-Index, fehlendes initialisiertes Job-State-Verzeichnis, verwaiste Zustände, Contents-1.000-Einträge-Grenze mit Tree-Fallback und commitgebundenem Readback, gekürzte Tree-Antwort, nichtleere Legacy-Leases ohne Fencing, Projektion-Reparatur und idempotenter Abschluss; unabhängige Sicherheitsprüfung plus GitHub-CI | Pflicht | lokal implementiert; 206 Tests und statische Prüfung bestanden. Unabhängiger Review: keine kritischen/hohen Befunde; Issue-Projektionen bleiben nicht atomar und Kommentare können dupliziert werden, sind aber nicht maßgeblich. GitHub-CI dieses Branches steht noch aus. Nicht in `main` oder Produktion; Live-Control-API bleibt geschlossen. |
+| A32 | CAS-Statusledger und Runner-Fencing | `test/github-control-plane.test.mjs`, `test/lease-store.test.mjs`, `test/strategy-learning.test.mjs`: konkurrierender Claim/Pause/Resume, Ablauf → Stale → Resume → neue Generation, verspäteter Completion, fehlender Lease-Index, fehlendes initialisiertes Job-State-Verzeichnis, verwaiste Zustände, Contents-1.000-Einträge-Grenze mit Tree-Fallback und commitgebundenem Readback, gekürzte Tree-Antwort, nichtleere Legacy-Leases ohne Fencing, Projektion-Reparatur und idempotenter Abschluss; unabhängige Sicherheitsprüfung plus GitHub-CI | Pflicht | Code- und Branch-Nachweis bestanden: 206 lokale Tests, statische Prüfung und unabhängiger Read-only-Review ohne kritische/hohe Befunde. GitHub Actions für Commit `88118344af1e0cb3d4bae0b14845117ba7946fb8`, Run `44004250028`: `test`, `macos-latest` und `macos-15-intel` erfolgreich. Issue-Projektionen bleiben nicht atomar und Kommentare können dupliziert werden, sind aber nicht maßgeblich. Nicht in `main` oder Produktion; Live-Control-API bleibt geschlossen. |
 
 ## Aktuelle Revalidierung – 2026-11-16
 
@@ -95,7 +95,7 @@ ausgewiesen und nicht als bestanden markiert.
 
 ## Aktueller Status
 
-Stand 2026-11-16. Die Auditbasis `b6d95e53de15fbd8fd7e929ccd09677586fa4019` hat denselben Dateibaum wie `origin/main` `1cd6204556de6d63b627c2f0cd2879c712b2e717` (PR #50); die Codebefunde gelten damit am aktuellen Main weiter. Der CAS-Fix liegt lokal und ist weder gemergt noch produktiv. Die technische Erstabnahme ist weiterhin nicht bestanden.
+Stand 2026-11-17. Die Auditbasis `b6d95e53de15fbd8fd7e929ccd09677586fa4019` hat denselben Dateibaum wie `origin/main` `1cd6204556de6d63b627c2f0cd2879c712b2e717` (PR #50); damit galten die Auditbefunde am Main. Der CAS-Fix liegt inzwischen auf `codex/control-plane-integrity` als Commit `88118344af1e0cb3d4bae0b14845117ba7946fb8`; dessen lokale Prüfungen, unabhängige Prüfung und drei GitHub-CI-Lanes sind erfolgreich. Der Fix ist weder gemergt noch produktiv. Die technische Erstabnahme ist weiterhin nicht bestanden.
 
 Externe Nachweise:
 - PR #47 wurde mit geprüftem Head `291112319032882734aa909806841f36978c0bac`
@@ -107,6 +107,10 @@ Externe Nachweise:
 - PR #49 wurde nach erfolgreichem Actions-Run `43940256313` automatisch gemergt.
   `test`, `macos-latest` und `macos-15-intel` bestanden; Merge-Commit ist
   `432010421a15956dbe3495c70a7be3df6a7ece2b`.
+- CAS-Branch `codex/control-plane-integrity`, Commit
+  `88118344af1e0cb3d4bae0b14845117ba7946fb8`: Actions-Run `44004250028`
+  bestand `test`, `macos-latest` und `macos-15-intel`. Kein Pull Request,
+  Merge oder Deployment wurde angelegt.
 - Netlify-Connector-Readback vom 2026-11-16: Free-Team `Booolio`, Projekt
   `prompthub-studio` (`834e2ac8-5324-4b2c-bcb0-9c65a228e43b`), GitHub-Integration
   für `bndkxbqf2g-stack/prompthub-studio`; Production-Deploy
@@ -127,9 +131,9 @@ Externe Nachweise:
 - GitHub-Connector-Readback bestätigt das private Control-Repository
   `bndkxbqf2g-stack/prompthub-studio-control`; `.prompthub/active-jobs.json`
   enthält noch das leere Legacy-Schema `version: 1` und keine aktiven Leases.
-  Die Umstellung auf Lease-Schema 2 und per Job gespeicherte CAS-Statusdateien
-  wurde nur lokal vorbereitet; am privaten Control-Repository wurde nichts
-  geschrieben.
+  Die Implementierung für Lease-Schema 2 und per Job gespeicherte
+  CAS-Statusdateien liegt auf dem Feature-Branch; am privaten Control-Repository
+  wurde weder migriert noch geschrieben.
 
 Offene Betriebsnachweise:
 - Runtime-Secrets, OAuth-Login und eng begrenzter Zugriff auf das private

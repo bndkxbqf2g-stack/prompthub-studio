@@ -1433,3 +1433,24 @@
   den offenen Grenzen aktualisiert. Technische Erstabnahme bleibt offen:
   SSO-Entscheidung, OAuth/Secrets, API-Livebetrieb, maschinenlesbarer
   Netlify-Credit-Readback und iPhone-Installation fehlen.
+
+## CP-062 – CAS-Statusledger auf Feature-Branch geprüft
+
+- Datum: 2026-11-17. Commit `88118344af1e0cb3d4bae0b14845117ba7946fb8` auf
+  `codex/control-plane-integrity` führt einen versionierten, atomaren
+  Compare-and-Swap-Status pro Auftrag mit Runner-Generation-Fencing ein.
+  Issues sind Anzeige-/Auditprojektionen; sie sind nicht maßgeblich für den
+  Auftragszustand. Am privaten Control-Repository wurde nichts geschrieben.
+- Lokale Pflichtprüfungen vor dem Commit: `npm test` 206/206 bestanden;
+  `npm run check` erfolgreich (114 Dateien und Prompt-Library-Abgleich);
+  `git diff --check` erfolgreich.
+- Unabhängiger Read-only-Review fand keine kritischen oder hohen Befunde.
+  Dokumentierte verbleibende Einschränkung: Issue-Projektionen können bei
+  konkurrierender Aktualisierung vorübergehend veralten; Recovery kann
+  Kommentare doppelt anlegen. API und PWA lesen den kanonischen Ledger.
+- GitHub Actions Run `44004250028` für denselben Commit bestand `test`,
+  `macos-latest` und `macos-15-intel` (alle drei erfolgreich).
+- Es wurde kein Pull Request eröffnet, nichts gemergt und nichts produktiv
+  bereitgestellt. Die technische Erstabnahme bleibt offen, insbesondere
+  produktive OAuth/Secrets/Quoten, Live-Control-API, echter Runner und
+  iPhone-End-to-End-Nachweis.
