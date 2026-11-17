@@ -2,8 +2,10 @@
 
 ## Anlass und Ausgangslage
 
-Cloudflare wurde zuvor als Hosting-Weg abgewählt und das vorhandene
-Pages-Projekt pausiert. Die aktuelle Nutzeranweisung vom 2026-11-17 verlangt
+Cloudflare wurde zuvor als Hosting-Weg abgewählt; das Pages-Projekt war beim
+letzten Dashboard-Readback am 2026-11-15 pausiert. Sein heutiger Zustand ist
+ohne Cloudflare-Connector oder Wrangler nicht erneut lesbar. Die aktuelle
+Nutzeranweisung vom 2026-11-17 verlangt
 eine erneute technische Bewertung und priorisiert Cloudflare, falls es sicher
 und kostenfrei geeignet ist. Sie autorisiert keine Wiederaufnahme von
 Deployments oder produktive Änderungen. Netlify stellt derzeit die öffentliche
@@ -19,7 +21,7 @@ Hosting und darf bei Quoten- oder API-Ausfall keine Aktivität vortäuschen.
 | Möglichkeit | Nachweister Umfang | Kosten-/Ausfallverhalten | Eignung |
 |---|---|---|---|
 | GitHub Pages allein | Statisches HTML/CSS/JS; keine serverseitige OAuth-Callback- oder API-Ausführung | GitHub-Free-Seite ist für das öffentliche Repo verfügbar | Für PWA-Shell und Dokumente geeignet; kein funktionsfähiger API-/Auth-Host |
-| Cloudflare Pages + Functions + D1 | Pages liefert statische Dateien; Functions teilen sich das Workers-Free-Kontingent; Pages Functions unterstützen D1-Bindings. D1-Batches sind transaktional. | Workers Free: 100.000 Requests/Tag und 10 ms CPU je Invocation. D1 Free: 5 Mio. gelesene und 100.000 geschriebene Zeilen/Tag, 500 MB je Datenbank und 5 GB gesamt. Überschrittene Free-Limits schlagen fehl; kein kostenpflichtiger Fallback. | Bevorzugter kostenloser Zielkandidat, aber noch nicht produktionsbereit: das vorhandene Projekt ist pausiert; der KV-Session-Adapter speichert OAuth-Zugriffstokens unverschlüsselt und konsumiert OAuth-State mit getrenntem Read/Delete. Ein transaktionaler, verschlüsselter Adapter, unabhängige Prüfung und Live-Quota-Readback fehlen. |
+| Cloudflare Pages + Functions + D1 | Pages liefert statische Dateien; Functions teilen sich das Workers-Free-Kontingent; Pages Functions unterstützen D1-Bindings. D1-Batches sind transaktional. | Workers Free: 100.000 Requests/Tag und 10 ms CPU je Invocation. D1 Free: 5 Mio. gelesene und 100.000 geschriebene Zeilen/Tag, 500 MB je Datenbank und 5 GB gesamt. Überschrittene Free-Limits schlagen fehl; kein kostenpflichtiger Fallback. | Bevorzugter kostenloser Zielkandidat, aber noch nicht produktionsbereit: das Projekt war zuletzt am 2026-11-15 als pausiert dokumentiert; aktueller Account-/Projektzustand ist nicht verifiziert. Der KV-Session-Adapter speichert OAuth-Zugriffstokens unverschlüsselt und konsumiert OAuth-State mit getrenntem Read/Delete. Ein transaktionaler, verschlüsselter Adapter, unabhängige Prüfung und Live-Quota-Readback fehlen. |
 | Netlify Free | Git-Deployments, Node-Functions und Blob-Storage; öffentliche und private Repository-Deployments sind dokumentiert. Der aktuelle Self-Serve-Vertrag untersagt Training auf Customer Content, sofern der Kunde nicht ausdrücklich optiert. | 0 USD/Monat, 300 Credits/Monat mit hartem Limit und ohne Auto-Recharge. Free-Nutzung wird laut Vertrag nicht berechnet; beim Limit pausiert Netlify alle Sites des Teams. | Bestehender verifizierter Live-Host mit vorbereitetem API-/Blob-Adapter. Team Free, Production-Deploy `ready`, Produktion öffentlich und Preview-SSO bestätigt. Der Credit-Stand ist nicht abrufbar; Cloud-Jobs bleiben fail-closed. |
 | Vercel Hobby | Git-Deployments, Functions, Blob und dokumentierte Usage-CLI | 0 USD, aber Hobby nur persönlich/nicht-kommerziell. Die aktuellen Terms gestatten für Hobby die Nutzung von Customer Content zum KI-/ML-Training und zur Weitergabe an Dritte für Modellverbesserung. | Für PromptHub-Daten ausgeschlossen, solange kein ausdrücklich anwendbarer Opt-out die Nutzung sicher ausschließt. Keine Verbindung oder Aktivierung erfolgt. |
 | Render Free | Serverlose Alternative steht hier nicht bereit; Free-Webservice mit dynamischem API-Server und kostenlosem Datenspeicher | Free-Webservices schlafen nach 15 Minuten Inaktivität ein; lokales Dateisystem ist flüchtig, Free-Postgres läuft nach 30 Tagen ab, und Bandbreite/Builds können bei vorhandenem Zahlungsmittel kostenpflichtig werden | Für die dauerhafte Control API und geschützte Sitzungsdaten ungeeignet. |
